@@ -39,4 +39,4 @@ wp-content/plugins/wp-minify/cache/*
 node_modules/
 .sass-cache/
 
-output
+node_modules
