@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Application</title>
+  <link rel="stylesheet" media="screen" href="application.css" type="text/css" />
+   <script src="application.js"></script>
+  <!-- VexFlow Compiled Source -->
+  <style type="text/css">
+    canvas {
+      background: #eed;
+      padding: 10px;
+      border: 10px solid #ddc;
+    }
+
+    div.egcode {
+      font-family: Courier;
+      font-size: 14px;
+    }
+  </style>
+ 
+</head>
+
+<body>
+	<div data-role="page" id="mainPage" class="ui-page ui-body-c ui-page-active">
+		<div data-role="header" class="ui-bar-a ui-header" role="banner">
+			<h1 class="ui-title" tabindex="0" role="heading" aria-level="1">Mobile Canvas</h1>
+		</div>
+		<div data-role="content" class="ui-content" role="main">
+			<canvas id="theCanva" style="width: 475.75px; height: 475.75px;">Canvas is not supported</canvas>
+			<a href="#" role="button" aria-label="button" data-theme="c" class="ui-btn ui-btn-up-c ui-btn-corner-all ui-shadow"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">Canvas Draw</span></span></a><input id="canvasDraw" type="button" value="Canvas Draw" class="ui-btn-hidden" tabindex="-1">
+		</div>
+	 
+		<div data-role="footer" class="ui-bar-a ui-footer" role="contentinfo">
+			<h1 class="ui-title" tabindex="0" role="heading" aria-level="1">Test</h1>
+		</div>
+	</div>
+	<script>
+	$(function() {
+	
+	  var sizedWindowWidth = $(window).width()/2;
+	  var sizedWindowHeight= $(window).height()/2;
+	  
+	  var canvas = $("#theCanva")
+		canvas.width(sizedWindowWidth);
+		canvas.height(sizedWindowHeight);
+	  var renderer = new Vex.Flow.Renderer(canvas[0],
+		Vex.Flow.Renderer.Backends.CANVAS);
+
+	  var ctx = renderer.getContext();
+	  var stave = new Vex.Flow.Stave(10, 0, 800);
+	  stave.addClef("treble").setContext(ctx).draw();
+	    });
+	</script>
+  
+</body>
+
+</html>

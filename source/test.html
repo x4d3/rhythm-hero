@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mobile Canvas Test</title>
+<!-- <link rel="stylesheet" href="styles/jquery.mobile-1.4.5.css">
+<script src="scripts/jquery-2.1.0.min.js"></script>
+<script src="scripts/jquery.mobile-1.4.5.min.js"></script> -->
+
+   <link rel="stylesheet" media="screen" href="application.css" type="text/css" />
+   <script src="application.js"></script>
+ 
+ 
+<script type="text/javascript">
+    $(function() {
+        var sizedWindowWidth = $(window).width() / 4;
+ 
+        $("#canvas").width(sizedWindowWidth);
+        $("#canvas").height(sizedWindowWidth);
+ 
+        $("#canvasDraw").click(function(){
+            var canvas = $("#canvas").get(0);
+ 
+            if(canvas)
+            {
+                var canvasContext = canvas.getContext('2d');
+ 
+                if(canvasContext)
+                {
+                    canvasContext.canvas.width  = sizedWindowWidth;
+                    canvasContext.canvas.height = sizedWindowWidth;
+ 
+                    canvasContext.font = "bold 14px serif";
+                    canvasContext.fillText("Canvas is supported", 10, 20);
+                    canvasContext.fillStyle = "#ff0000";
+                    canvasContext.font = "italic 14px sans-serif";
+                    canvasContext.fillText("Hello Canvas", 30, 40);
+                    canvasContext.fillStyle = "#00ff00";
+                    canvasContext.fillRect(40, 50, 70, 20);
+                }
+            }
+        });
+    });
+</script>
+ </head>
+
+<body>
+<div data-role="page" id="mainPage" class="ui-page ui-body-c ui-page-active">
+    <div data-role="header" class="ui-bar-a ui-header" role="banner">
+        <h1 class="ui-title" tabindex="0" role="heading" aria-level="1">Mobile Canvas</h1>
+    </div>
+    <div data-role="content" class="ui-content" role="main">
+        <canvas id="canvas" style="width: 475.75px; height: 475.75px;">Canvas is not supported</canvas>
+        <a href="#" role="button" aria-label="button" data-theme="c" class="ui-btn ui-btn-up-c ui-btn-corner-all ui-shadow"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">Canvas Draw</span></span></a><input id="canvasDraw" type="button" value="Canvas Draw" class="ui-btn-hidden" tabindex="-1">
+    </div>
+ 
+    <div data-role="footer" class="ui-bar-a ui-footer" role="contentinfo">
+        <h1 class="ui-title" tabindex="0" role="heading" aria-level="1">Test</h1>
+    </div>
+</div>
+</body>
