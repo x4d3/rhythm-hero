@@ -1,0 +1,1 @@
+"undefined"==typeof xade&&(xade={RH:{}}),xade.RH.log=function(message){console.log(message)},xade.RH.Application=function(){function Application(){}var log=xade.RH.log;return Application.prototype={start:function(){log("Application Started")}},Application}();

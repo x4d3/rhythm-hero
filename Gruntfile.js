@@ -1,163 +1,63 @@
 module.exports = function(grunt) {
- 
-  // configure the tasks
-  grunt.initConfig({
- 
-    copy: {
-      build: {
-        cwd: 'source',
-        src: [ '**', '!**/*.styl', '!**/*.coffee', '!**/*.jade' ],
-        dest: 'build',
-        expand: true
-      },
-    },
- 
-    clean: {
-      build: {
-        src: [ 'build' ]
-      },
-      stylesheets: {
-        src: [ 'build/**/*.css', '!build/application.css' ]
-      },
-      scripts: {
-        src: [ 'build/**/*.js', '!build/application.js' ]
-      },
-    },
- 
-    stylus: {
-      build: {
-        options: {
-          linenos: true,
-          compress: false
+    var SOURCE_FILES = ['src/application.js'];
+    grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
+        concat: {
+            options: {
+                separator: ';'
+            },
+            dist: {
+                src: SOURCE_FILES,
+                dest: 'www/<%= pkg.name %>.js'
+            }
         },
-        files: [{
-          expand: true,
-          cwd: 'source',
-          src: [ '**/*.styl' ],
-          dest: 'build',
-          ext: '.css'
-        }]
-      }
-    },
- 
-    autoprefixer: {
-      build: {
-        expand: true,
-        cwd: 'build',
-        src: [ '**/*.css' ],
-        dest: 'build'
-      }
-    },
- 
-    cssmin: {
-      build: {
-        files: {
-          'build/application.css': [ 'build/**/*.css' ]
-        }
-      }
-    },
- 
-    coffee: {
-      build: {
-        expand: true,
-        cwd: 'source',
-        src: [ '**/*.coffee' ],
-        dest: 'build',
-        ext: '.js'
-      }
-    },
- 
-    uglify: {
-      build: {
-        options: {
-          mangle: false
+        uglify: {
+            options: {
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+            },
+            dist: {
+                files: {
+                    'www/<%= pkg.name %>.min.js': [
+                        '<%= concat.dist.dest %>'
+                    ]
+                }
+            }
         },
-        files: {
-          'build/application.js': [ 'build/**/*.js' ]
-        }
-      }
-    },
- 
-    jade: {
-      compile: {
-        options: {
-          data: {}
+        qunit: {
+            files: ['tests/**/*.html']
         },
-        files: [{
-          expand: true,
-          cwd: 'source',
-          src: [ '**/*.jade' ],
-          dest: 'build',
-          ext: '.html'
-        }]
-      }
-    },
- 
-    watch: {
-      stylesheets: {
-        files: 'source/**/*.styl',
-        tasks: [ 'stylesheets' ]
-      },
-      scripts: {
-        files: 'source/**/*.coffee',
-        tasks: [ 'scripts' ]
-      },
-      jade: {
-        files: 'source/**/*.jade',
-        tasks: [ 'jade' ]
-      },
-      copy: {
-        files: [ 'source/**', '!source/**/*.styl', '!source/**/*.coffee', '!source/**/*.jade' ],
-        tasks: [ 'copy' ]
-      }
-    },
- 
-    connect: {
-      server: {
-        options: {
-          port: 4000,
-          base: 'build',
-          hostname: '*'
+        jshint: {
+            files: ['Gruntfile.js', 'src/**/*.js', 'tests/*.js'],
+            options: {
+                // options here to override JSHint defaults
+                globals: {
+                    jQuery: true,
+                    console: true,
+                    module: true,
+                    document: true
+                }
+            }
+        },
+        watch: {
+            files: ['<%= jshint.files %>'],
+            tasks: ['jshint', 'qunit']
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 4000,
+                    base: 'www',
+                    hostname: '*'
+                }
+            }
         }
-      }
-    }
- 
-  });
- 
-  // load the tasks
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-stylus');
-  grunt.loadNpmTasks('grunt-autoprefixer');
-  grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-contrib-coffee');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-jade');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-connect');
- 
-  // define the tasks
-  grunt.registerTask(
-    'stylesheets', 
-    'Compiles the stylesheets.', 
-    [ 'stylus', 'autoprefixer', 'cssmin', 'clean:stylesheets' ]
-  );
- 
-  grunt.registerTask(
-    'scripts', 
-    'Compiles the JavaScript files.', 
-    [ 'coffee', 'uglify', 'clean:scripts' ]
-  );
- 
-  grunt.registerTask(
-    'build', 
-    'Compiles all of the assets and copies the files to the build directory.', 
-    [ 'clean:build', 'copy', 'stylesheets', 'scripts', 'jade' ]
-  );
- 
-  grunt.registerTask(
-    'default', 
-    'Watches the project for changes, automatically builds them and runs a server.', 
-    [ 'build', 'connect', 'watch' ]
-  );
+    });
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-qunit');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.registerTask('test', ['jshint', 'qunit']);
+    grunt.registerTask('default', ['jshint', 'qunit', 'concat', 'uglify', 'connect', 'watch']);
 };
