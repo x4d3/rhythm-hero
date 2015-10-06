@@ -1,13 +1,20 @@
 module.exports = function(grunt) {
-    var SOURCE_FILES = ['src/application.js'];
+    var SOURCE_FILES = [
+	'rh.js',
+	'event-manager.js',
+	'game.js',
+	'application.js'
+	];
+	
+	
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         concat: {
             options: {
-                separator: ';'
+                separator: '\n'
             },
             dist: {
-                src: SOURCE_FILES,
+                src: SOURCE_FILES.map(function(path){return "src/" + path;}),
                 dest: 'www/<%= pkg.name %>.js'
             }
         },
@@ -40,7 +47,8 @@ module.exports = function(grunt) {
         },
         watch: {
             files: ['<%= jshint.files %>'],
-            tasks: ['jshint', 'qunit']
+            tasks: ['jshint', 'qunit', 'concat', 'uglify'],
+			options: { livereload: true }
         },
         connect: {
             server: {
