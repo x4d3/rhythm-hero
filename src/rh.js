@@ -1,16 +1,6 @@
 if (typeof RH === 'undefined') {
 	RH = {};
 }
-RH.identity = function(a){
-	return a;
-};
-(function(){
-	var t0 = new Date().getTime();
-	RH.getTime = function(){
-		return new Date().getTime() - t0;
-	};	
-})();
-
 RH.logManager = (function(){
 	var LogLevel = function(level, name){
 		this.level = level;
@@ -60,9 +50,43 @@ RH.logManager = (function(){
 	var logManager = new LogManager();
 	return logManager;
 }());
+
 RH.debug = function(){
 	RH.logManager.setAllLogLevel(0);
 };
+
+RH.identity = function(a){
+	return a;
+};
+
+(function(){
+	var t0 = new Date().getTime();
+	RH.getTime = function(){
+		return new Date().getTime() - t0;
+	};	
+})();
+
+
+RH.binarySearch = function(array, searchElement) {
+    var minIndex = 0;
+    var maxIndex = array.length - 1;
+
+    while (minIndex <= maxIndex) {
+        var currentIndex = (minIndex + maxIndex) / 2 | 0;
+        var currentElement = array[currentIndex];
+        if (currentElement < searchElement) {
+            minIndex = currentIndex + 1;
+        }else if (currentElement > searchElement) {
+            maxIndex = currentIndex = currentIndex - 1;
+        }else {
+            return currentIndex;
+        }
+		
+    }
+    return maxIndex;
+};
+
+
 
 window.requestAnimFrame = (function(){
 	return  window.requestAnimationFrame ||
