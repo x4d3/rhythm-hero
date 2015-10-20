@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/x4d3/rythm-hero/issues"
   },
-  "homepage": "https://github.com/x4d3/rythm-hero"
+  "homepage": "https://github.com/x4d3/rythm-hero",
+  "scripts": {
+        "test": "grunt test"
+    }
 }
