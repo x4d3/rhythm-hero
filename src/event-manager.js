@@ -8,18 +8,20 @@ RH.EventManager = (function(){
 	}
 	
 	EventManager.prototype = {
-		replay : function(t, callback){
+		getEvents : function(t){
 			var index = RH.binarySearch(this.keyChanged, t);
 			var isPressed = index % 2 === 0;
-			var callCallback = function(t1, t2){
-				callback(isPressed, t2 - t1);
+			var result = [];
+			var addToResult = function(t1, t2){
+				result.push({isPressed: isPressed, duration: t2 - t1});
 				isPressed = !isPressed;
 			};
-			callCallback(t, this.keyChanged[index + 1]);
+			addToResult(t, this.keyChanged[index + 1]);
 			for (var i = index + 2; i < this.keyChanged.length; i++){
-				callCallback(this.keyChanged[i - 1], this.keyChanged[i]);
+				addToResult(this.keyChanged[i - 1], this.keyChanged[i]);
 			}
-			callCallback(this.keyChanged[this.keyChanged.length - 1], this.getTime());
+			addToResult(this.keyChanged[this.keyChanged.length - 1], this.getTime());
+			return result;
 		},onUp: function(event){
 			logger.debug('onUp: ' + event.which);
 			this.keyPressed[event.which] = false;

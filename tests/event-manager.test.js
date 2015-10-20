@@ -1,6 +1,6 @@
 module("Event Manager Test");
 
-test("replay", function() {
+test("getEvents", function() {
 	var mockEvent = {which:30};
 	var newEvent = function(isPressed, duration){
 		return {isPressed: isPressed, duration: duration};
@@ -23,20 +23,12 @@ test("replay", function() {
 		onDown = !onDown;
 	}
 	timeAnswered = 20;
-	var events = [];
-	eventManager.replay(0, function(isPressed, duration){
-		events.push(newEvent(isPressed, duration));
-	});
 	
 	var expected = [newEvent(false, 5), newEvent(true, 1),newEvent(false, 2),  newEvent(true, 3), newEvent(false, 4), newEvent(true, 5)];
-	deepEqual(events, expected);
-	
-	events = [];
-	eventManager.replay(7, function(isPressed, duration){
-		events.push(newEvent(isPressed, duration));
-	});
+	deepEqual(eventManager.getEvents(0), expected);
+
 	expected = [newEvent(false, 1), newEvent(true, 3), newEvent(false, 4), newEvent(true, 5)];
-	deepEqual(events, expected);
+	deepEqual(eventManager.getEvents(7), expected);
 	
 	
 });
