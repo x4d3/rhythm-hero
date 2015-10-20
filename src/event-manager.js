@@ -16,11 +16,16 @@ RH.EventManager = (function(){
 				result.push({isPressed: isPressed, duration: t2 - t1});
 				isPressed = !isPressed;
 			};
-			addToResult(t, this.keyChanged[index + 1]);
-			for (var i = index + 2; i < this.keyChanged.length; i++){
-				addToResult(this.keyChanged[i - 1], this.keyChanged[i]);
+			var length = this.keyChanged.length;
+			if(index + 1 >= length){
+				addToResult(t, this.getTime());
+			}else{
+				addToResult(t, this.keyChanged[index + 1]);
+				for (var i = index + 2; i < this.keyChanged.length; i++){
+					addToResult(this.keyChanged[i - 1], this.keyChanged[i]);
+				}
+				addToResult(this.keyChanged[this.keyChanged.length - 1], this.getTime());
 			}
-			addToResult(this.keyChanged[this.keyChanged.length - 1], this.getTime());
 			return result;
 		},onUp: function(event){
 			logger.debug('onUp: ' + event.which);
