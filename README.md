@@ -12,3 +12,9 @@ $ grunt
 ```
 will start a server on: (http://localhost:4000/)
 
+Publish to GH Page
+------------
+```sh
+$ GH_TOKEN=<your password> GH_REF=github.com/<your name>/<your repo>.git ./deploy.sh
+```
+

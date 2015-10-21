@@ -3,3 +3,4 @@ node_js:
   - "4.2.1"
 before_script:
   - npm install -g grunt-cli
+script: bash ./deploy.sh 
