@@ -12,9 +12,16 @@ $ grunt
 ```
 will start a server on: (http://localhost:4000/)
 
-Publish to GH Page
+Manually Publish to GH Page
 ------------
+Create a token (https://help.github.com/articles/creating-an-access-token-for-command-line-use/)
+Update your Environment variable
+```
+GH_TOKEN=<YourToken>
+GH_REF=github.com/<your name>/<your repo>.git
+```
+and call
 ```sh
-$ GH_TOKEN=<your password> GH_REF=github.com/<your name>/<your repo>.git ./deploy.sh
+$ ./deploy.sh
 ```
 
