@@ -52,7 +52,10 @@ $( document ).ready(function() {
 		};
 		canvases.mousedown(onDown).mouseup(onUp);
 		$("body").keydown(onDown).keyup(onUp);
-		
+		$(window).blur(function() {
+			//If the application loose the focuse, we consider that the user is not pressing any key
+			application.getEventManager().resetKeyPressed();
+		});
 		application.start();
 	}
 });

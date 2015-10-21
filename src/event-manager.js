@@ -33,6 +33,11 @@ RH.EventManager = (function(){
 			this.keyPressed[event.which] = false;
 			this._update();
 		},
+		resetKeyPressed : function(){
+			logger.debug('resetKeyPressed');
+			this.keyPressed = [];
+			this._update();
+		},
 		onDown: function(event){
 			logger.debug('onDown: '+ event.which);
 			this.keyPressed[event.which] = true;
