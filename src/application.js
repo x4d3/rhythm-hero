@@ -1,4 +1,5 @@
 RH.Application = (function(){
+	'use strict';
 	var Game = RH.Game;
 	var EventManager = RH.EventManager;
 	
@@ -9,11 +10,11 @@ RH.Application = (function(){
 		return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
 	}
 	
-	function Application(canvas) {
-		this.canvas = canvas;
+	function Application(canvases) {
+		this.canvases = canvases;
 		this.eventManager = new EventManager();
 	}
-	
+		
 	Application.prototype = {
 		getEventManager : function(){
 			return this.eventManager;
@@ -23,7 +24,7 @@ RH.Application = (function(){
 			var ts = getParameterByName('ts');
 			var parsedTempo = tempo ? parseInt(tempo, 10): null;
 			var parsedTS = ts? RH.TimeSignature.parse(ts):null;
-			var game = new Game(this.eventManager, this.canvas, new RH.GameOptions(parsedTS, parsedTempo));
+			var game = new Game(this.eventManager, this.canvases, new RH.GameOptions(parsedTS, parsedTempo));
 			(function animloop(){
 				var isOn = game.update();
 				if (isOn){
@@ -37,9 +38,10 @@ RH.Application = (function(){
 }());
 
 $( document ).ready(function() {
-	var canvas = $("canvas");
-	if (canvas.length){
-		var application = new RH.Application(canvas[0]);
+	'use strict';
+	var canvases = $("canvas");
+	if (canvases.length){
+		var application = new RH.Application({front: canvases.filter(".front")[0], back: canvases.filter(".back")[0]});
 		var onDown = function(event){
 			application.getEventManager().onDown(event);
 			event.preventDefault();
@@ -48,7 +50,7 @@ $( document ).ready(function() {
 			application.getEventManager().onUp(event);
 			event.preventDefault();
 		};
-		canvas.mousedown(onDown).mouseup(onUp);
+		canvases.mousedown(onDown).mouseup(onUp);
 		$("body").keydown(onDown).keyup(onUp);
 		
 		application.start();

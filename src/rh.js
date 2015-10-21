@@ -2,6 +2,7 @@ if (typeof RH === 'undefined') {
 	RH = {};
 }
 RH.logManager = (function(){
+	'use strict';
 	var LogLevel = function(level, name){
 		this.level = level;
 		this.name = name;

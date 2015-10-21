@@ -1,4 +1,5 @@
 RH.TimeSignature = (function(){
+	'use strict';
 	function TimeSignature(numerator, denumerator){
 		this.numerator = numerator;
 		this.denumerator = denumerator;
@@ -25,8 +26,9 @@ RH.TS = {
 };
 
 RH.GameOptions = (function(){
+	'use strict';
 	function GameOptions(timeSignature, tempo){
-		this.timeSignature = timeSignature?timeSignature:RH.TS.FOUR_FOUR;
+		this.timeSignature = timeSignature ? timeSignature:RH.TS.FOUR_FOUR;
 		//beat per minutes
 		this.tempo = tempo?tempo:60; 
 	}
@@ -36,6 +38,7 @@ RH.GameOptions = (function(){
 }());
 
 RH.DebugGameScreen = (function(){
+	'use strict';
 	// timeWidth is the number of miliseconds that the canvas width can represent
 	function DebugGameScreen(canvas, timeWidth) {
 		this.canvas = canvas;
@@ -65,21 +68,47 @@ RH.DebugGameScreen = (function(){
 	return DebugGameScreen;
 }());
 
+RH.GameScreen = (function(){
+	'use strict';
+	// timeWidth is the number of miliseconds that the canvas width can represent
+	function GameScreen(canvas, timeWidth) {
+		this.canvas = canvas;
+		this.timeWidth = timeWidth;
+	}
+	GameScreen.prototype = {
+		update : function(ups){
+			var canvas = this.canvas;
+			var context = canvas.getContext("2d");
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+
+			var stave = new Vex.Flow.Stave(10, 0, canvas.width - 10);
+			stave.addClef("treble").setContext(context).draw();
+		}
+	};
+	return GameScreen;
+}());
+
 RH.Game = (function(){
-	function Game(eventManager, canvas, options) {
+	'use strict';
+	function Game(eventManager, canvases, options) {
 		this.eventManager = eventManager;
 		this.options = options;
-		this.screen = new RH.DebugGameScreen(canvas,1000* 2 * this.options.timeSignature.beatPerBar() * 60/this.options.tempo);
+		this.screens = {
+			front: new RH.DebugGameScreen(canvases.front,1000* 2 * this.options.timeSignature.beatPerBar() * 60/this.options.tempo),
+			back: new RH.GameScreen(canvases.back,1000* this.options.timeSignature.beatPerBar() * 60/this.options.tempo)
+		};
 		this.isOn = true;
 		this.t0 = RH.getTime();
 	}
 	Game.prototype = {
 		update : function(){
 			var beatPerBar = this.options.timeSignature.beatPerBar();
-			var shift = 2 *1000 * (1/2 * beatPerBar) * (60/this.options.tempo);
+			var shift = 1000/2 * (beatPerBar) * (60/this.options.tempo);
 			var events = this.eventManager.getEvents(RH.getTime() - shift);
 			//console.log(events[0]);
-			this.screen.update(events);
+			this.screens.front.update(events);
+			this.screens.back.update(events);
 			return this.isOn;
 		}
 	};

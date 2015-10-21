@@ -1,0 +1,9 @@
+#canvases {
+	position: relative; 
+	height: 200px;
+}
+canvas {
+	position: absolute;
+	top: 0;
+	left: 0; 
+}

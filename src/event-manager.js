@@ -1,4 +1,5 @@
 RH.EventManager = (function(){
+	'use strict';
 	var logger = RH.logManager.getLogger('EventManager');
 	function EventManager(getTimeCallback){
 		this.keyPressed = [];
