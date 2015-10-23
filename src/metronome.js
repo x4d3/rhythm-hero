@@ -17,6 +17,28 @@ RH.Metronome = (function(){
 		context.stroke();
 	};
 	
+	
+	DRAWERS[RH.TS.THREE_FOUR.toString()] = function(metronome, context, ellapsedBeats){
+		var division = RH.divide(ellapsedBeats, 1);
+		var x;
+		var y;
+		switch(division.quotient) {
+			case 0:
+				x = 1/2 * (1 - division.rest);
+				y = division.rest * Math.sqrt(3/4);
+				break;
+			case 1:
+				x = division.rest;
+				y = Math.sqrt(3/4);
+				break;
+			case 2:
+				x = 1 - 1/2 * division.rest;
+				y = Math.sqrt(3/4) * (1 - division.rest);
+				break;
+		}
+		context.fillText(division.quotient + 1, 5 , 10);
+		drawDot(context, metronome.width * x , metronome.height * y);
+	};
 	DRAWERS[RH.TS.FOUR_FOUR.toString()] = function(metronome, context, ellapsedBeats){
 		var division = RH.divide(ellapsedBeats, 1);
 		var x;

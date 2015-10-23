@@ -36,7 +36,7 @@ RH.Game = (function(){
 			var beatPerMs = this.options.getBeatPerMillisecond();
 			var shift = 0.5 * beatPerBar / beatPerMs;
 			var events = this.eventManager.getEvents(t - shift);
-			this.screens.front.update(events);
+			this.screens.front.update(events, ellapsed);
 			this.screens.back.update(ellapsed);
 			return this.isOn;
 		}

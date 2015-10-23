@@ -22,5 +22,6 @@ RH.TimeSignature = (function(){
 
 
 RH.TS = {
-	FOUR_FOUR : new RH.TimeSignature(4, 4)
+	FOUR_FOUR : new RH.TimeSignature(4, 4),
+	THREE_FOUR : new RH.TimeSignature(3, 4)
 };

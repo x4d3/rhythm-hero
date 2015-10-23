@@ -13,7 +13,6 @@ canvas {
 div.rounded {
 	background: #eed;
     border: 10px solid #ddc;
-    padding: 10px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
 }
