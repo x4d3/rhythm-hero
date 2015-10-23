@@ -25,6 +25,59 @@ RH.TS = {
 	FOUR_FOUR : new RH.TimeSignature(4, 4)
 };
 
+
+RH.Metronome = (function(){
+	'use strict';
+	function Metronome(width, height){
+		this.width = width;
+		this.height = height;
+	}
+	
+	var DRAWERS = {};
+	
+	var drawDot = function(context, x, y){
+		context.beginPath();
+		context.arc(x, y, 2, 0, 2 * Math.PI, false);
+		context.fillStyle = 'green';
+		context.fill();
+		context.lineWidth = 1;
+		context.strokeStyle = '#003300';
+		context.stroke();
+	};
+	
+	DRAWERS[RH.TS.FOUR_FOUR.toString()] = function(metronome, context, ellapsedBeats){
+		var division = RH.divide(ellapsedBeats, 1);
+		var x;
+		var y;
+		switch(division.quotient) {
+			case 0:
+				x =	1/2;
+				y = division.rest;
+				break;
+			case 1:
+				x = 1/2 * (1 - division.rest);
+				y = 1 - 1/2 * division.rest;
+				break;
+			case 2:
+				x = division.rest;
+				y = 1/2;
+				break;
+			case 3:
+				x = 1 - division.rest * 1/2;
+				y = 1/2 * (1 - division.rest);
+				break;
+		}
+		drawDot(context, metronome.width * x , metronome.height * y);
+	};
+	Metronome.prototype = {
+		draw: function(context, timeSignature, ellapsedBeats){
+			context.clearRect(0, 0, this.width, this.height);
+			DRAWERS[timeSignature.toString()](this, context, ellapsedBeats);
+		}
+	};
+	return Metronome;
+}());
+
 RH.GameOptions = (function(){
 	'use strict';
 	function GameOptions(timeSignature, tempo){
@@ -83,24 +136,31 @@ RH.GameScreen = (function(){
 			}
 			this.bars[i] = notes;
 		}
+		this.metronome = new RH.Metronome(50, 50);
 	}
 	GameScreen.prototype = {
-		update : function(barEllapsed, beatsEllapsed, beatPerBar, beatPerMs){
+		update : function(ellapsedBars, ellapsedBeats, beatPerBar, beatPerMs, timeSignature){
 
 			var canvas = this.canvas;
 			var context = canvas.getContext("2d");
 			context.clearRect(0, 0, canvas.width, canvas.height);
+			
+			context.save();
+			context.translate(canvas.width/2 - 25, 30);
+			this.metronome.draw(context, timeSignature, ellapsedBeats);
+			context.restore();
+			
 			var renderer = new Vex.Flow.Renderer(canvas,Vex.Flow.Renderer.Backends.CANVAS);
 			var barLength = (beatPerBar/beatPerMs) *  (canvas.width/ ( this.timeWidth)); //px/seconds
 			for (var i = 0; i < 3; i++){
-				var shift = barLength * (beatsEllapsed / beatPerBar);
+				var shift = barLength * (ellapsedBeats / beatPerBar);
 				var startStave = i* barLength  - shift;
 				var stave = new Vex.Flow.Stave(startStave, 50,  barLength);
 				stave.setContext(context).draw();
-				var notes = RH.getArrayElement(this.bars, barEllapsed + i);
+				var notes = RH.getArrayElement(this.bars, ellapsedBars + i);
 				Vex.Flow.Formatter.FormatAndDraw(context, stave, notes);
 			}
-			this.previousBar= barEllapsed;
+			this.previousBar= ellapsedBars;
 			
 
 		}
@@ -131,7 +191,7 @@ RH.Game = (function(){
 			var shift = 0.5 * beatPerBar / beatPerMs;
 			var events = this.eventManager.getEvents(t - shift);
 			this.screens.front.update(events);
-			this.screens.back.update(division.quotient, division.rest, beatPerBar, beatPerMs);
+			this.screens.back.update(division.quotient, division.rest, beatPerBar, beatPerMs, this.options.timeSignature);
 			return this.isOn;
 		},
 		getBeatPerMillisecond : function(){
