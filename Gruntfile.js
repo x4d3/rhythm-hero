@@ -1,8 +1,11 @@
 module.exports = function(grunt) {
     var SOURCE_FILES = [
     'rh.js',
-	'vex-utils.js',
+    'vex-utils.js',
     'event-manager.js',
+    'time-signature.js',
+    'metronome.js',
+    'game-screen.js',
     'game.js',
     'application.js'
     ];
