@@ -1,9 +1,10 @@
 RH.DebugGameScreen = (function(){
 	'use strict';
 	// timeWidth is the number of miliseconds that the canvas width can represent
-	function DebugGameScreen(canvas, timeWidth) {
+	function DebugGameScreen(canvas, options) {
 		this.canvas = canvas;
-		this.timeWidth = timeWidth;
+		this.options = options;
+		this.timeWidth = 2 *  options.getBeatPerBar() / options.getBeatPerMillisecond();
 	}
 	DebugGameScreen.prototype = {
 		update : function(ups){
@@ -32,9 +33,10 @@ RH.DebugGameScreen = (function(){
 RH.GameScreen = (function(){
 	'use strict';
 	// timeWidth is the number of miliseconds that the canvas width can represent
-	function GameScreen(canvas, timeWidth) {
+	function GameScreen(canvas, options) {
 		this.canvas = canvas;
-		this.timeWidth = timeWidth;
+		this.options = options;
+		this.timeWidth = 2 *  options.getBeatPerBar() / options.getBeatPerMillisecond();
 		this.bars = [];
 		for (var i = 0; i < 3; i++){
 			var notes = [];
@@ -48,15 +50,20 @@ RH.GameScreen = (function(){
 	}
 	GameScreen.prototype = {
 
-		update : function(ellapsedBars, ellapsedBeats, beatPerBar, beatPerMs, timeSignature){
-
+		update : function(ellapsed){
+			var beatPerBar = this.options.getBeatPerBar();
+			var beatPerMs = this.options.getBeatPerMillisecond();
+			var division = RH.divide(ellapsed *  beatPerMs, beatPerBar);
+			var ellapsedBars = division.quotient;
+			var ellapsedBeats = division.rest;
+			
 			var canvas = this.canvas;
 			var context = canvas.getContext("2d");
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			
 			context.save();
 			context.translate(canvas.width/2 - 25, 30);
-			this.metronome.draw(context, timeSignature, ellapsedBeats);
+			this.metronome.draw(context, this.options.timeSignature, ellapsedBeats);
 			context.restore();
 			
 			var renderer = new Vex.Flow.Renderer(canvas,Vex.Flow.Renderer.Backends.CANVAS);
