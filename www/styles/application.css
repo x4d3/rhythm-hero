@@ -1,9 +1,19 @@
 #canvases {
 	position: relative; 
 	height: 200px;
+	width: 800px;
+    margin: 0 auto;
 }
 canvas {
 	position: absolute;
 	top: 0;
 	left: 0; 
+}
+
+div.rounded {
+	background: #eed;
+    border: 10px solid #ddc;
+    padding: 10px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
 }

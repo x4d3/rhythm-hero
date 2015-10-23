@@ -24,3 +24,16 @@ test("binarySearch", function() {
 	testBinarySearch(array2, 30, 3);
 	testBinarySearch(array2, 35, 3);
 });
+
+test("divide", function() {
+
+	function testDivide(dividend, divisor, expectedQuotient, expectedRest){
+		var result = RH.divide(dividend, divisor);
+		equal(result.quotient, expectedQuotient, "testDivide: " + arguments);
+		equal(result.rest, expectedRest, "testDivide: " + arguments);
+	}
+	testDivide(2.5, 2, 1, 0.5);
+	testDivide(2, 2, 1, 0);
+	testDivide(3.5, 5, 0, 3.5);
+	testDivide(0, 5, 0, 0);
+});
