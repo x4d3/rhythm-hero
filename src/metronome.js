@@ -23,7 +23,7 @@ RH.Metronome = (function(){
 		var y;
 		switch(division.quotient) {
 			case 0:
-				x =	1/2;
+				x = 1/2;
 				y = division.rest;
 				break;
 			case 1:
@@ -39,7 +39,14 @@ RH.Metronome = (function(){
 				y = 1/2 * (1 - division.rest);
 				break;
 		}
-		
+		context.beginPath();
+		context.lineWidth = 1;
+		context.moveTo(0.5 * metronome.width, 0);
+		context.lineTo(0.5 * metronome.width, metronome.height);
+		context.moveTo(0, 0.5 * metronome.height);
+		context.lineTo(metronome.width, 0.5 * metronome.height);
+		context.stroke();
+		context.fillText(division.quotient + 1, 5 , 10);
 		drawDot(context, metronome.width * x , metronome.height * y);
 	};
 	Metronome.prototype = {

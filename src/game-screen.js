@@ -62,8 +62,8 @@ RH.GameScreen = (function(){
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			
 			context.save();
-			context.translate(canvas.width/2 - 25, 30);
-			this.metronome.draw(context, this.options.timeSignature, ellapsedBeats);
+			context.translate(canvas.width/2 - 25, 5);
+			this.metronome.draw(context, this.options.timeSignature, RH.mod(ellapsedBeats - beatPerBar/2, beatPerBar));
 			context.restore();
 			
 			var renderer = new Vex.Flow.Renderer(canvas,Vex.Flow.Renderer.Backends.CANVAS);
