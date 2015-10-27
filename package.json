@@ -20,9 +20,7 @@
 	"grunt-contrib-concat": "0.5.x",
 	"grunt-contrib-watch": "0.6.x"
   },
-  "devDependencies": {
-    "grunt": "~0.4.5"
-  },
+  "devDependencies": {},
   "author": "",
   "license": "ISC",
   "bugs": {
