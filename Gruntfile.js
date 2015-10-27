@@ -62,9 +62,17 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            files: ['<%= jshint.files %>'],
-            tasks: ['jshint', 'concat', 'uglify', 'qunit'],
-            options: { livereload: true }
+            scripts : {
+                 files: ['<%= jshint.files %>'],
+                 tasks: ['jshint', 'concat', 'uglify', 'qunit'],
+                 options: { livereload: true }
+            },
+			html:{
+				files: ['www/*'],
+				tasks: ['clean', 'copy', 'jshint', 'concat', 'uglify', 'qunit'],
+				options: { livereload: true }
+			}
+
         },
         connect: {
             server: {
