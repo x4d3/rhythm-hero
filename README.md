@@ -1,9 +1,9 @@
-rythm-hero
+Rhythm Hero
 ==========
 
 Little game to learn read rythm on music sheet.
 
-[![Build Status](https://travis-ci.org/x4d3/rythm-hero.svg?branch=master)](https://travis-ci.org/x4d3/rythm-hero)
+[![Build Status](https://travis-ci.org/x4d3/rhythm-hero.svg?branch=master)](https://travis-ci.org/x4d3/rhythm-hero)
 
 Installation
 ------------
