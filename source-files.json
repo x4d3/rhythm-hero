@@ -1,6 +1,7 @@
 [
 	"rh.js",
 	"vex-utils.js",
+	"rhythm-patterns.js"
 	"event-manager.js",
 	"time-signature.js",
 	"metronome.js",
