@@ -4,6 +4,30 @@ if (typeof RH === 'undefined') {
 
 (function(){
 	'use strict';
+	RH.Preconditions = {};
+	
+	RH.Preconditions.checkType = function(value, type){
+		if(typeof value !== type){
+			throw new Exception("It should be a " + type + ": " + value);
+		}
+		return value;
+	};
+	RH.Preconditions.checkIsNumber = function(value){
+		return RH.Preconditions.checkType(value, 'number');
+	};
+	RH.Preconditions.checkIsString = function(value){
+		return RH.Preconditions.checkType(value, 'string');
+	};
+	
+	RH.Preconditions.checkIsInt = function(value){
+		RH.Preconditions.checkIsNumber(value);
+		if (value % 1 !== 0){
+			throw new Exception("It should be an int: " + value);
+		}
+		return value;
+	};
+	
+	
 	RH.logManager = (function(){
 		var LogLevel = function(level, name){
 			this.level = level;
