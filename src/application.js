@@ -41,14 +41,25 @@ $( document ).ready(function() {
 	'use strict';
 	var canvases = $("canvas");
 	if (canvases.length){
-		var application = new RH.Application({front: canvases.filter(".front")[0], back: canvases.filter(".back")[0]});
+		var applicationCanvases = {front: canvases.filter(".front")[0], back: canvases.filter(".back")[0]};
+		var application = new RH.Application(applicationCanvases);
+		var onEvent = function(isUp, event){
+			if (isUp){
+				application.getEventManager().onUp(event);
+			}else{
+				application.getEventManager().onDown(event);
+			}
+			//Don't prevent from calling ctrl + U or ctrl + shift + J etc...
+			if (!event.ctrlKey){
+				event.preventDefault();
+			}
+		};
+		
 		var onDown = function(event){
-			application.getEventManager().onDown(event);
-			event.preventDefault();
+			onEvent(false, event);
 		};
 		var onUp = function(event){
-			application.getEventManager().onUp(event);
-			event.preventDefault();
+			onEvent(true, event);
 		};
 		canvases.mousedown(onDown).mouseup(onUp);
 		$("body").keydown(onDown).keyup(onUp);
