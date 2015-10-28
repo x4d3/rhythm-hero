@@ -8,7 +8,7 @@ if (typeof RH === 'undefined') {
 	
 	RH.Preconditions.checkType = function(value, type){
 		if(typeof value !== type){
-			throw new Exception("It should be a " + type + ": " + value);
+			throw "It should be a " + type + ": " + value;
 		}
 		return value;
 	};
@@ -22,7 +22,7 @@ if (typeof RH === 'undefined') {
 	RH.Preconditions.checkIsInt = function(value){
 		RH.Preconditions.checkIsNumber(value);
 		if (value % 1 !== 0){
-			throw new Exception("It should be an int: " + value);
+			throw "It should be an int: " + value;
 		}
 		return value;
 	};

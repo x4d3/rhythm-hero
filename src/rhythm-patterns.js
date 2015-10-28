@@ -13,7 +13,7 @@ RH.RhythmPatterns = (function(){
 	};
 	Pattern.prototype = {
 		getDuration:function(){
-			return this.notes.reduce(function(sum, note){return sum.add(note.duration)});
+			return this.notes.reduce(function(sum, note){return sum.add(note.duration);});
 		}
 	};
 	var Note = function(duration, isRest){
@@ -68,21 +68,25 @@ RH.RhythmPatterns = (function(){
 	addPattern("crotchet rest", 1, 100, "1/2r,1/2");
 	
 	var difficulties = PATTERNS.map(function(x){return x.difficulty;});
+	
 	RhythmPatterns.MAX_DIFFICULTY = Math.max.apply(Math, difficulties);
-	RhythmPatterns.MIN_DIFFICULTY = Math.min.apply(Math, difficulties);
-	
-	
-	RhythmPatterns.generatePattern = function(minDifficulty, maxDifficulty, numberOfBeats){
+
+	RhythmPatterns.generatePattern = function(minDifficulty, maxDifficulty, size){
 		var filtered = PATTERNS.filter(function(x){return x.difficulty >= minDifficulty && x.difficulty<=maxDifficulty;});
 		var sumFrequency = 0;
 		var summedFrequencies = filtered.map(function(x){
-			summedFrequencies += x.frequency;
-			return summedFrequencies;
-		}); 
-	
+			sumFrequency += x.frequency;
+			return sumFrequency;
+		});
+		var result = [];
+		for (var i = 0; i < size; i++) {
+			var index = RH.binarySearch(summedFrequencies, Math.random() * sumFrequency);
+			result[i] = filtered[index];
+		}
+		return result;
 	};
 	
 	
 	return RhythmPatterns;
-});
+})();
 
