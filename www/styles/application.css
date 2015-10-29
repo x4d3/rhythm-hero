@@ -1,8 +1,12 @@
 #canvases {
-	position: relative; 
+	position: absolute;
 	height: 200px;
 	width: 800px;
-    margin: 0 auto;
+	margin: auto;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
 }
 canvas {
 	position: absolute;
@@ -12,7 +16,7 @@ canvas {
 
 div.rounded {
 	background: #eed;
-    border: 10px solid #ddc;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
+	border: 10px solid #ddc;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 }
