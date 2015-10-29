@@ -16,24 +16,29 @@ RH.Metronome = (function(){
 		context.strokeStyle = '#003300';
 		context.stroke();
 	};
-	
+	//Make the metronome movement more agressive going to the point, like a conductor would do
+	//the movement should be slower and then faster going to the target point
+	var convertProgression = function(rest){
+		return Math.pow(rest, 3);
+	};
 	
 	DRAWERS[RH.TS.THREE_FOUR.toString()] = function(metronome, context, ellapsedBeats){
 		var division = RH.divide(ellapsedBeats, 1);
 		var x;
 		var y;
+		var alpha = convertProgression(division.rest);
 		switch(division.quotient) {
 			case 0:
-				x = 1/2 * (1 - division.rest);
-				y = division.rest * Math.sqrt(3/4);
+				x = 1/2 * (1 - alpha);
+				y = alpha * Math.sqrt(3/4);
 				break;
 			case 1:
-				x = division.rest;
+				x = alpha;
 				y = Math.sqrt(3/4);
 				break;
 			case 2:
-				x = 1 - 1/2 * division.rest;
-				y = Math.sqrt(3/4) * (1 - division.rest);
+				x = 1 - 1/2 * alpha;
+				y = Math.sqrt(3/4) * (1 - alpha);
 				break;
 		}
 		context.fillText(division.quotient + 1, 5 , 10);
@@ -43,22 +48,23 @@ RH.Metronome = (function(){
 		var division = RH.divide(ellapsedBeats, 1);
 		var x;
 		var y;
+		var alpha = convertProgression(division.rest);
 		switch(division.quotient) {
 			case 0:
 				x = 1/2;
-				y = division.rest;
+				y = alpha;
 				break;
 			case 1:
-				x = 1/2 * (1 - division.rest);
-				y = 1 - 1/2 * division.rest;
+				x = 1/2 * (1 - alpha);
+				y = 1 - 1/2 * alpha;
 				break;
 			case 2:
-				x = division.rest;
+				x = alpha;
 				y = 1/2;
 				break;
 			case 3:
-				x = 1 - division.rest * 1/2;
-				y = 1/2 * (1 - division.rest);
+				x = 1 - alpha * 1/2;
+				y = 1/2 * (1 - alpha);
 				break;
 		}
 		context.beginPath();
