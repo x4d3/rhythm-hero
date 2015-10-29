@@ -18,4 +18,4 @@ grunt test
 chmod -R 755 target
 
 # ftp the target directory
-lftp -e "mirror -R target ${RH_FTP_REMOTE_DIR};quit" -u ${RH_FTP_USER},${RH_FTP_PASSWORD}, ${RH_FTP_HOST}
+lftp -e "mirror --reverse --recursion always --verbose target ${RH_FTP_REMOTE_DIR} ;quit" -u ${RH_FTP_USER},${RH_FTP_PASSWORD}, ${RH_FTP_HOST}
