@@ -16,8 +16,8 @@ RH.Metronome = (function(){
 		context.strokeStyle = '#003300';
 		context.stroke();
 	};
-	//Make the metronome movement more agressive going to the point, like a conductor would do
-	//the movement should be slower and then faster going to the target point
+
+	//the movement should be slower and then faster going to the target point, like a conductor would do
 	var convertProgression = function(rest){
 		return Math.pow(rest, 3);
 	};
@@ -29,16 +29,16 @@ RH.Metronome = (function(){
 		var alpha = convertProgression(division.rest);
 		switch(division.quotient) {
 			case 0:
-				x = 1/2 * (1 - alpha);
-				y = alpha * Math.sqrt(3/4);
-				break;
-			case 1:
 				x = alpha;
 				y = Math.sqrt(3/4);
 				break;
-			case 2:
+			case 1:
 				x = 1 - 1/2 * alpha;
 				y = Math.sqrt(3/4) * (1 - alpha);
+				break;
+			case 2:
+				x = 1/2 * (1 - alpha);
+				y = alpha * Math.sqrt(3/4);
 				break;
 		}
 		context.fillText(division.quotient + 1, 5 , 10);
@@ -51,20 +51,20 @@ RH.Metronome = (function(){
 		var alpha = convertProgression(division.rest);
 		switch(division.quotient) {
 			case 0:
-				x = 1/2;
-				y = alpha;
-				break;
-			case 1:
 				x = 1/2 * (1 - alpha);
 				y = 1 - 1/2 * alpha;
 				break;
-			case 2:
+			case 1:
 				x = alpha;
 				y = 1/2;
 				break;
-			case 3:
+			case 2:
 				x = 1 - alpha * 1/2;
 				y = 1/2 * (1 - alpha);
+				break;
+			case 3:
+				x = 1/2;
+				y = alpha;
 				break;
 		}
 		context.beginPath();
