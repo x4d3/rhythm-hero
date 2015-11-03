@@ -1,6 +1,7 @@
 RH.GameOptions = (function(){
 	'use strict';
-	function GameOptions(timeSignature, tempo){
+	function GameOptions(debugMode, timeSignature, tempo){
+		this.debugMode = debugMode;
 		this.timeSignature = timeSignature ? timeSignature:RH.TS.FOUR_FOUR;
 		//beat per minutes
 		this.tempo = tempo?tempo:60; 
