@@ -1,12 +1,12 @@
-RH.DebugGameScreen = (function(){
+RH.FrontScreen = (function(){
 	'use strict';
 	// timeWidth is the number of miliseconds that the canvas width can represent
-	function DebugGameScreen(canvas, options) {
+	function FrontScreen(canvas, options) {
 		this.canvas = canvas;
 		this.options = options;
 		this.timeWidth = 2 *  options.getBeatPerBar() / options.getBeatPerMillisecond();
 	}
-	DebugGameScreen.prototype = {
+	FrontScreen.prototype = {
 		update : function(ups, ellapsed){
 			var canvas = this.canvas;
 			var context = canvas.getContext("2d");
@@ -55,13 +55,13 @@ RH.DebugGameScreen = (function(){
 
 		}
 	};
-	return DebugGameScreen;
+	return FrontScreen;
 }());
 
-RH.GameScreen = (function(){
+RH.BackScreen = (function(){
 	'use strict';
 	// timeWidth is the number of miliseconds that the canvas width can represent
-	function GameScreen(canvas, options) {
+	function BackScreen(canvas, options) {
 		this.canvas = canvas;
 		this.options = options;
 		this.timeWidth = 2 *  options.getBeatPerBar() / options.getBeatPerMillisecond();
@@ -76,7 +76,7 @@ RH.GameScreen = (function(){
 		}
 		this.metronome = new RH.Metronome(50, 50);
 	}
-	GameScreen.prototype = {
+	BackScreen.prototype = {
 
 		update : function(ellapsed){
 			var beatPerBar = this.options.getBeatPerBar();
@@ -109,5 +109,5 @@ RH.GameScreen = (function(){
 
 		}
 	};
-	return GameScreen;
+	return BackScreen;
 }());

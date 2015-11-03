@@ -21,8 +21,8 @@ RH.Game = (function(){
 		this.eventManager = eventManager;
 		this.options = options;
 		this.screens = {
-			front: new RH.DebugGameScreen(canvases.front, options),
-			back: new RH.GameScreen(canvases.back, options)
+			front: new RH.FrontScreen(canvases.front, options),
+			back: new RH.BackScreen(canvases.back, options)
 		};
 		this.isOn = true;
 		this.t0 = RH.getTime();
