@@ -18,9 +18,25 @@ RH.GameOptions = (function(){
 
 RH.Game = (function(){
 	'use strict';
+	var VexUtils = RH.VexUtils;
+	
+	var generateBars = function(beatPerBar, patterns){
+		var result = [];
+		var beatPerBarFraction = [];
+		var notes = [];
+		for (var i = 0; i < patterns.length; i++) {
+			var pattern = patterns[i];
+
+			
+		}
+		return result;
+	};
+	
+
 	function Game(eventManager, canvases, options) {
 		this.eventManager = eventManager;
 		this.options = options;
+		var patterns = RH.RhythmPatterns.generatePatterns(0, RH.RhythmPatterns.MAX_DIFFICULTY, 50);
 		this.screens = {
 			front: new RH.FrontScreen(canvases.front, options),
 			back: new RH.BackScreen(canvases.back, options)

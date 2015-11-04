@@ -38,17 +38,26 @@ RH.VexUtils = (function(){
 	});
 	var ORIGINAL_KEYS = ALL_NOTES_ARRAY;
 	var TRANSPOSED_KEYS = ALL_NOTES_ARRAY;
+	var currentIndex = 7;
+	var distribution = gaussian(0, 3);
 	
 	VexUtils.randomKey = function(){
-		var index = Math.floor((Math.random() * 14));
-		return VexUtils.newKey(index);
+		currentIndex += Math.floor(distribution.ppf(Math.random()));
+		if (currentIndex <0){
+			currentIndex = 0;
+		}else if(currentIndex > 14){
+			currentIndex = 14;
+		}
+		return VexUtils.newKey(currentIndex);
 	};
+	
 	VexUtils.newKey = function(index){
 		var division = RH.divide(index, 7);
 		var scale = 4 + division.quotient;
 		var key = RH.getArrayElement(Vex.Flow.Music.roots, division.rest); 
 		return key + "/" + scale;
 	};
+	
 	VexUtils.newNote = function(key, duration){
 		return new Vex.Flow.StaveNote({ keys: [key], duration: duration.toString()});
 	};
