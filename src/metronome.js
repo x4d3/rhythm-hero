@@ -82,11 +82,7 @@ RH.Metronome = (function(){
 			var beatNumber = division.quotient;
 			if (this.currentBeat != beatNumber){
 				this.currentBeat = beatNumber;
-				if (beatNumber === 0){
-					SoundsManager.play('TIC');
-				}else{
-					SoundsManager.play('TOC');
-				}
+				SoundsManager.play(beatNumber === 0 ? 'TIC': 'TOC');
 			}
 			var progression = division.rest;
 			DRAWERS[timeSignature.toString()](this, context, beatNumber, convertProgression(progression));
