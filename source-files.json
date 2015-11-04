@@ -1,5 +1,6 @@
 [
 	"rh.js",
+	"sounds-manager.js",
 	"vex-utils.js",
 	"rhythm-patterns.js",
 	"event-manager.js",

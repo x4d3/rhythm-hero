@@ -1,8 +1,10 @@
 RH.Metronome = (function(){
 	'use strict';
+	var SoundsManager = RH.SoundsManager;
 	function Metronome(width, height){
 		this.width = width;
 		this.height = height;
+		this.currentBeat = -1;
 	}
 	
 	var DRAWERS = {};
@@ -22,49 +24,45 @@ RH.Metronome = (function(){
 		return Math.pow(rest, 4);
 	};
 	
-	DRAWERS[RH.TS.THREE_FOUR.toString()] = function(metronome, context, ellapsedBeats){
-		var division = RH.divide(ellapsedBeats, 1);
+	DRAWERS[RH.TS.THREE_FOUR.toString()] = function(metronome, context, beatNumber, progression){
+		
 		var x;
 		var y;
-		var alpha = convertProgression(division.rest);
-		switch(division.quotient) {
+		switch(beatNumber) {
 			case 0:
-				x = alpha;
+				x = progression;
 				y = Math.sqrt(3/4);
 				break;
 			case 1:
-				x = 1 - 1/2 * alpha;
-				y = Math.sqrt(3/4) * (1 - alpha);
+				x = 1 - 1/2 * progression;
+				y = Math.sqrt(3/4) * (1 - progression);
 				break;
 			case 2:
-				x = 1/2 * (1 - alpha);
-				y = alpha * Math.sqrt(3/4);
+				x = 1/2 * (1 - progression);
+				y = progression * Math.sqrt(3/4);
 				break;
 		}
-		context.fillText(division.quotient + 1, 5 , 10);
 		drawDot(context, metronome.width * x , metronome.height * y);
 	};
-	DRAWERS[RH.TS.FOUR_FOUR.toString()] = function(metronome, context, ellapsedBeats){
-		var division = RH.divide(ellapsedBeats, 1);
+	DRAWERS[RH.TS.FOUR_FOUR.toString()] = function(metronome, context, beatNumber, progression){
 		var x;
 		var y;
-		var alpha = convertProgression(division.rest);
-		switch(division.quotient) {
+		switch(beatNumber) {
 			case 0:
-				x = 1/2 * (1 - alpha);
-				y = 1 - 1/2 * alpha;
+				x = 1/2 * (1 - progression);
+				y = 1 - 1/2 * progression;
 				break;
 			case 1:
-				x = alpha;
+				x = progression;
 				y = 1/2;
 				break;
 			case 2:
-				x = 1 - alpha * 1/2;
-				y = 1/2 * (1 - alpha);
+				x = 1 - progression * 1/2;
+				y = 1/2 * (1 - progression);
 				break;
 			case 3:
 				x = 1/2;
-				y = alpha;
+				y = progression;
 				break;
 		}
 		context.beginPath();
@@ -74,13 +72,25 @@ RH.Metronome = (function(){
 		context.moveTo(0, 0.5 * metronome.height);
 		context.lineTo(metronome.width, 0.5 * metronome.height);
 		context.stroke();
-		context.fillText(division.quotient + 1, 5 , 10);
+
 		drawDot(context, metronome.width * x , metronome.height * y);
 	};
 	Metronome.prototype = {
 		draw: function(context, timeSignature, ellapsedBeats){
 			context.clearRect(0, 0, this.width, this.height);
-			DRAWERS[timeSignature.toString()](this, context, ellapsedBeats);
+			var division = RH.divide(ellapsedBeats, 1);
+			var beatNumber = division.quotient;
+			if (this.currentBeat != beatNumber){
+				this.currentBeat = beatNumber;
+				if (beatNumber === 0){
+					SoundsManager.play('TIC');
+				}else{
+					SoundsManager.play('TOC');
+				}
+			}
+			var progression = division.rest;
+			DRAWERS[timeSignature.toString()](this, context, beatNumber, convertProgression(progression));
+			context.fillText(beatNumber+ 1, 5 , 10);
 		}
 	};
 	return Metronome;

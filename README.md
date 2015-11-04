@@ -5,6 +5,8 @@ Little game to learn read rythm on music sheet.
 
 [![Build Status](https://travis-ci.org/x4d3/rhythm-hero.svg?branch=master)](https://travis-ci.org/x4d3/rhythm-hero)
 
+Demo can be found here: (http://x4d3.github.io/rhythm-hero/)
+
 Installation
 ------------
 ```sh

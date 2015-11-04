@@ -83,6 +83,11 @@ $( document ).ready(function() {
 		window.addEventListener('load', resize);
 		window.addEventListener('resize', resize);
 		
+		var switchSound = $(".switch-sound");
+		switchSound.click(function(){
+			var isOn = RH.SoundsManager.switchSound();
+			switchSound.toggleClass('off', !isOn );
+		});
 	}
 });
 
