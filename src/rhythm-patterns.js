@@ -123,7 +123,11 @@ RH.RhythmPatterns = (function() {
 		});
 		var result = [];
 		for (var i = 0; i < size; i++) {
-			var index = RH.binarySearch(summedFrequencies, Math.random() * sumFrequency);
+			var alea = Math.random() * sumFrequency;
+			var index = RH.binarySearch(summedFrequencies, alea) + 1 ;
+			if (index >= filtered.length){
+				throw 'error: ' + index + ",[" + summedFrequencies + "], " + alea +", " + sumFrequency;
+			}
 			result[i] = filtered[index];
 		}
 		return result;

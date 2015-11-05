@@ -6,8 +6,8 @@ RH.Measure = (function() {
 		this.lastNotePressed = lastNotePressed;
 		this.isEmpty = false;
 	};
-	Measure.EMPTY = new Measure([], false, false);
-	Measure.EMPTY.isEmpty = true;
+	
+
 	Measure.prototype = {
 		toString : function() {
 			return "{" + this.notes + ", " + this.firstNotePressed + ", " + this.lastNotePressed + "}";
@@ -16,3 +16,6 @@ RH.Measure = (function() {
 
 	return Measure;
 }());
+
+RH.Measure.EMPTY = new RH.Measure([], false, false);
+RH.Measure.EMPTY.isEmpty = true;

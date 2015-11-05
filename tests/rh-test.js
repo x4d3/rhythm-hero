@@ -24,6 +24,12 @@ test("binarySearch", function() {
 	testBinarySearch(array2, 25, 2);
 	testBinarySearch(array2, 30, 3);
 	testBinarySearch(array2, 35, 3);
+	
+	var array3 = [10,20,120,220,320,420,440,460,560,660,760];
+	testBinarySearch(array3, 675.9780231211334, 9);
+	
+	
+	
 });
 
 test("divide", function() {

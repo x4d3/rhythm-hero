@@ -62,13 +62,89 @@ RH.FrontScreen = (function() {
 RH.BackScreen = (function() {
 	'use strict';
 	var Preconditions = RH.Preconditions;
+	var VF = Vex.Flow;
 	
 	var VexMeasure = function(measure) {
 		this.measure = Preconditions.checkInstance(measure, RH.Measure);
+		
+		var note_data = [ {
+			keys : [ "f/4" ],
+			duration : "8"
+		}, {
+			keys : [ "e/4" ],
+			duration : "8"
+		}, {
+			keys : [ "d/4" ],
+			duration : "8"
+		}, {
+			keys : [ "c/4" ],
+			duration : "16"
+		}, {
+			keys : [ "c/4" ],
+			duration : "16"
+		}, {
+			keys : [ "c/5" ],
+			duration : "8"
+		}, {
+			keys : [ "b/4" ],
+			duration : "8"
+		}, {
+			keys : [ "c/5" ],
+			duration : "8"
+		}, {
+			keys : [ "c/5" ],
+			duration : "32"
+		}, {
+			keys : [ "c/5" ],
+			duration : "32"
+		}, {
+			keys : [ "b/4" ],
+			duration : "32"
+		}, {
+			keys : [ "f/4" ],
+			duration : "32"
+		} ];
+
+		function createNote(note_data) {
+			return new Vex.Flow.StaveNote(note_data);
+		}
+		var notes = note_data.map(createNote);
+
+
+		
+		this.notes = notes;
+		
 	};
 	
 	VexMeasure.prototype = {
 		draw : function(context, stave){
+			if (this.measure.isEmpty){
+				return;
+			}
+			var notes = this.notes;
+			
+			stave.setContext(context);
+			stave.addTimeSignature("3/4");
+			stave.draw(context);
+			
+			var formatter = new Vex.Flow.Formatter();
+
+			var voice = new Vex.Flow.Voice(Vex.Flow.TIME4_4);
+			
+			var group1 = notes.slice(0, 5);
+			var group2 = notes.slice(5, 12);
+			var beams = [];
+			beams.push(new Vex.Flow.Beam(group1));
+			beams.push(new Vex.Flow.Beam(group2));
+
+			voice.addTickables(notes);
+			formatter.joinVoices([ voice ]).formatToStave([ voice ], stave);
+
+			
+			voice.draw(context, stave);
+			beams.forEach(function(beam){
+				beam.setContext(context).draw();
+			});
 			
 		}
 	};
