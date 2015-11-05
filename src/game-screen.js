@@ -52,7 +52,6 @@ RH.FrontScreen = (function() {
 				}
 				context.stroke();
 				context.closePath();
-
 			}
 
 		}
@@ -62,23 +61,27 @@ RH.FrontScreen = (function() {
 
 RH.BackScreen = (function() {
 	'use strict';
+	var Preconditions = RH.Preconditions;
+	
+	var VexMeasure = function(measure) {
+		this.measure = Preconditions.checkInstance(measure, RH.Measure);
+	};
+	
+	VexMeasure.prototype = {
+		draw : function(context, stave){
+			
+		}
+	};
+
 	// timeWidth is the number of miliseconds that the canvas width can represent
-	function BackScreen(canvas, measures, options) {
+	var BackScreen = function(canvas, measures, options) {
 		this.canvas = canvas;
-		this.measures = measures;
+		this.vexMeasures = measures.map(function(measure){return new VexMeasure(measure);});
 		this.options = options;
 		this.timeWidth = 2 * options.getBeatPerBar() / options.getBeatPerMillisecond();
-		this.bars = [];
-		for (var i = 0; i < 3; i++) {
-			var notes = [];
-			for (var j = 0; j < options.getBeatPerBar(); j++) {
-				var key = RH.VexUtils.randomKey();
-				notes[j] = RH.VexUtils.newNote(key, 4);
-			}
-			this.bars[i] = notes;
-		}
 		this.metronome = new RH.Metronome(50, 50);
-	}
+	};
+	
 	BackScreen.prototype = {
 
 		update : function(ellapsed) {
@@ -96,7 +99,7 @@ RH.BackScreen = (function() {
 			context.translate(canvas.width / 2 - 25, 5);
 			this.metronome.draw(context, this.options.timeSignature, RH.mod(ellapsedBeats - beatPerBar / 2, beatPerBar));
 			context.restore();
-
+			
 			var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
 			var barLength = (beatPerBar / beatPerMs) * (canvas.width / (this.timeWidth)); //px/seconds
 			for (var i = 0; i < 3; i++) {
@@ -104,8 +107,8 @@ RH.BackScreen = (function() {
 				var startStave = i * barLength - shift;
 				var stave = new Vex.Flow.Stave(startStave, 50, barLength);
 				stave.setContext(context).draw();
-				var notes = RH.getArrayElement(this.bars, ellapsedBars + i);
-				Vex.Flow.Formatter.FormatAndDraw(context, stave, notes);
+				var vexMeasure =  RH.getArrayElement(this.vexMeasures, ellapsedBars + i);
+				vexMeasure.draw(context, stave);
 			}
 			this.previousBar = ellapsedBars;
 

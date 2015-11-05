@@ -38,7 +38,8 @@ RH.Game = (function() {
 	};
 	// static method
 	Game.generateMeasures = function(beatPerBar, patterns) {
-		var result = [];
+		//The two first measure are empty
+		var result = [Measure.EMPTY, Measure.EMPTY];
 		var beats = ZERO_F;
 		var beatPerBarF = new Fraction(beatPerBar, 1);
 		var measureNotes = [];
