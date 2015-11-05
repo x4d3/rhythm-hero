@@ -1,9 +1,10 @@
 RH.FrontScreen = (function(){
 	'use strict';
 	// timeWidth is the number of miliseconds that the canvas width can represent
-	function FrontScreen(canvas, options) {
+	function FrontScreen(canvas, measures, options) {
 		this.canvas = canvas;
 		this.options = options;
+		this.measures = measures;
 		this.timeWidth = 2 *  options.getBeatPerBar() / options.getBeatPerMillisecond();
 	}
 	FrontScreen.prototype = {
@@ -64,8 +65,9 @@ RH.FrontScreen = (function(){
 RH.BackScreen = (function(){
 	'use strict';
 	// timeWidth is the number of miliseconds that the canvas width can represent
-	function BackScreen(canvas, options) {
+	function BackScreen(canvas, measures, options) {
 		this.canvas = canvas;
+		this.measures = measures;
 		this.options = options;
 		this.timeWidth = 2 *  options.getBeatPerBar() / options.getBeatPerMillisecond();
 		this.bars = [];

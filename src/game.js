@@ -27,9 +27,10 @@ RH.Game = (function(){
 		this.eventManager = eventManager;
 		this.options = options;
 		var patterns = RH.RhythmPatterns.generatePatterns(0, RH.RhythmPatterns.MAX_DIFFICULTY, 50);
+		this.measures = Game.generateMeasures(options.getBeatPerBar(), patterns);
 		this.screens = {
-			front: new RH.FrontScreen(canvases.front, options),
-			back: new RH.BackScreen(canvases.back, options)
+			front: new RH.FrontScreen(canvases.front, this.measures, options),
+			back: new RH.BackScreen(canvases.back, this.measures, options)
 		};
 		this.isOn = true;
 		this.t0 = RH.getTime();
