@@ -1,3 +1,19 @@
+RH.Measure = (function(){
+	'use strict';
+	var Measure = function(notes, firstNotePressed, lastNotePressed){
+		this.notes = notes;
+		this.firstNotePressed = firstNotePressed;
+		this.lastNotePressed = lastNotePressed;
+	};
+	
+	Measure.prototype = {
+		toString : function(){
+			return "{" + this.notes + ", " + this.firstNotePressed + ", " + this.lastNotePressed + "}";
+		}
+	};
+	return Measure;
+}());
+
 RH.GameOptions = (function(){
 	'use strict';
 	function GameOptions(debugMode, timeSignature, tempo){
@@ -19,21 +35,11 @@ RH.GameOptions = (function(){
 RH.Game = (function(){
 	'use strict';
 	var VexUtils = RH.VexUtils;
-	
-	var generateBars = function(beatPerBar, patterns){
-		var result = [];
-		var beatPerBarFraction = [];
-		var notes = [];
-		for (var i = 0; i < patterns.length; i++) {
-			var pattern = patterns[i];
+	var Note = RH.Note;
+	var Measure = RH.Measure;
+	var ZERO_F = new Fraction(0);
 
-			
-		}
-		return result;
-	};
-	
-
-	function Game(eventManager, canvases, options) {
+	var Game = function(eventManager, canvases, options) {
 		this.eventManager = eventManager;
 		this.options = options;
 		var patterns = RH.RhythmPatterns.generatePatterns(0, RH.RhythmPatterns.MAX_DIFFICULTY, 50);
@@ -43,7 +49,47 @@ RH.Game = (function(){
 		};
 		this.isOn = true;
 		this.t0 = RH.getTime();
-	}
+	};
+	//static method
+	Game.generateMeasures = function(beatPerBar, patterns){
+		var result = [];
+		var beats = ZERO_F;
+		var beatPerBarF = new Fraction(beatPerBar, 1);
+		var measureNotes = [];
+		var firstNotePressed = false;
+		for (var i = 0; i < patterns.length; i++) {
+			var pattern = patterns[i];
+			var notes = pattern.notes;
+			for (var j = 0; j < notes.length; j++) {
+				var note = notes[j];
+				var sum = note.duration.add(beats);
+				var compare = sum.compare(beatPerBar, 1);
+				if (compare > 0){
+					var durationLeft = beatPerBarF.sub(beats.n, beats.d);
+					var split = note.split(durationLeft);
+					measureNotes.push(split[0]);
+					result.push(new Measure(measureNotes, firstNotePressed, true));
+					firstNotePressed = true;
+					var newDuration = note.duration.sub(durationLeft.n, durationLeft.d);
+					measureNotes = [split[1]];
+					beats = split[1].duration;
+				}else{
+					measureNotes.push(note);
+					if (compare === 0){
+						beats = ZERO_F;
+						result.push(new Measure(measureNotes, firstNotePressed, false));
+						measureNotes = [];
+						firstNotePressed = false;
+					}else{
+						beats = sum;
+					}
+				}
+			}
+		}
+		//we don't fill the last bar
+		return result;
+	};
+	
 	
 	Game.prototype = {
 		update : function(){

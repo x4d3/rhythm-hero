@@ -3,7 +3,8 @@ module("RH Tests");
 test("binarySearch", function() {
 	
 	function testBinarySearch(a, key, expected){
-		equal(RH.binarySearch(a, key), expected, "binarySearch: " + a + ", " + key);
+		var result = RH.binarySearch(a, key);
+		equal(result, expected, key + " in [" + a + "] gives: " + expected);
 	}
 	var array = [1,2,3];
 	
@@ -29,11 +30,38 @@ test("divide", function() {
 
 	function testDivide(dividend, divisor, expectedQuotient, expectedRest){
 		var result = RH.divide(dividend, divisor);
-		equal(result.quotient, expectedQuotient, "testDivide: " + arguments);
-		equal(result.rest, expectedRest, "testDivide: " + arguments);
+		var message = dividend + "/" + divisor + " = " + expectedQuotient + " + " + expectedRest;
+		equal(result.quotient, expectedQuotient, message);
+		equal(result.rest, expectedRest);
 	}
 	testDivide(2.5, 2, 1, 0.5);
 	testDivide(2, 2, 1, 0);
 	testDivide(3.5, 5, 0, 3.5);
 	testDivide(0, 5, 0, 0);
+});
+
+test("Preconditions.checkInt", function() {
+	var Preconditions = RH.Preconditions;
+	equal(Preconditions.checkIsInt(1), 1);
+	equal(Preconditions.checkIsInt(0), 0);
+	equal(Preconditions.checkIsInt(-1), -1);
+	throws(function() {
+		Preconditions.checkIsInt(1.5);
+	}, 'a double throws an exception');
+	throws(function() {
+		Preconditions.checkIsInt(null);
+	}, 'null throws an exception');
+});
+
+
+test("Preconditions.checkArrayType", function() {
+	var Preconditions = RH.Preconditions;
+	var CustomClass = function(){};
+	Preconditions.checkArrayType([new CustomClass(), new CustomClass()], CustomClass);
+	throws(function() {
+		Preconditions.checkArrayType([new CustomClass(), "string"], CustomClass);
+	});
+	throws(function() {
+		Preconditions.checkArrayType(new CustomClass(), CustomClass);
+	});
 });

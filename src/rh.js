@@ -4,22 +4,29 @@ if (typeof RH === 'undefined') {
 
 (function(){
 	'use strict';
-	RH.Preconditions = {};
+	var Preconditions = {};
 	
-	RH.Preconditions.checkType = function(value, type){
+	Preconditions.checkInstance = function(value, instance){
+		if(!(value instanceof instance)){
+			throw "It should be a " + instance.name + ": " + value;
+		}
+		return value;
+	};
+	
+	Preconditions.checkType = function(value, type){
 		if(typeof value !== type){
 			throw "It should be a " + type + ": " + value;
 		}
 		return value;
 	};
-	RH.Preconditions.checkIsNumber = function(value){
-		return RH.Preconditions.checkType(value, 'number');
+	Preconditions.checkIsNumber = function(value){
+		return Preconditions.checkType(value, 'number');
 	};
-	RH.Preconditions.checkIsString = function(value){
-		return RH.Preconditions.checkType(value, 'string');
+	Preconditions.checkIsString = function(value){
+		return Preconditions.checkType(value, 'string');
 	};
 	
-	RH.Preconditions.checkIsInt = function(value){
+	Preconditions.checkIsInt = function(value){
 		RH.Preconditions.checkIsNumber(value);
 		if (value % 1 !== 0){
 			throw "It should be an int: " + value;
@@ -27,6 +34,14 @@ if (typeof RH === 'undefined') {
 		return value;
 	};
 	
+	Preconditions.checkArrayType = function(array, instance){
+		Preconditions.checkInstance(array, Array);
+		for (var i = 0; i < array.length; i++){
+			Preconditions.checkInstance(array[i], instance);
+		}
+		return array;
+	};
+	RH.Preconditions = Preconditions;
 	
 	RH.logManager = (function(){
 		var LogLevel = function(level, name){
