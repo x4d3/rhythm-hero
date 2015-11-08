@@ -1,4 +1,8 @@
 [
+	"lib/jquery-2.1.0.min.js",
+	"lib/vexflow-min.js",
+	"lib/gaussian.js",
+	"lib/fraction.js",		
 	"rh.js",
 	"sounds-manager.js",
 	"vex-utils.js",

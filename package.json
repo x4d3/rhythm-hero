@@ -18,7 +18,11 @@
 		"grunt-contrib-uglify": "0.2.x",
 		"grunt-contrib-qunit": "0.7.x",
 		"grunt-contrib-concat": "0.5.x",
-		"grunt-contrib-watch": "0.6.x"
+		"grunt-contrib-watch": "0.6.x",
+		"grunt-contrib-cssmin": "0.14.x ",
+		"grunt-contrib-htmlmin": "0.6.x",
+		"grunt-appcache": "0.1.x"
+		
 	},
 	"devDependencies": {
 		"node-qunit-phantomjs": "^1.2.2"

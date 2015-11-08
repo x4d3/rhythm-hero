@@ -93,5 +93,7 @@ $(document).ready(function() {
 			var isOn = RH.SoundsManager.switchSound();
 			switchSound.toggleClass('off', !isOn);
 		});
+
+		$('body').removeClass('loading');
 	}
 });

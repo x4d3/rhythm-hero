@@ -1,8 +1,3 @@
-$(document).bind('mobileinit', function() {
-	$.mobile.changePage.defaults.changeHash = false;
-	$.mobile.hashListeningEnabled = false;
-	$.mobile.pushStateEnabled = false;
-});
 if (typeof window.Audio === 'undefined') {
 	console.log('mocking window.Audio');
 	var Audio = function(src) {

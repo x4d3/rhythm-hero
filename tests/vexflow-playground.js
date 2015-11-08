@@ -208,10 +208,10 @@ $(document).ready(function() {
 		}
 		tempCanvaJ.appendTo(body);
 		var savedCanvas = [];
-		for (var i = 0; i < numberOfMeasures; i++){
+		for (i = 0; i < numberOfMeasures; i++){
 			savedCanvas[i] = context.getImageData(400* i, 0, 400, 100);
 		}
-		canvas.getContext('2d').putImageData(savedCanvas[5], 0, 0)
+		canvas.getContext('2d').putImageData(savedCanvas[5], 0, 0);
 	});
 	
 
