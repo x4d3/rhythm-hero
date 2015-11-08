@@ -114,10 +114,8 @@ $(document).ready(function() {
 		tuplet2.setContext(context).draw();
 	});
 
-	testCanvas('3', function(canvas) {
-		var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
-		var context = renderer.getContext();
-		var stave = new Vex.Flow.Stave(10, 0, 500);
+	var drawBeamsOnStave = function(context, stave){
+
 
 		var note_data = [ {
 			keys : [ "f/4" ],
@@ -181,14 +179,42 @@ $(document).ready(function() {
 		
 		voice.draw(context, stave);
 
-
-
-
 		beam1.setContext(context).draw();
 		beam2.setContext(context).draw();
-		
-		
 
+	};
+	
+	testCanvas('3', function(canvas) {
+		var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+		var context = renderer.getContext();
+		var stave = new Vex.Flow.Stave(10, 0, 500);
+		drawBeamsOnStave(context, stave);
 	});
+
+	testCanvas('3', function(canvas) {
+		var numberOfMeasures = 60;
+		var tempCanvaJ = $('<canvas>');
+		tempCanvaJ.prop({
+			width : 400 * numberOfMeasures,
+			height : 100
+		});
+		var tempCanvas = tempCanvaJ[0];
+		var context = tempCanvas.getContext('2d');
+		var renderer = new Vex.Flow.Renderer(tempCanvas, Vex.Flow.Renderer.Backends.CANVAS);
+		var ctx = renderer.getContext();
+		for (var i = 0; i < numberOfMeasures; i++){
+			var stave = new Vex.Flow.Stave(400 * i, 0, 400);
+			drawBeamsOnStave(ctx, stave);
+		}
+		tempCanvaJ.appendTo(body);
+		var savedCanvas = [];
+		for (var i = 0; i < numberOfMeasures; i++){
+			savedCanvas[i] = context.getImageData(400* i, 0, 400, 100);
+		}
+		canvas.getContext('2d').putImageData(savedCanvas[5], 0, 0)
+	});
+	
+
+	
 
 });
