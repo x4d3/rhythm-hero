@@ -76,17 +76,18 @@ $(document).ready(function() {
 			application.getEventManager().resetKeyPressed();
 		});
 		application.start();
-		var MIN_WIDTH = 600;
-		var MAX_WIDTH = 1000;
-		var resize = function() {
-			var width = Math.min(Math.max(window.innerWidth, MIN_WIDTH), MAX_WIDTH);
-			$("#canvases").width(width);
-			canvases.prop({
-				width : width
-			});
-		};
-		window.addEventListener('load', resize);
-		window.addEventListener('resize', resize);
+		//TODO: Make the canvases resizable
+//		var MIN_WIDTH = 600;
+//		var MAX_WIDTH = 1000;
+//		var resize = function() {
+//			var width = Math.min(Math.max(window.innerWidth, MIN_WIDTH), MAX_WIDTH);
+//			$("#canvases").width(width);
+//			canvases.prop({
+//				width : width
+//			});
+//		};
+//		window.addEventListener('load', resize);
+//		window.addEventListener('resize', resize);
 
 		var switchSound = $(".switch-sound");
 		switchSound.click(function() {

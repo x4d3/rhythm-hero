@@ -63,10 +63,10 @@ RH.BackScreen = (function() {
 	'use strict';
 	var Preconditions = RH.Preconditions;
 	var VF = Vex.Flow;
-	
-	var VexMeasure = function(measure) {
-		this.measure = Preconditions.checkInstance(measure, RH.Measure);
-		
+
+	var drawBeamsOnStave = function(context, stave){
+
+
 		var note_data = [ {
 			keys : [ "f/4" ],
 			duration : "8"
@@ -108,56 +108,66 @@ RH.BackScreen = (function() {
 		function createNote(note_data) {
 			return new Vex.Flow.StaveNote(note_data);
 		}
+		
+		stave.setContext(context);
+		stave.addTimeSignature("3/4");
+		stave.draw(context);
+		
+		var formatter = new Vex.Flow.Formatter();
 		var notes = note_data.map(createNote);
-
+		var voice = new Vex.Flow.Voice(Vex.Flow.TIME4_4);
+		
+		var group1 = notes.slice(0, 5);
+		var group2 = notes.slice(5, 12);
+		var beam1 = new Vex.Flow.Beam(group1);
+		var beam2 = new Vex.Flow.Beam(group2);
+		
+		
+		voice.addTickables(notes);
+		formatter.joinVoices([ voice ]).formatToStave([ voice ], stave);
 
 		
-		this.notes = notes;
-		
+		voice.draw(context, stave);
+
+		beam1.setContext(context).draw();
+		beam2.setContext(context).draw();
+
 	};
 	
-	VexMeasure.prototype = {
-		draw : function(context, stave){
-			if (this.measure.isEmpty){
-				return;
-			}
-			var notes = this.notes;
-			
-			stave.setContext(context);
-			stave.addTimeSignature("3/4");
-			stave.draw(context);
-			
-			var formatter = new Vex.Flow.Formatter();
+	var createMeasuresCanvases = function(measureWidth, measures) {
+		var tempCanvaJ = $('<canvas>');
 
-			var voice = new Vex.Flow.Voice(Vex.Flow.TIME4_4);
-			
-			var group1 = notes.slice(0, 5);
-			var group2 = notes.slice(5, 12);
-			var beams = [];
-			beams.push(new Vex.Flow.Beam(group1));
-			beams.push(new Vex.Flow.Beam(group2));
-
-			voice.addTickables(notes);
-			formatter.joinVoices([ voice ]).formatToStave([ voice ], stave);
-
-			
-			voice.draw(context, stave);
-			beams.forEach(function(beam){
-				beam.setContext(context).draw();
-			});
-			
+		tempCanvaJ.prop({
+			width : measureWidth * measures.length,
+			height : 100
+		});
+		var tempCanvas = tempCanvaJ[0];
+		var context = tempCanvas.getContext('2d');
+		var renderer = new Vex.Flow.Renderer(tempCanvas, Vex.Flow.Renderer.Backends.CANVAS);
+		var ctx = renderer.getContext();
+		for (var i = 0; i < measures.length; i++) {
+			var stave = new Vex.Flow.Stave(measureWidth * i, 0, measureWidth);
+//			if (!measures[i].isEmpty){
+				drawBeamsOnStave(ctx, stave);
+//			}
 		}
+		var result = [];
+		for (i = 0; i < measures.length; i++) {
+			result[i] = context.getImageData(measureWidth * i, 0, measureWidth, 100);
+		}
+		return result;
 	};
 
 	// timeWidth is the number of miliseconds that the canvas width can represent
 	var BackScreen = function(canvas, measures, options) {
 		this.canvas = canvas;
-		this.vexMeasures = measures.map(function(measure){return new VexMeasure(measure);});
 		this.options = options;
 		this.timeWidth = 2 * options.getBeatPerBar() / options.getBeatPerMillisecond();
 		this.metronome = new RH.Metronome(50, 50);
+		this.measureWidth = Math.floor(canvas.width / 2);
+		this.measuresCanvases = createMeasuresCanvases(this.measureWidth, measures);
 	};
-	
+
 	BackScreen.prototype = {
 
 		update : function(ellapsed) {
@@ -170,24 +180,25 @@ RH.BackScreen = (function() {
 			var canvas = this.canvas;
 			var context = canvas.getContext("2d");
 			context.clearRect(0, 0, canvas.width, canvas.height);
+			
+			for (var i = 0; i < 3; i++) {
+				var shift = this.measureWidth * (ellapsedBeats / beatPerBar);
+				var startStave = i * this.measureWidth - shift;
+				var measureCanvasData = this.measuresCanvases[ellapsedBars];
+				if (measureCanvasData !== undefined){
+					canvas.getContext('2d').putImageData(measureCanvasData, startStave, 50);
+				}else{
+					throw 'error: ' + ellapsedBars;
+				}
 
+			}
+
+			
+			//Draw Metronome
 			context.save();
 			context.translate(canvas.width / 2 - 25, 5);
 			this.metronome.draw(context, this.options.timeSignature, RH.mod(ellapsedBeats - beatPerBar / 2, beatPerBar));
 			context.restore();
-			
-			var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
-			var barLength = (beatPerBar / beatPerMs) * (canvas.width / (this.timeWidth)); //px/seconds
-			for (var i = 0; i < 3; i++) {
-				var shift = barLength * (ellapsedBeats / beatPerBar);
-				var startStave = i * barLength - shift;
-				var stave = new Vex.Flow.Stave(startStave, 50, barLength);
-				stave.setContext(context).draw();
-				var vexMeasure =  RH.getArrayElement(this.vexMeasures, ellapsedBars + i);
-				vexMeasure.draw(context, stave);
-			}
-			this.previousBar = ellapsedBars;
-
 		}
 	};
 	return BackScreen;
