@@ -126,7 +126,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-appcache');
 	
 	
-	grunt.registerTask('test', ['clean', 'copy', 'jshint', 'concat', 'qunit' ]);
+	grunt.registerTask('test', ['clean', 'copy', 'jshint', 'concat', 'qunit']);
 	grunt.registerTask('default', ['test', 'connect', 'watch']);
 	grunt.registerTask('stage', ['test', 'uglify', 'cssmin', 'htmlmin', 'appcache']);
 	grunt.registerTask('stage-test', ['stage', 'connect', 'watch']);

@@ -12,7 +12,7 @@ rm -rf target || exit 0;
 mkdir target;
 
 # run our compile script, discussed above
-grunt test
+grunt stage
 
 #change files permssion
 chmod -R 755 target
