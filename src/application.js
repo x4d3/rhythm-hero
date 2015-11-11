@@ -25,6 +25,9 @@ RH.Application = (function() {
 			var parsedDebugMode = debugMode === 'true';
 			var parsedTempo = tempo ? parseInt(tempo, 10) : null;
 			var parsedTS = ts ? RH.TimeSignature.parse(ts) : null;
+			if (parsedDebugMode){
+				RH.debug();
+			}
 			var game = new Game(this.eventManager, this.canvases, new RH.GameOptions(parsedDebugMode, parsedTS, parsedTempo));
 			(function animloop() {
 				var isOn = game.update();

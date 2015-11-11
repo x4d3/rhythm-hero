@@ -4,14 +4,15 @@
 	"lib/gaussian.js",
 	"lib/fraction.js",		
 	"rh.js",
+	"time-signature.js",
 	"sounds-manager.js",
 	"vex-utils.js",
 	"rhythm-patterns.js",
 	"measure.js",
 	"event-manager.js",
-	"time-signature.js",
 	"metronome.js",
 	"game-screen.js",
+	"game-options.js",
 	"game.js",
 	"application.js"
 ]

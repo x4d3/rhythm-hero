@@ -21,7 +21,7 @@ RH.Metronome = (function() {
 
 	//the movement should be slower and then faster going to the target point, like a conductor would do
 	var convertProgression = function(rest) {
-		return Math.pow(rest, 4);
+		return Math.pow(rest, 5);
 	};
 
 	DRAWERS[RH.TS.THREE_FOUR.toString()] = function(metronome, context, beatNumber, progression) {
