@@ -3,8 +3,7 @@ RH.GameOptions = (function() {
 	var DEFAULT_TEMPO = 60;
 	var DEFAULT_TS = RH.TS.FOUR_FOUR;
 	
-	function GameOptions(debugMode, timeSignature, tempo) {
-		this.debugMode = debugMode;
+	function GameOptions(timeSignature, tempo) {
 		this.timeSignature = timeSignature ? timeSignature : RH.TS.FOUR_FOUR;
 		// beat per minutes
 		this.tempo = tempo ? tempo : 60;

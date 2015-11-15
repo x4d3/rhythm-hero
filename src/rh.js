@@ -93,9 +93,10 @@ if (typeof RH === 'undefined') {
 		var logManager = new LogManager();
 		return logManager;
 	}());
-
+	RH.isDebug = false;
 	RH.debug = function() {
 		RH.logManager.setAllLogLevel(0);
+		RH.isDebug = true;
 	};
 
 	RH.identity = function(a) {

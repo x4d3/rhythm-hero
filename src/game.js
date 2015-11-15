@@ -37,6 +37,10 @@ RH.Game = (function() {
 				this.currentMeasureIndex = measureIndex;
 				logger.debug(measureIndex + "," + measure);
 				//new measure, let's calculate the measure score
+				if (measureIndex  === this.measures.length){
+					this.isOn = false;
+					return false;
+				}
 			}
 			
 			var measureInfo = {
@@ -65,7 +69,7 @@ RH.Game = (function() {
 		
 		var EMPTY = new RH.Measure(tempo, timeSignature, [], false, false);
 		
-		var result = [EMPTY, EMPTY];
+		var result = [EMPTY];
 		var beats = ZERO_F;
 
 		var measureNotes = [];

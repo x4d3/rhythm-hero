@@ -1,72 +1,107 @@
 RH.FrontScreen = (function() {
 	'use strict';
-	// timeWidth is the number of miliseconds that the canvas width can represent
+	// timeWidth is the number of miliseconds screen the canvas width can represent
 	function FrontScreen(canvas, eventManager, measures, options) {
 		this.canvas = canvas;
 		this.eventManager = eventManager;
 		this.measures = measures;
 		this.options = options;
+		this.measureLength = canvas.width / 2;
+
 	}
 	FrontScreen.prototype = {
 		update : function(measureInfo) {
-			if (!this.options.debugMode) {
+			if (!RH.isDebug) {
 				return;
 			}
 			var canvas = this.canvas;
-			
+
 			var measure = measureInfo.measure;
 			var beatPerBar = measure.getBeatPerBar();
 			var measureDuration = measure.getBeatPerBar() / measure.getBeatPerMillisecond();
-			
-			var ups = this.eventManager.getEvents(measureInfo.t - measureDuration* 0.5);
-			var barLength = canvas.width/2;
-			
-			
+
 			var context = canvas.getContext("2d");
 			context.clearRect(0, 0, canvas.width, canvas.height);
 
-			
-			var x = 0;
+			this.displayEvents(measureInfo);
+
+			var shift = this.measureLength * (-0.5 + measureInfo.ellapsedBeats / beatPerBar);
 			var screen = this;
-			context.beginPath();
-			context.lineWidth = 1;
-			var y = 0;
-			ups.forEach(function(element) {
-				y = 0.5 + (element.isPressed ? canvas.height / 8 : canvas.height / 4);
-				context.lineTo(x, y);
-				var newX = x + element.duration * barLength/measureDuration;
-				context.lineTo(newX, y);
-				x = newX;
-			});
 
-			context.moveTo(canvas.width / 4, 0);
-			context.lineTo(canvas.width / 4, canvas.height);
-			context.stroke();
-			context.closePath();
-
-			
-			var shift = barLength * (0.5 + measureInfo.ellapsedBeats / beatPerBar);
-			
-			
-			for (var i = 0; i < 4; i++){
-				var index = measureInfo.index  + i;
-				if (index < 0  || index >= this.measures.length){
-					continue;
+			[ -1, 0, 1, 2 ].forEach(function(i) {
+				var index = measureInfo.index + i;
+				if (index < 0 || index >= screen.measures.length) {
+					return true;
 				}
-				var currentMeasure = this.measures[index];
-				var startBar = i * barLength - shift;
-				context.fillText(index, startBar + barLength / 2, canvas.height * 3 / 4);
+				var currentMeasure = screen.measures[index];
+				var startBar = i * screen.measureLength - shift;
+				context.fillText(index, startBar + screen.measureLength / 2, canvas.height * 3 / 4);
 				context.beginPath();
 				for (var j = 0; j < currentMeasure.getBeatPerBar(); j++) {
-					var beatX = startBar + j * (barLength / measure.getBeatPerBar());
+					var beatX = startBar + j * (screen.measureLength / measure.getBeatPerBar());
 					var z = (j === 0) ? 3 / 4 : 7 / 8;
 					context.moveTo(beatX, canvas.height * z);
 					context.lineTo(beatX, canvas.height);
 				}
 				context.stroke();
 				context.closePath();
-			}
 
+				context.save();
+				context.beginPath();
+				context.strokeStyle = 'blue';
+				context.lineWidth = 1;
+				var x = startBar;
+
+				var beatLength = screen.measureLength / currentMeasure.getBeatPerBar();
+				var epsilon = 0.05 * beatLength;
+				var Y_IS_ON = canvas.height * 3 / 16;
+				var Y_IS_OFF = canvas.height / 4;
+				var y = currentMeasure.firstNotePressed ? Y_IS_ON : Y_IS_OFF;
+				context.fillText(currentMeasure, x + 5, Y_IS_ON - 5);
+				currentMeasure.notes.forEach(function(note, j) {
+					context.moveTo(x, y);
+					y = (note.isRest ? Y_IS_OFF : Y_IS_ON);
+					context.lineTo(x, y);
+					var duration = note.duration.valueOf() * beatLength;
+					var newX = x + duration;
+					if (j == (currentMeasure.notes.length - 1) && currentMeasure.lastNotePressed) {
+						context.lineTo(newX, y);
+					} else {
+						context.lineTo(newX - epsilon, y);
+						y = Y_IS_OFF;
+						context.lineTo(newX - epsilon, y);
+						context.lineTo(newX, y	);
+					}
+					x = newX;
+				});
+				context.stroke();
+				context.closePath();
+				context.restore();
+			});
+
+		},
+		displayEvents : function(measureInfo) {
+			var canvas = this.canvas;
+			var context = canvas.getContext("2d");
+			var measure = measureInfo.measure;
+			var measureDuration = measure.getBeatPerBar() / measure.getBeatPerMillisecond();
+			var ups = this.eventManager.getEvents(measureInfo.t - measureDuration * 0.5);
+			var x = 0;
+			var screen = this;
+			context.beginPath();
+			context.lineWidth = 1;
+			var y = 0;
+			ups.forEach(function(element) {
+				y = 0.5 + (element.isPressed ? canvas.height / 16 : canvas.height / 8);
+				context.lineTo(x, y);
+				var newX = x + element.duration * screen.measureLength / measureDuration;
+				context.lineTo(newX, y);
+				x = newX;
+			});
+			context.moveTo(canvas.width / 4, 0);
+			context.lineTo(canvas.width / 4, canvas.height);
+			context.stroke();
+			context.closePath();
 		}
 	};
 	return FrontScreen;
@@ -88,20 +123,21 @@ RH.BackScreen = (function() {
 		var context = tempCanvas.getContext('2d');
 		var renderer = new VF.Renderer(tempCanvas, VF.Renderer.Backends.CANVAS);
 		var ctx = renderer.getContext();
-		var createNote = function (note_data) {
+		var createNote = function(note_data) {
 			return new Vex.Flow.StaveNote(note_data);
 		};
-		
-		measures.forEach(function(measure, i){
+
+		measures.forEach(function(measure, i) {
 			if (measure.isEmpty) {
+				//display 
 				var x = measureWidth * i;
 				var beatPerBar = measure.getBeatPerBar();
 				for (var j = 0; j < beatPerBar; j++) {
-					context.fillText(j+1, x + j * measureWidth / beatPerBar, 50);
+					context.fillText(j + 1, x + j * measureWidth / beatPerBar, 60);
 				}
 				return true;
 			}
-			
+
 			var stave = new VF.Stave(measureWidth * i, 0, measureWidth);
 
 			stave.setContext(context);
@@ -146,23 +182,21 @@ RH.BackScreen = (function() {
 				keys : [ "f/4" ],
 				duration : "32"
 			} ];
-			
+
 			var notes = note_data.map(createNote);
 			var voice = new VF.Voice(VF.TIME4_4);
-			
+
 			var group1 = notes.slice(0, 5);
 			var group2 = notes.slice(5, 12);
 			var beams = [];
 			beams.push(new Vex.Flow.Beam(group1));
 			beams.push(new Vex.Flow.Beam(group2));
-			
-			
+
 			voice.addTickables(notes);
 			formatter.joinVoices([ voice ]).formatToStave([ voice ], stave);
 
-			
-			voice.draw(context, stave);			
-			beams.forEach(function(beam){
+			voice.draw(context, stave);
+			beams.forEach(function(beam) {
 				beam.setContext(context).draw();
 			});
 
@@ -174,12 +208,13 @@ RH.BackScreen = (function() {
 		return result;
 	};
 
-	// timeWidth is the number of miliseconds that the canvas width can represent
+	// timeWidth is the number of miliseconds screen the canvas width can represent
 	var BackScreen = function(canvas, measures, options) {
 		this.canvas = canvas;
 		this.options = options;
 		this.metronome = new RH.Metronome(50, 50);
 		this.measureWidth = Math.floor(canvas.width / 2);
+		this.measures = measures;
 		this.measuresCanvases = createMeasuresCanvases(this.measureWidth, measures);
 	};
 
@@ -188,23 +223,31 @@ RH.BackScreen = (function() {
 		update : function(measureInfo) {
 			var measure = measureInfo.measure;
 			var beatPerBar = measure.getBeatPerBar();
-			var shift = this.measureWidth * (0.5 + measureInfo.ellapsedBeats / beatPerBar);
-			
+			var shift = this.measureWidth * (-0.5 + measureInfo.ellapsedBeats / beatPerBar);
+
 			var canvas = this.canvas;
 			var context = canvas.getContext("2d");
 			context.clearRect(0, 0, canvas.width, canvas.height);
-			
-			for (var i = 0; i < 4; i++) {
+
+			for (var i = -1; i < 3; i++) {
 				var startStave = i * this.measureWidth - shift;
 				var index = measureInfo.index + i;
-				if (index < 0  || index >= this.measuresCanvases.length){
+				if (index < 0 || index >= this.measuresCanvases.length) {
 					continue;
 				}
+
 				var measureCanvasData = this.measuresCanvases[index];
 				canvas.getContext('2d').putImageData(measureCanvasData, startStave, 50);
+				//display the count down
+				if (this.measures[index].isEmpty) {
+					context.beginPath();
+					context.arc(3 + startStave + RH.divide(measureInfo.ellapsedBeats, 1).quotient * this.measureWidth / this.measures[index].getBeatPerBar(), 107, 8, 0, 2 * Math.PI, false);
+					context.lineWidth = 1;
+					context.strokeStyle = '#003300';
+					context.stroke();
+				}
 			}
 
-			
 			//Draw Metronome
 			context.save();
 			context.translate(canvas.width / 2 - 25, 5);

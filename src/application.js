@@ -28,7 +28,7 @@ RH.Application = (function() {
 			if (parsedDebugMode){
 				RH.debug();
 			}
-			var game = new Game(this.eventManager, this.canvases, new RH.GameOptions(parsedDebugMode, parsedTS, parsedTempo));
+			var game = new Game(this.eventManager, this.canvases, new RH.GameOptions(parsedTS, parsedTempo));
 			(function animloop() {
 				var isOn = game.update();
 				if (isOn) {
