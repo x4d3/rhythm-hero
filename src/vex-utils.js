@@ -192,7 +192,7 @@ RH.VexUtils = (function() {
 						first_indices : [ 0 ],
 						last_indices : [ 0 ]
 					});
-					ties.push(ties);
+					ties.push(tie);
 				}
 				vxNotes.push(vxNote);
 
