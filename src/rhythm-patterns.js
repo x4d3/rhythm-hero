@@ -9,13 +9,13 @@ RH.Note = (function() {
 
 	Note.prototype = {
 		toString : function() {
-			return this.duration.toFraction() + (this.isRest ? "r" : "");
+			return this.duration.toString() + (this.isRest ? "r" : "");
 		},
 		split : function(duration) {
-			if (this.duration.compare(duration.n, duration.d) < 0) {
-				throw 'duration: ' + duration.toFraction() + " can't be bigger than note duration: " + this.duration.toFraction();
+			if (this.duration.compareTo(duration) < 0) {
+				throw 'duration: ' + duration + " can't be bigger than note duration: " + this.duration;
 			}
-			var splitDuration = this.duration.sub(duration.n, duration.d);
+			var splitDuration = this.duration.subtract(duration);
 			return [ new Note(duration, this.isRest), new Note(splitDuration, this.isRest) ];
 		}
 	};
@@ -39,10 +39,10 @@ RH.Pattern = (function() {
 		getDuration : function() {
 			return this.notes.reduce(function(sum, note) {
 				return sum.add(note.duration);
-			}, new Fraction(0));
+			}, Fraction.ZERO);
 		},
 		toString : function() {
-			return "Pattern[" + this.description + ",D:" + this.difficulty + ",F:" + this.frequency + ",notes:" + this.notes + ",duration:" + this.getDuration().toFraction() + "]";
+			return "Pattern[" + this.description + ",D:" + this.difficulty + ",F:" + this.frequency + ",notes:" + this.notes + ",duration:" + this.getDuration() + "]";
 		}
 	};
 
@@ -73,12 +73,8 @@ RH.RhythmPatterns = (function() {
 		} else {
 			isRest = false;
 		}
-		var split = value.split("/");
-		var numerator = parseInt(split[0].trim(), 10);
-		var denominator = parseInt(split[1].trim(), 10);
-		var duration = new Fraction(numerator, denominator);
+		var duration =  Fraction.parse(value);
 		return new Note(duration, isRest);
-
 	};
 
 	var PATTERNS = [];

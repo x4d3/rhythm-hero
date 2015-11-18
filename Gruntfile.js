@@ -10,15 +10,15 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 		pkg : grunt.file.readJSON('package.json'),
-		clean : ["target"],
+		clean : [ "target" ],
 		copy : {
 			dev : {
-				files : [{
+				files : [ {
 					expand : true,
 					cwd : 'www/',
-					src : ['**'],
+					src : [ '**' ],
 					dest : 'target/'
-				}]
+				} ]
 			}
 		},
 		concat : {
@@ -36,10 +36,10 @@ module.exports = function(grunt) {
 			}
 		},
 		qunit : {
-			files : ['tests/**/*test.html']
+			files : [ 'tests/**/*test.html' ]
 		},
 		jshint : {
-			files : ['Gruntfile.js', 'src/*.js', 'tests/*.js'],
+			files : [ 'Gruntfile.js', 'src/*.js', 'tests/*.js' ],
 			options : {
 				// options here to override JSHint defaults
 				globals : {
@@ -53,15 +53,15 @@ module.exports = function(grunt) {
 		},
 		watch : {
 			scripts : {
-				files : ['<%= jshint.files %>'],
-				tasks : ['jshint', 'concat', 'qunit'],
+				files : [ '<%= jshint.files %>' ],
+				tasks : [ 'jshint', 'concat', 'qunit' ],
 				options : {
 					livereload : true
 				}
 			},
 			html : {
-				files : ['www/*'],
-				tasks : ['clean', 'copy', 'jshint', 'concat', 'qunit'],
+				files : [ 'www/*' ],
+				tasks : [ 'clean', 'copy', 'jshint', 'concat', 'qunit' ],
 				options : {
 					livereload : true
 				}
@@ -80,14 +80,14 @@ module.exports = function(grunt) {
 		uglify : {
 			dist : {
 				files : {
-					'target/script.js' : ['target/script.js']
+					'target/script.js' : [ 'target/script.js' ]
 				}
 			}
 		},
 		cssmin : {
 			dist : {
 				files : {
-					'target/style.css' : ['target/style.css']
+					'target/style.css' : [ 'target/style.css' ]
 				}
 			}
 		},
@@ -124,10 +124,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-appcache');
-	
-	
-	grunt.registerTask('test', ['clean', 'copy', 'jshint', 'concat', 'qunit']);
-	grunt.registerTask('default', ['test', 'connect', 'watch']);
-	grunt.registerTask('stage', ['test', 'uglify', 'cssmin', 'htmlmin', 'appcache']);
-	grunt.registerTask('stage-test', ['stage', 'connect', 'watch']);
+
+	grunt.registerTask('test', [ 'clean', 'copy', 'jshint', 'concat', 'qunit' ]);
+	grunt.registerTask('default', [ 'test', 'connect', 'watch' ]);
+	grunt.registerTask('stage', [ 'test', 'uglify', 'cssmin', 'htmlmin', 'appcache' ]);
+	grunt.registerTask('stage-test', [ 'stage', 'connect', 'watch' ]);
 };

@@ -65,12 +65,11 @@ RH.Game = (function() {
 		var timeSignature = options.timeSignature;
 		var beatPerBar = timeSignature.getBeatPerBar();
 		var beatPerBarF = new Fraction(beatPerBar, 1);
-		var ZERO_F = new Fraction(0);
 		
 		var EMPTY = new RH.Measure(tempo, timeSignature, [], false, false);
 		
 		var result = [EMPTY];
-		var beats = ZERO_F;
+		var beats = Fraction.ZERO;
 
 		var measureNotes = [];
 		var firstNotePressed = false;
@@ -80,20 +79,20 @@ RH.Game = (function() {
 			for (var j = 0; j < notes.length; j++) {
 				var note = notes[j];
 				var sum = note.duration.add(beats);
-				var compare = sum.compare(beatPerBar, 1);
+				var compare = sum.compareTo(beatPerBarF);
 				if (compare > 0) {
-					var durationLeft = beatPerBarF.sub(beats.n, beats.d);
+					var durationLeft = beatPerBarF.subtract(beats);
 					var split = note.split(durationLeft);
 					measureNotes.push(split[0]);
 					result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, true));
 					firstNotePressed = true;
-					var newDuration = note.duration.sub(durationLeft.n, durationLeft.d);
+					var newDuration = note.duration.subtract(durationLeft);
 					measureNotes = [ split[1] ];
 					beats = split[1].duration;
 				} else {
 					measureNotes.push(note);
 					if (compare === 0) {
-						beats = ZERO_F;
+						beats = Fraction.ZERO;
 						result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, false));
 						measureNotes = [];
 						firstNotePressed = false;

@@ -1,5 +1,9 @@
 $(document).ready(function() {
 	'use strict';
+	function createNote(note_data) {
+		return new Vex.Flow.StaveNote(note_data);
+	}
+
 	var body = $("body");
 	var VF = Vex.Flow;
 	var testCanvas = function(title, callBack) {
@@ -26,8 +30,9 @@ $(document).ready(function() {
 		// Dotted eighth E##
 		new Vex.Flow.StaveNote({
 			keys : [ "e##/5" ],
-			duration : "8d"
-		}).addAccidental(0, new Vex.Flow.Accidental("##")).addDotToAll(),
+			duration : "8d",
+			dots:3
+		}).addAccidental(0, new Vex.Flow.Accidental("##")).addDotToAll().addDotToAll(),
 
 		// Sixteenth Eb
 		new Vex.Flow.StaveNote({
@@ -95,16 +100,15 @@ $(document).ready(function() {
 			beat_value : 4,
 			resolution : VF.RESOLUTION
 		});
-
+		var beams = VF.Beam.generateBeams(notes);
 		voice.setStrict(true);
 		voice.addTickables(notes);
 		stave.setContext(context);
 		stave.addTimeSignature("3/4");
 		stave.draw(context);
-		var beams = VF.Beam.generateBeams(notes);
+		
 		var formatter = new VF.Formatter().joinVoices([ voice ]).format([ voice ], 300);
 		voice.draw(context, stave);
-
 
 		beams.forEach(function(beam) {
 			beam.setContext(context).draw();
@@ -114,8 +118,7 @@ $(document).ready(function() {
 		tuplet2.setContext(context).draw();
 	});
 
-	var drawBeamsOnStave = function(context, stave){
-
+	var drawBeamsOnStave = function(context, stave) {
 
 		var note_data = [ {
 			keys : [ "f/4" ],
@@ -155,35 +158,29 @@ $(document).ready(function() {
 			duration : "32"
 		} ];
 
-		function createNote(note_data) {
-			return new Vex.Flow.StaveNote(note_data);
-		}
-		
 		stave.setContext(context);
 		stave.addTimeSignature("3/4");
 		stave.draw(context);
-		
+
 		var formatter = new Vex.Flow.Formatter();
 		var notes = note_data.map(createNote);
 		var voice = new Vex.Flow.Voice(Vex.Flow.TIME4_4);
-		
+
 		var group1 = notes.slice(0, 5);
 		var group2 = notes.slice(5, 12);
 		var beam1 = new Vex.Flow.Beam(group1);
 		var beam2 = new Vex.Flow.Beam(group2);
-		
-		
+
 		voice.addTickables(notes);
 		formatter.joinVoices([ voice ]).formatToStave([ voice ], stave);
 
-		
 		voice.draw(context, stave);
 
 		beam1.setContext(context).draw();
 		beam2.setContext(context).draw();
 
 	};
-	
+
 	testCanvas('3', function(canvas) {
 		var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
 		var context = renderer.getContext();
@@ -202,19 +199,60 @@ $(document).ready(function() {
 		var context = tempCanvas.getContext('2d');
 		var renderer = new Vex.Flow.Renderer(tempCanvas, Vex.Flow.Renderer.Backends.CANVAS);
 		var ctx = renderer.getContext();
-		for (var i = 0; i < numberOfMeasures; i++){
+		for (var i = 0; i < numberOfMeasures; i++) {
 			var stave = new Vex.Flow.Stave(400 * i, 0, 400);
 			drawBeamsOnStave(ctx, stave);
 		}
-		tempCanvaJ.appendTo(body);
 		var savedCanvas = [];
-		for (i = 0; i < numberOfMeasures; i++){
-			savedCanvas[i] = context.getImageData(400* i, 0, 400, 100);
+		for (i = 0; i < numberOfMeasures; i++) {
+			savedCanvas[i] = context.getImageData(400 * i, 0, 400, 100);
 		}
 		canvas.getContext('2d').putImageData(savedCanvas[5], 0, 0);
 	});
-	
 
-	
+	testCanvas('notes', function(canvas) {
+		var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+		var context = renderer.getContext();
+		var stave = new Vex.Flow.Stave(10, 0, 500);
+
+		function newNote(note_struct) {
+			return new VF.StaveNote(note_struct);
+		}
+
+		var note_data = [ {
+			keys : [ "f/4" ],
+			duration : "0.5"
+		}, {
+			keys : [ "f/4" ],
+			duration : "2"
+		}, {
+			keys : [ "f/4" ],
+			duration : "4"
+		}, {
+			keys : [ "f/4" ],
+			duration : "8"
+		},{
+			keys : [ "f/4" ],
+			duration : "16"
+		}
+
+		];
+		var notes = note_data.map(createNote);
+		// 3/4 time
+		var voice = new VF.Voice({
+			num_beats : 4,
+			beat_value : 4,
+			resolution : VF.RESOLUTION
+		});
+
+		voice.setStrict(false);
+		voice.addTickables(notes);
+		stave.setContext(context);
+		stave.addTimeSignature("4/4");
+		stave.draw(context);
+		var formatter = new VF.Formatter().joinVoices([ voice ]).format([ voice ], 300);
+		voice.draw(context, stave);
+
+	});
 
 });

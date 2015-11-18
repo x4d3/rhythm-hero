@@ -1,16 +1,19 @@
 RH.TimeSignature = (function() {
 	'use strict';
-	function TimeSignature(numerator, denumerator) {
+	function TimeSignature(numerator, denominator) {
 		this.numerator = numerator;
-		this.denumerator = denumerator;
+		this.denominator = denominator;
 	}
 	TimeSignature.prototype = {
 		toString : function() {
-			return this.numerator + "/" + this.denumerator;
+			return this.numerator + "/" + this.denominator;
 		},
 		// one beat = one 1/4th
 		getBeatPerBar : function() {
-			return this.numerator * 4 / this.denumerator;
+			return this.numerator * 4 / this.denominator;
+		},
+		equals : function(other) {
+			return other.numerator == this.numerator && other.denominator == this.denominator;
 		}
 	};
 	TimeSignature.parse = function(string) {

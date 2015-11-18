@@ -1,8 +1,9 @@
 [
 	"lib/jquery-2.1.0.min.js",
-	"lib/vexflow-min.js",
+	"lib/vexflow-debug.js",
 	"lib/gaussian.js",
-	"lib/fraction.js",		
+	"lib/fraction.js",
+	"lib/prime-library.js",
 	"rh.js",
 	"time-signature.js",
 	"sounds-manager.js",

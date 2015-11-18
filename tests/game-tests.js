@@ -5,6 +5,7 @@ test("Game.generateBars", function() {
 	var Measure = RH.Measure;
 	var Note = RH.Note;
 	var GameOptions = RH.GameOptions;
+	var RhythmPatterns = RH.RhythmPatterns;
 	
 	var tempo = GameOptions.DEFAULT_TEMPO;
 	var timeSignature = GameOptions.DEFAULT_TS;
@@ -14,7 +15,7 @@ test("Game.generateBars", function() {
 		return new Note(new Fraction(n, d), false);
 	};
 	var testMeasures = function(patternsS, awaitedMeasures) {
-		var patterns = patternsS.map(RH.RhythmPatterns.getPattern);
+		var patterns = patternsS.map(RhythmPatterns.getPattern);
 		var options = new GameOptions(timeSignature, tempo);
 		var measures = Game.generateMeasures(options, patterns);
 		deepEqual(measures, [EMPTY ].concat(awaitedMeasures), "measures" + measures + ", " + awaitedMeasures);

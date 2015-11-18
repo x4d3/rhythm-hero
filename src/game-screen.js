@@ -57,12 +57,11 @@ RH.FrontScreen = (function() {
 				var Y_IS_ON = canvas.height * 3 / 16;
 				var Y_IS_OFF = canvas.height / 4;
 				var y = currentMeasure.firstNotePressed ? Y_IS_ON : Y_IS_OFF;
-				context.fillText(currentMeasure, x + 5, Y_IS_ON - 5);
 				currentMeasure.notes.forEach(function(note, j) {
 					context.moveTo(x, y);
 					y = (note.isRest ? Y_IS_OFF : Y_IS_ON);
 					context.lineTo(x, y);
-					var duration = note.duration.valueOf() * beatLength;
+					var duration = note.duration.value	() * beatLength;
 					var newX = x + duration;
 					if (j == (currentMeasure.notes.length - 1) && currentMeasure.lastNotePressed) {
 						context.lineTo(newX, y);
@@ -111,7 +110,8 @@ RH.BackScreen = (function() {
 	'use strict';
 	var Preconditions = RH.Preconditions;
 	var VF = Vex.Flow;
-
+	var VexUtils = RH.VexUtils;
+	
 	var createMeasuresCanvases = function(measureWidth, measures) {
 		var tempCanvaJ = $('<canvas>');
 
@@ -123,10 +123,7 @@ RH.BackScreen = (function() {
 		var context = tempCanvas.getContext('2d');
 		var renderer = new VF.Renderer(tempCanvas, VF.Renderer.Backends.CANVAS);
 		var ctx = renderer.getContext();
-		var createNote = function(note_data) {
-			return new Vex.Flow.StaveNote(note_data);
-		};
-
+		var currentTimeSignature = null;
 		measures.forEach(function(measure, i) {
 			if (measure.isEmpty) {
 				//display 
@@ -137,69 +134,42 @@ RH.BackScreen = (function() {
 				}
 				return true;
 			}
-
+			var timeSignature = measure.timeSignature;
+			
 			var stave = new VF.Stave(measureWidth * i, 0, measureWidth);
-
 			stave.setContext(context);
-			stave.addTimeSignature("3/4");
+			
+			if (currentTimeSignature === null || currentTimeSignature.equals(timeSignature)){
+				currentTimeSignature = timeSignature;
+				stave.addTimeSignature(timeSignature.toString());
+			}
 			stave.draw(context);
-
 			var formatter = new VF.Formatter();
-			var note_data = [ {
-				keys : [ "f/4" ],
-				duration : "8"
-			}, {
-				keys : [ "e/4" ],
-				duration : "8"
-			}, {
-				keys : [ "d/4" ],
-				duration : "8"
-			}, {
-				keys : [ "c/4" ],
-				duration : "16"
-			}, {
-				keys : [ "c/4" ],
-				duration : "16"
-			}, {
-				keys : [ "c/5" ],
-				duration : "8"
-			}, {
-				keys : [ "b/4" ],
-				duration : "8"
-			}, {
-				keys : [ "c/5" ],
-				duration : "8"
-			}, {
-				keys : [ "c/5" ],
-				duration : "32"
-			}, {
-				keys : [ "c/5" ],
-				duration : "32"
-			}, {
-				keys : [ "b/4" ],
-				duration : "32"
-			}, {
-				keys : [ "f/4" ],
-				duration : "32"
-			} ];
+			var result = VexUtils.generateNotesTupletTiesAndBeams(measure.notes);
 
-			var notes = note_data.map(createNote);
-			var voice = new VF.Voice(VF.TIME4_4);
-
-			var group1 = notes.slice(0, 5);
-			var group2 = notes.slice(5, 12);
-			var beams = [];
-			beams.push(new Vex.Flow.Beam(group1));
-			beams.push(new Vex.Flow.Beam(group2));
-
-			voice.addTickables(notes);
+			var voice = new VF.Voice({
+				num_beats : timeSignature.numerator,
+				beat_value : timeSignature.denominator,
+				resolution : VF.RESOLUTION
+			});
+			voice.setStrict(false);
+			voice.addTickables(result.notes);
 			formatter.joinVoices([ voice ]).formatToStave([ voice ], stave);
-
 			voice.draw(context, stave);
-			beams.forEach(function(beam) {
+			
+			result.beams.forEach(function(beam) {
 				beam.setContext(context).draw();
 			});
-
+			result.ties.forEach(function(tie) {
+				tie.setContext(context).draw();
+			});
+			result.tuplets.forEach(function(tuplet) {
+				tuplet.setContext(context).draw();
+			});
+			if (RH.isDebug){
+				context.fillText(measure, measureWidth * i, 0);
+			}
+			
 		});
 		var result = [];
 		for (var i = 0; i < measures.length; i++) {
@@ -217,7 +187,8 @@ RH.BackScreen = (function() {
 		this.measures = measures;
 		this.measuresCanvases = createMeasuresCanvases(this.measureWidth, measures);
 	};
-
+	BackScreen.createMeasuresCanvases = createMeasuresCanvases;
+	
 	BackScreen.prototype = {
 
 		update : function(measureInfo) {
