@@ -117,7 +117,7 @@ RH.BackScreen = (function() {
 
 		tempCanvaJ.prop({
 			width : measureWidth * measures.length,
-			height : 100
+			height : 150
 		});
 		var tempCanvas = tempCanvaJ[0];
 		var context = tempCanvas.getContext('2d');
