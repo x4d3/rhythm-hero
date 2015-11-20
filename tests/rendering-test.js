@@ -9,7 +9,8 @@ $(document).ready(function() {
 	var BackScreen = RH.BackScreen;
 	
 	var WIDTH = 400;
-	
+	//To make the test reproduceable
+	Math.seedrandom('Test');
 	RH.debug();
 	function createNote(note_data) {
 		return new Vex.Flow.StaveNote(note_data);

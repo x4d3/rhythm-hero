@@ -1,7 +1,7 @@
 Rhythm Hero
 ==========
 
-Little game to learn read rythm on music sheet.
+Little game to learn read rythm on music sheet, using [VexFlow](http://www.vexflow.com) music notation rendering API.
 
 [![Build Status](https://travis-ci.org/x4d3/rhythm-hero.svg?branch=master)](https://travis-ci.org/x4d3/rhythm-hero)
 
@@ -27,3 +27,12 @@ and call
 $ ./deploy.sh
 ```
 
+Libraries
+------------
+The project use:
+
+- [VexFlow](http://www.vexflow.com) 
+- [Gaussian](https://github.com/errcw/gaussian)
+- [seedrandom](https://github.com/davidbau/seedrandom)
+- [fraction.js](https://github.com/x4d3/fraction.js)
+- [prime-library.js](https://github.com/x4d3/prime-library.js)
