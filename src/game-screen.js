@@ -124,6 +124,7 @@ RH.BackScreen = (function() {
 		var renderer = new VF.Renderer(tempCanvas, VF.Renderer.Backends.CANVAS);
 		var ctx = renderer.getContext();
 		var currentTimeSignature = null;
+		var currentTempo = null;
 		measures.forEach(function(measure, i) {
 			if (measure.isEmpty) {
 				//display 
@@ -135,14 +136,24 @@ RH.BackScreen = (function() {
 				return true;
 			}
 			var timeSignature = measure.timeSignature;
-			
+			var tempo = measure.tempo;
 			var stave = new VF.Stave(measureWidth * i, 0, measureWidth);
 			stave.setContext(context);
 			
-			if (currentTimeSignature === null || currentTimeSignature.equals(timeSignature)){
+			if (currentTimeSignature === null || !currentTimeSignature.equals(timeSignature)){
 				currentTimeSignature = timeSignature;
 				stave.addTimeSignature(timeSignature.toString());
 			}
+			if (currentTempo === null || currentTempo != tempo){
+				currentTempo = tempo;
+				stave.setTempo({
+					duration : "q",
+					bpm : tempo
+				}, 0);
+			}
+
+
+			
 			stave.draw(context);
 			var formatter = new VF.Formatter();
 			var result = VexUtils.generateNotesTupletTiesAndBeams(measure.notes);
