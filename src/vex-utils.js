@@ -217,11 +217,15 @@ RH.VexUtils = (function() {
 
 			});
 		});
+		var beamsOption = {
+			beam_rests : true,
+			beam_middle_only : true
+		};
 		return {
 			notes : vxNotes,
 			tuplets : tuplets,
 			ties : ties,
-			beams : VF.Beam.generateBeams(vxNotes)
+			beams : VF.Beam.generateBeams(vxNotes, beamsOption)
 		};
 
 	};
