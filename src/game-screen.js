@@ -117,7 +117,7 @@ RH.BackScreen = (function() {
 
 		tempCanvaJ.prop({
 			width : measureWidth * measures.length,
-			height : 150
+			height : 200
 		});
 		var tempCanvas = tempCanvaJ[0];
 		var context = tempCanvas.getContext('2d');
@@ -160,20 +160,21 @@ RH.BackScreen = (function() {
 			result.beams.forEach(function(beam) {
 				beam.setContext(context).draw();
 			});
-			result.ties.forEach(function(tie) {
-				tie.setContext(context).draw();
-			});
 			result.tuplets.forEach(function(tuplet) {
 				tuplet.setContext(context).draw();
 			});
+			result.ties.forEach(function(tie) {
+				tie.setContext(context).draw();
+			});
+
 			if (RH.isDebug){
-				context.fillText(measure, measureWidth * i, 0);
+				context.fillText(measure, measureWidth * i, 20);
 			}
 			
 		});
 		var result = [];
 		for (var i = 0; i < measures.length; i++) {
-			result[i] = context.getImageData(measureWidth * i, 0, measureWidth, 100);
+			result[i] = context.getImageData(measureWidth * i, 0, measureWidth, 200);
 		}
 		return result;
 	};

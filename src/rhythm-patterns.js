@@ -92,11 +92,12 @@ RH.RhythmPatterns = (function() {
 	addPattern("whole", 0, 10, "4/1");
 	addPattern("minim", 0, 10, "2/1");
 	addPattern("crotchet", 0, 100, "1/1");
-	addPattern("double quivers", 1, 100, "1/2,1/2");
-	addPattern("dotted, crotchet quaver", 1, 100, "3/2,1/2");
-	addPattern("quaver, dotted crotchet", 1, 100, "1/2,3/2");
+	addPattern("quaver", 0, 50, "1/2");
+	addPattern("double quaver", 1, 100, "1/2,1/2");
+	addPattern("dotted crotchet quaver", 1, 100, "3/2,1/2");
+	addPattern("quaver dotted crotchet", 1, 100, "1/2,3/2");
 
-	addPattern("triplet quaver ", 2, 20, "1/3,1/3,1/3");
+	addPattern("triplet quaver", 2, 20, "1/3,1/3,1/3");
 	addPattern("triplet crotchet", 3, 20, "2/3,2/3,2/3");
 
 	addPattern("crotchet rest", 0, 100, "1/1r");

@@ -1,16 +1,25 @@
 $(document).ready(function() {
 	'use strict';
 	module("Rendering Tests");
+	var Game = RH.Game;
+	var Measure = RH.Measure;
+	var Note = RH.Note;
+	var GameOptions = RH.GameOptions;
+	var RhythmPatterns = RH.RhythmPatterns;
+	var BackScreen = RH.BackScreen;
+	
+	var WIDTH = 400;
+	
 	RH.debug();
 	function createNote(note_data) {
 		return new Vex.Flow.StaveNote(note_data);
 	}
 
 	var VF = Vex.Flow;
-	var generateCanvas = function(title, canvasWidth){
+	var generateCanvas = function(title, WIDTH){
 		var canvasJ = $('<canvas>');
 		canvasJ.prop({
-			width : canvasWidth,
+			width : WIDTH,
 			height : 100
 		});
 		$('<div>').append($('<h2>').text(title)).append(canvasJ).appendTo($("#test-output"));
@@ -27,13 +36,8 @@ $(document).ready(function() {
 
 	test('first', function() {
 		var title = 'first';
-		var Game = RH.Game;
-		var Measure = RH.Measure;
-		var Note = RH.Note;
-		var GameOptions = RH.GameOptions;
-		var RhythmPatterns = RH.RhythmPatterns;
-		var BackScreen = RH.BackScreen;
-		var canvasWidth = 400;
+
+
 		
 		var tempo = GameOptions.DEFAULT_TEMPO;
 		var timeSignature = GameOptions.DEFAULT_TS;
@@ -41,22 +45,33 @@ $(document).ready(function() {
 		var measures = Game.generateMeasures(options, RhythmPatterns.PATTERNS);
 		
 		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
-		var canvas = generateCanvas(title, canvasWidth * measures.length);
+		var canvas = generateCanvas(title, WIDTH * measures.length);
 		for (var i = 0; i < measures.length; i++){
-			canvas.getContext('2d').putImageData(canvasesData[i], canvasWidth * i , 0);
+			canvas.getContext('2d').putImageData(canvasesData[i], WIDTH * i , 0);
 		}
 		ok(true, title);
 	});
 
 	test('second', function() {
 		var title = 'second';
-		var Game = RH.Game;
-		var Measure = RH.Measure;
-		var Note = RH.Note;
-		var GameOptions = RH.GameOptions;
-		var RhythmPatterns = RH.RhythmPatterns;
-		var BackScreen = RH.BackScreen;
-		var canvasWidth = 400;
+		
+		var tempo = GameOptions.DEFAULT_TEMPO;
+		var timeSignature = GameOptions.DEFAULT_TS;
+		var options = new GameOptions(timeSignature, tempo);
+		var patternsS = ['minim','crotchet', 'quaver', 'triplet quaver','dotted crotchet quaver', 'quaver dotted crotchet', 'whole'];
+		var patterns = patternsS.map(RhythmPatterns.getPattern);
+		var measures = Game.generateMeasures(options, patterns);
+		
+		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
+		var canvas = generateCanvas(title, WIDTH * measures.length);
+		for (var i = 0; i < measures.length; i++){
+			canvas.getContext('2d').putImageData(canvasesData[i], WIDTH * i , 0);
+		}
+		ok(true, title);
+	});
+	
+	test('third', function() {
+		var title = 'third';
 		
 		var tempo = GameOptions.DEFAULT_TEMPO;
 		var timeSignature = GameOptions.DEFAULT_TS;
@@ -65,11 +80,11 @@ $(document).ready(function() {
 		var measures = Game.generateMeasures(options, patterns);
 		
 		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
-		var canvas = generateCanvas(title, canvasWidth * measures.length);
+		var canvas = generateCanvas(title, WIDTH * measures.length);
 		for (var i = 0; i < measures.length; i++){
-			canvas.getContext('2d').putImageData(canvasesData[i], canvasWidth * i , 0);
+			canvas.getContext('2d').putImageData(canvasesData[i], WIDTH * i , 0);
 		}
 		ok(true, title);
 	});
-	
+
 });

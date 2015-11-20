@@ -121,7 +121,7 @@ RH.VexUtils = (function() {
 	var isPowerTwo = function(n) {
 		return (n & (n - 1)) === 0;
 	};
-	//Awful, awful code...R
+	//Awful, awful code...Refactor please.
 	VexUtils.generateNotesTupletTiesAndBeams = function(notes) {
 
 		var allNotes = [];
@@ -205,14 +205,18 @@ RH.VexUtils = (function() {
 					var n = wholeDuration.numerator;
 					var d = wholeDuration.denominator;
 					if ((n == 1 && isPowerTwo(d)) || (d == 1 && isPowerTwo(1))) {
-						tuplets.push(new VF.Tuplet(vxNotes.slice(-currentTuplet.length)));
+						var tupletOption =  {
+							num_notes : noteData.tupletFactor,
+							beats_occupied : wholeDuration.value()
+						};
+						var tuplet = new VF.Tuplet(vxNotes.slice(-currentTuplet.length), tupletOption);
+						tuplets.push(tuplet);
 						currentTuplet = [];
 					}
 				}
 
 			});
 		});
-
 		return {
 			notes : vxNotes,
 			tuplets : tuplets,
