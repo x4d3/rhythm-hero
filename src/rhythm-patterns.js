@@ -80,6 +80,9 @@ RH.RhythmPatterns = (function() {
 	var PATTERNS = [];
 	var PATTERNS_PER_DESCRIPTION = {};
 	var addPattern = function(description, difficulty, frequency, notesString) {
+		if (description === null){
+			description = notesString;
+		}
 		var notes = parseNotes(notesString);
 		var pattern = new Pattern(description, difficulty, frequency, notes);
 		PATTERNS.push(pattern);
@@ -97,12 +100,29 @@ RH.RhythmPatterns = (function() {
 	addPattern("dotted crotchet quaver", 1, 100, "3/2,1/2");
 	addPattern("quaver dotted crotchet", 1, 100, "1/2,3/2");
 
+	addPattern("crotchet rest", 0, 100, "1/1r");
+	addPattern("quaver rest", 1, 100, "1/2r");
+	addPattern("quaver rest quaver", 1, 100, "1/2r,1/2");
+	
+	addPattern(null, 2, 25, "1/4,1/4,1/4,1/4");
+	addPattern(null, 2, 25, "1/4,1/4,1/2");
+	addPattern(null, 2, 25, "1/2,1/4,1/4");
+	addPattern(null, 2, 25, "3/4,1/4");
+	addPattern(null, 2, 25, "1/4,3/4");
+	
+	addPattern(null, 2, 25, "1/4,1/4r,1/4,1/4");
+	addPattern(null, 2, 25, "1/4,1/4r,1/2");
+	addPattern(null, 2, 25, "1/2,1/4r,1/4");
+	addPattern(null, 2, 25, "3/4r,1/4");
+	addPattern(null, 2, 25, "1/4r,3/4");
+	
+	
+	
 	addPattern("triplet quaver", 2, 20, "1/3,1/3,1/3");
 	addPattern("triplet crotchet", 3, 20, "2/3,2/3,2/3");
 
-	addPattern("crotchet rest", 0, 100, "1/1r");
-	addPattern("quaver rest", 1, 100, "1/2r");
-	addPattern("quaver rest, quaver", 1, 100, "1/2r,1/2");
+	addPattern("quintuplet quaver", 5, 20, "1/5,1/5,1/5,1/5,1/5");
+	addPattern("quintuplet crotchet", 6, 20, "2/5,2/5,2/5,2/5,2/5");
 
 	var difficulties = PATTERNS.map(function(x) {
 		return x.difficulty;

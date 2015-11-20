@@ -6,7 +6,7 @@ test("general", function() {
 	for (var i = 0; i < patterns.length; i++) {
 		console.log(patterns[i]);
 	}
-	equal(RH.RhythmPatterns.MAX_DIFFICULTY, 3);
+	equal(RH.RhythmPatterns.MAX_DIFFICULTY, 6);
 
 });
 
