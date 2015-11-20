@@ -13,7 +13,8 @@
 	"measure.js",
 	"event-manager.js",
 	"metronome.js",
-	"game-screen.js",
+	"front-screen.js",
+	"back-screen.js",
 	"game-options.js",
 	"game.js",
 	"application.js"
