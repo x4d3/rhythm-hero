@@ -14,13 +14,19 @@ $(document).ready(function() {
 	function createNote(note_data) {
 		return new Vex.Flow.StaveNote(note_data);
 	}
-
+	var displayCanvas = function(title, canvasesData){
+		var canvas = generateCanvas(title, WIDTH * canvasesData.length);
+		for (var i = 1; i < canvasesData.length; i++){
+			canvas.getContext('2d').putImageData(canvasesData[i], WIDTH * (i-1) , 0);
+		}
+	};
+	
 	var VF = Vex.Flow;
 	var generateCanvas = function(title, WIDTH){
 		var canvasJ = $('<canvas>');
 		canvasJ.prop({
 			width : WIDTH,
-			height : 100
+			height : 150
 		});
 		$('<div>').append($('<h2>').text(title)).append(canvasJ).appendTo($("#test-output"));
 		return canvasJ[0];
@@ -45,10 +51,7 @@ $(document).ready(function() {
 		var measures = Game.generateMeasures(options, RhythmPatterns.PATTERNS);
 		
 		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
-		var canvas = generateCanvas(title, WIDTH * measures.length);
-		for (var i = 0; i < measures.length; i++){
-			canvas.getContext('2d').putImageData(canvasesData[i], WIDTH * i , 0);
-		}
+		displayCanvas(title, canvasesData);
 		ok(true, title);
 	});
 
@@ -63,10 +66,7 @@ $(document).ready(function() {
 		var measures = Game.generateMeasures(options, patterns);
 		
 		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
-		var canvas = generateCanvas(title, WIDTH * measures.length);
-		for (var i = 0; i < measures.length; i++){
-			canvas.getContext('2d').putImageData(canvasesData[i], WIDTH * i , 0);
-		}
+		displayCanvas(title, canvasesData);
 		ok(true, title);
 	});
 	
@@ -80,10 +80,7 @@ $(document).ready(function() {
 		var measures = Game.generateMeasures(options, patterns);
 		
 		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
-		var canvas = generateCanvas(title, WIDTH * measures.length);
-		for (var i = 0; i < measures.length; i++){
-			canvas.getContext('2d').putImageData(canvasesData[i], WIDTH * i , 0);
-		}
+		displayCanvas(title, canvasesData);
 		ok(true, title);
 	});
 
