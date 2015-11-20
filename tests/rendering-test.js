@@ -12,53 +12,35 @@ $(document).ready(function() {
 	//To make the test reproduceable
 	Math.seedrandom('Test');
 	RH.debug();
-	function createNote(note_data) {
-		return new Vex.Flow.StaveNote(note_data);
-	}
-	var displayCanvas = function(title, canvasesData){
-		var canvas = generateCanvas(title, WIDTH * canvasesData.length);
-		for (var i = 1; i < canvasesData.length; i++){
-			canvas.getContext('2d').putImageData(canvasesData[i], WIDTH * (i-1) , 0);
-		}
-	};
 	
-	var VF = Vex.Flow;
 	var generateCanvas = function(title, WIDTH){
 		var canvasJ = $('<canvas>');
 		canvasJ.prop({
 			width : WIDTH,
-			height : 150
+			height : 150	
 		});
 		$('<div>').append($('<h2>').text(title)).append(canvasJ).appendTo($("#test-output"));
 		return canvasJ[0];
 	};
 	
-	var testCanvas = function(title, callBack) {
-		test(title, function() {
-			var canvas = generateCanvas(title, 800);
-			callBack(canvas);
-			ok(true, title);
-		});
+	var displayCanvases = function(title, canvasesData){
+		var canvas = generateCanvas(title, WIDTH * canvasesData.length);
+		for (var i = 1; i < canvasesData.length; i++){
+			canvas.getContext('2d').putImageData(canvasesData[i], WIDTH * (i-1) , 0);
+		}
 	};
-
-	test('first', function() {
-		var title = 'first';
-
-
-		
+	test('All Patterns', function(assert) {
 		var tempo = GameOptions.DEFAULT_TEMPO;
 		var timeSignature = GameOptions.DEFAULT_TS;
 		var options = new GameOptions(timeSignature, tempo);
 		var measures = Game.generateMeasures(options, RhythmPatterns.PATTERNS);
 		
 		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
-		displayCanvas(title, canvasesData);
-		ok(true, title);
+		displayCanvases(assert.testName, canvasesData);
+		ok(true);
 	});
 
-	test('second', function() {
-		var title = 'second';
-		
+	test('Defined Patterns', function(assert) {
 		var tempo = GameOptions.DEFAULT_TEMPO;
 		var timeSignature = GameOptions.DEFAULT_TS;
 		var options = new GameOptions(timeSignature, tempo);
@@ -67,22 +49,20 @@ $(document).ready(function() {
 		var measures = Game.generateMeasures(options, patterns);
 		
 		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
-		displayCanvas(title, canvasesData);
-		ok(true, title);
+		displayCanvases(assert.testName, canvasesData);
+		ok(true);
 	});
 	
-	test('third', function() {
-		var title = 'third';
-		
+	test('Random Patterns', function(assert) {
 		var tempo = GameOptions.DEFAULT_TEMPO;
 		var timeSignature = GameOptions.DEFAULT_TS;
 		var options = new GameOptions(timeSignature, tempo);
-		var patterns = RH.RhythmPatterns.generatePatterns(0, RH.RhythmPatterns.MAX_DIFFICULTY, 50);
+		var patterns = RH.RhythmPatterns.generatePatterns(0, RH.RhythmPatterns.MAX_DIFFICULTY, 100);
 		var measures = Game.generateMeasures(options, patterns);
 		
 		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
-		displayCanvas(title, canvasesData);
-		ok(true, title);
+		displayCanvases(assert.testName, canvasesData);
+		ok(true);
 	});
 
 });
