@@ -4,13 +4,12 @@ body {
 
 #canvases {
 	bottom: 0;
-	height: 200px;
+	height: 300px;
 	left: 0;
 	margin: auto;
 	position: absolute;
 	right: 0;
 	top: 0;
-	width: 800px;
 }
 
 canvas {
@@ -95,20 +94,21 @@ div.rounded {
 }
 
 .modal .message {
-	position:absolute;
+	position: absolute;
 	top: 50%;
 	bottom: 50%;
-	left:50%;
-	right:50%;
+	left: 50%;
+	right: 50%;
 }
+
 .modal img {
 	float: left;
 }
+
 .modal i {
 	padding-left: 5px;
 	te
 }
-
 
 /* When the body has the loading class, we turn
    the scrollbar off with overflow:hidden */
@@ -120,4 +120,24 @@ body.loading {
    modal element will be visible */
 body.loading .modal {
 	display: block;
+}
+
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) { /* Styles */
+}
+
+/* Smartphones (landscape) ----------- */
+@media only screen and (max-device-width : 800px) { /* Styles */
+	#canvases {
+		min-width: 100%;
+	}
+	canvas {
+		width: 100%;
+	}
+}
+
+@media only screen and (min-device-width : 800px) { /* Styles */
+	#canvases {
+		width: 800px;
+	}
 }
