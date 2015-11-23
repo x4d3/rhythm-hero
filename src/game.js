@@ -3,6 +3,7 @@ RH.Game = (function() {
 	var VexUtils = RH.VexUtils;
 	var Note = RH.Note;
 	var Measure = RH.Measure;
+	var ScoreCalculator = RH.ScoreCalculator;
 	var logger = RH.logManager.getLogger('Game');
 	
 	var Game = function(eventManager, canvases, options) {
@@ -24,6 +25,7 @@ RH.Game = (function() {
 		this.isOn = true;
 		this.t0 = RH.getTime();
 		this.currentMeasureIndex = -1;
+		this.scoreCalculator = new ScoreCalculator(eventManager, this.measures);
 	};
 	
 	Game.prototype = {
@@ -34,6 +36,7 @@ RH.Game = (function() {
 			var startTime = this.measuresStartTime[measureIndex];
 			var measure = this.measures[measureIndex];
 			if (measureIndex !== this.currentMeasureIndex){
+				this.scoreCalculator.addMeasureScore(t, this.currentMeasureIndex);
 				this.currentMeasureIndex = measureIndex;
 				logger.debug(measureIndex + "," + measure);
 				//new measure, let's calculate the measure score

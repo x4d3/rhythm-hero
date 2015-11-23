@@ -16,6 +16,7 @@
 	"front-screen.js",
 	"back-screen.js",
 	"game-options.js",
+	"score-calculator.js",
 	"game.js",
 	"application.js"
 ]

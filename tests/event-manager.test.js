@@ -4,10 +4,12 @@ test("getEvents", function() {
 	var mockEvent = {
 		which : 30
 	};
-	var newEvent = function(isPressed, duration) {
+	var newEvent = function(isPressed, t1, t2) {
 		return {
 			isPressed : isPressed,
-			duration : duration
+			duration : t2 - t1,
+			t1 : t1,
+			t2 : t2
 		};
 	};
 
@@ -30,10 +32,10 @@ test("getEvents", function() {
 	}
 	timeAnswered = 20;
 
-	var expected = [ newEvent(false, 5), newEvent(true, 1), newEvent(false, 2), newEvent(true, 3), newEvent(false, 4), newEvent(true, 5) ];
+	var expected = [ newEvent(false, 0, 5), newEvent(true, 5, 6), newEvent(false, 6, 8), newEvent(true, 8, 11), newEvent(false, 11, 15), newEvent(true, 15, 20) ];
 	deepEqual(eventManager.getEvents(0), expected);
 
-	expected = [ newEvent(false, 1), newEvent(true, 3), newEvent(false, 4), newEvent(true, 5) ];
+	expected = [ newEvent(false, 7, 8), newEvent(true, 8, 11), newEvent(false, 11, 15), newEvent(true, 15, 20) ];
 	deepEqual(eventManager.getEvents(7), expected);
 
 });

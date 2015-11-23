@@ -11,9 +11,7 @@ RH.FrontScreen = (function() {
 	}
 	FrontScreen.prototype = {
 		update : function(measureInfo) {
-			if (!RH.isDebug) {
-				return;
-			}
+
 			var canvas = this.canvas;
 
 			var measure = measureInfo.measure;
@@ -22,7 +20,21 @@ RH.FrontScreen = (function() {
 
 			var context = canvas.getContext("2d");
 			context.clearRect(0, 0, canvas.width, canvas.height);
-
+			
+			if(this.eventManager.isPressed){
+				context.beginPath();
+				context.arc(canvas.width - 20, 20, 10, 0, 2 * Math.PI, false);
+				context.fillStyle = 'grey';
+				context.fill();
+				context.lineWidth = 0.5;
+				context.strokeStyle = 'black';
+				context.stroke();
+			}
+			
+			
+			if (!RH.isDebug) {
+				return;
+			}
 			this.displayEvents(measureInfo);
 
 			var shift = this.measureLength * (-0.5 + measureInfo.ellapsedBeats / beatPerBar);
