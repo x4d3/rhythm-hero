@@ -83,8 +83,9 @@ RH.BackScreen = (function() {
 	};
 
 	// timeWidth is the number of miliseconds screen the canvas width can represent
-	var BackScreen = function(canvas, measures, options) {
+	var BackScreen = function(canvas, scoreCalculator, measures, options) {
 		this.canvas = canvas;
+		this.scoreCalculator = scoreCalculator;
 		this.options = options;
 		this.metronome = new RH.Metronome(50, 50);
 		this.measureWidth = Math.floor(canvas.width / 2);
@@ -99,29 +100,44 @@ RH.BackScreen = (function() {
 			var measure = measureInfo.measure;
 			var beatPerBar = measure.getBeatPerBar();
 			var shift = this.measureWidth * (-0.5 + measureInfo.ellapsedBeats / beatPerBar);
-
+			var screen = this;
 			var canvas = this.canvas;
 			var context = canvas.getContext("2d");
 			context.clearRect(0, 0, canvas.width, canvas.height);
 
-			for (var i = -1; i < 3; i++) {
-				var startStave = i * this.measureWidth - shift;
+			[ -1, 0, 1, 2 ].forEach(function(i) {
+				var startStave = i * screen.measureWidth - shift;
 				var index = measureInfo.index + i;
-				if (index < 0 || index >= this.measuresCanvases.length) {
-					continue;
+				if (index < 0 || index >= screen.measuresCanvases.length) {
+					return;
 				}
-
-				var measureCanvasData = this.measuresCanvases[index];
+				if (i == -1) {
+					var noteScores = screen.scoreCalculator.measuresScore[index];
+					if (noteScores !== undefined) {
+						context.save();
+						var y = 50;
+						var x = startStave + screen.measureWidth - 20;
+						noteScores.forEach(function(noteScore) {
+							var type = noteScore.getType();
+							var ch = type.icon;
+							context.fillStyle = type.color;
+							context.fillText(ch, x, y);
+							x += context.measureText(ch).width;
+						});
+						context.restore();
+					}
+				}
+				var measureCanvasData = screen.measuresCanvases[index];
 				canvas.getContext('2d').putImageData(measureCanvasData, startStave, 50);
 				//display the count down
-				if (this.measures[index].isEmpty) {
+				if (screen.measures[index].isEmpty) {
 					context.beginPath();
-					context.arc(3 + startStave + RH.divide(measureInfo.ellapsedBeats, 1).quotient * this.measureWidth / this.measures[index].getBeatPerBar(), 107, 8, 0, 2 * Math.PI, false);
+					context.arc(3 + startStave + RH.divide(measureInfo.ellapsedBeats, 1).quotient * screen.measureWidth / screen.measures[index].getBeatPerBar(), 107, 8, 0, 2 * Math.PI, false);
 					context.lineWidth = 1;
 					context.strokeStyle = '#003300';
 					context.stroke();
 				}
-			}
+			});
 
 			//Draw Metronome
 			context.save();

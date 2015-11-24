@@ -19,7 +19,6 @@ test("getEvents", function() {
 	});
 
 	var onDown = true;
-
 	var times = [ 5, 6, 8, 11, 15 ];
 	for (var i = 0; i < times.length; i++) {
 		timeAnswered = times[i];

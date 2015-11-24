@@ -3,6 +3,7 @@
 	"lib/seedrandom.js",
 	"lib/vexflow-debug.js",
 	"lib/gaussian.js",
+	"lib/numeral.min.js",
 	"lib/fraction.js",
 	"lib/prime-library.js",
 	"rh.js",

@@ -9,6 +9,25 @@ RH.EventManager = (function() {
 	}
 
 	EventManager.prototype = {
+		getEventsBetween : function(startTime, endTime) {
+			var index1 = RH.binarySearch(this.keyChanged, startTime);
+			var index2 = RH.binarySearch(this.keyChanged, endTime);
+			if(this.keyChanged[index2] < endTime){
+				index2++;
+			}
+			var isPressed = index1 % 2 === 0;
+			var result = [];
+			for (var i = index1; i < index2 + 1; i++) {
+				if (i>= 0 && i < this.keyChanged.length) {
+					result.push({
+						isPressed : isPressed,
+						t : this.keyChanged[i],
+					});
+				}
+				isPressed = !isPressed;
+			}
+			return result;
+		},
 		getEvents : function(t) {
 			var index = RH.binarySearch(this.keyChanged, t);
 			var isPressed = index % 2 === 0;
@@ -16,7 +35,9 @@ RH.EventManager = (function() {
 			var addToResult = function(t1, t2) {
 				result.push({
 					isPressed : isPressed,
-					duration : t2 - t1
+					duration : t2 - t1,
+					t1 : t1,
+					t2 : t2
 				});
 				isPressed = !isPressed;
 			};

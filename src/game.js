@@ -18,14 +18,15 @@ RH.Game = (function() {
 			return result;
 		});
 		this.measuresStartTime.push(currentTime);
+		this.scoreCalculator = new ScoreCalculator(eventManager, this.measures);
 		this.screens = {
 			front : new RH.FrontScreen(canvases.front, eventManager, this.measures, options),
-			back : new RH.BackScreen(canvases.back, this.measures, options)
+			back : new RH.BackScreen(canvases.back, this.scoreCalculator, this.measures, options)
 		};
 		this.isOn = true;
 		this.t0 = RH.getTime();
 		this.currentMeasureIndex = -1;
-		this.scoreCalculator = new ScoreCalculator(eventManager, this.measures);
+		
 	};
 	
 	Game.prototype = {
@@ -70,7 +71,6 @@ RH.Game = (function() {
 		var beatPerBarF = new Fraction(beatPerBar, 1);
 		
 		var EMPTY = new RH.Measure(tempo, timeSignature, [], false, false);
-		
 		var result = [EMPTY];
 		var beats = Fraction.ZERO;
 

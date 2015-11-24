@@ -34,5 +34,6 @@ The project use:
 - [VexFlow](http://www.vexflow.com) 
 - [Gaussian](https://github.com/errcw/gaussian)
 - [seedrandom](https://github.com/davidbau/seedrandom)
+- [Numeral-js](https://github.com/adamwdraper/Numeral-js)
 - [fraction.js](https://github.com/x4d3/fraction.js)
 - [prime-library.js](https://github.com/x4d3/prime-library.js)
