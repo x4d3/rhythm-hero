@@ -12,7 +12,7 @@ RH.Screen = (function() {
 		this.options = options;
 		this.measureWidth = canvas.width / 2;
 		this.metronome = new RH.Metronome(50, 50);
-		this.measuresCanvases = createMeasuresCanvases(this.measureWidth, measures);
+		this.measuresCanvases = VexUtils.generateMeasuresCanvases(this.measureWidth, measures);
 	}
 
 	Screen.prototype = {
@@ -158,83 +158,6 @@ RH.Screen = (function() {
 		}
 	};
 
-	var createMeasuresCanvases = function(measureWidth, measures) {
-		var tempCanvaJ = $('<canvas>');
-
-		tempCanvaJ.prop({
-			width : measureWidth * measures.length,
-			height : 200
-		});
-		var tempCanvas = tempCanvaJ[0];
-		var context = tempCanvas.getContext('2d');
-		var renderer = new VF.Renderer(tempCanvas, VF.Renderer.Backends.CANVAS);
-		var ctx = renderer.getContext();
-		var currentTimeSignature = null;
-		var currentTempo = null;
-		measures.forEach(function(measure, i) {
-			if (measure.isEmpty) {
-				// display
-				var x = measureWidth * i;
-				var beatPerBar = measure.getBeatPerBar();
-				for (var j = 0; j < beatPerBar; j++) {
-					context.fillText(j + 1, x + j * measureWidth / beatPerBar, 60);
-				}
-				return true;
-			}
-			var timeSignature = measure.timeSignature;
-			var tempo = measure.tempo;
-			var stave = new VF.Stave(measureWidth * i, 0, measureWidth);
-			stave.setContext(context);
-
-			if (currentTimeSignature === null || !currentTimeSignature.equals(timeSignature)) {
-				currentTimeSignature = timeSignature;
-				stave.addTimeSignature(timeSignature.toString());
-			}
-			if (currentTempo === null || currentTempo != tempo) {
-				currentTempo = tempo;
-				stave.setTempo({
-					duration : "q",
-					bpm : tempo
-				}, 0);
-			}
-
-			stave.draw(context);
-			var formatter = new VF.Formatter();
-			var result = VexUtils.generateNotesTupletTiesAndBeams(measure.notes);
-
-			var voice = new VF.Voice({
-				num_beats : timeSignature.numerator,
-				beat_value : timeSignature.denominator,
-				resolution : VF.RESOLUTION
-			});
-			voice.setStrict(false);
-			voice.addTickables(result.notes);
-			formatter.joinVoices([ voice ]).formatToStave([ voice ], stave);
-			voice.draw(context, stave);
-
-			result.beams.forEach(function(beam) {
-				beam.setContext(context).draw();
-			});
-			result.tuplets.forEach(function(tuplet) {
-				tuplet.setContext(context).draw();
-			});
-			result.ties.forEach(function(tie) {
-				tie.setContext(context).draw();
-			});
-
-			if (RH.isDebug) {
-				context.fillText(measure, measureWidth * i, 20);
-			}
-
-		});
-		var result = [];
-		for (var i = 0; i < measures.length; i++) {
-			result[i] = context.getImageData(measureWidth * i, 0, measureWidth, 200);
-		}
-		return result;
-	};
-
-	Screen.createMeasuresCanvases = createMeasuresCanvases;
 
 	return Screen;
 
