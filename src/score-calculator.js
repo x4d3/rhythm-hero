@@ -80,7 +80,7 @@ RH.ScoreCalculator = (function() {
 			}
 			var bpm = measure.getBeatPerMillisecond();
 
-			var measureDuration = measure.getBeatPerBar() / bpm;
+			var measureDuration = measure.getDuration();
 
 			var noteStartTime = t - measureDuration;
 			var notesScores = measure.notes.map(function(note, noteIndex) {

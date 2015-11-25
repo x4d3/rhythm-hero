@@ -22,6 +22,9 @@ RH.Measure = (function() {
 		},
 		getBeatPerBar : function() {
 			return this.timeSignature.getBeatPerBar();
+		},
+		getDuration : function() {
+			return this.getBeatPerBar() / this.getBeatPerMillisecond();
 		}
 	};
 

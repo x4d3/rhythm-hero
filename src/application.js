@@ -9,8 +9,8 @@ RH.Application = (function() {
 		return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
 	}
 
-	function Application(canvases) {
-		this.canvases = canvases;
+	function Application(canvas) {
+		this.canvas = canvas;
 		this.eventManager = new EventManager();
 	}
 
@@ -25,10 +25,10 @@ RH.Application = (function() {
 			var parsedDebugMode = debugMode === 'true';
 			var parsedTempo = tempo ? parseInt(tempo, 10) : null;
 			var parsedTS = ts ? RH.TimeSignature.parse(ts) : null;
-			if (parsedDebugMode){
+			if (parsedDebugMode) {
 				RH.debug();
 			}
-			var game = new Game(this.eventManager, this.canvases, new RH.GameOptions(parsedTS, parsedTempo));
+			var game = new Game(this.eventManager, this.canvas, new RH.GameOptions(parsedTS, parsedTempo));
 			(function animloop() {
 				var isOn = game.update();
 				if (isOn) {
@@ -43,13 +43,9 @@ RH.Application = (function() {
 
 $(document).ready(function() {
 	'use strict';
-	var canvases = $("canvas");
-	if (canvases.length) {
-		var applicationCanvases = {
-			front : canvases.filter(".front")[0],
-			back : canvases.filter(".back")[0]
-		};
-		var application = new RH.Application(applicationCanvases);
+	var canvas = $("canvas#application");
+	if (canvas.length) {
+		var application = new RH.Application(canvas[0]);
 		var onEvent = function(isUp, event) {
 			if (isUp) {
 				application.getEventManager().onUp(event);
@@ -68,29 +64,16 @@ $(document).ready(function() {
 		var onUp = function(event) {
 			onEvent(true, event);
 		};
-		canvases.on('touchstart mousedown', onDown);
-		canvases.on('touchend mouseup touchcancel', onUp);
+		canvas.on('touchstart mousedown', onDown);
+		canvas.on('touchend mouseup touchcancel', onUp);
 
 		$("body").keydown(onDown).keyup(onUp);
 
 		$(window).blur(function() {
-			// If the application loose the focuse, we consider that the user is
-			// not pressing any key
+			// If the application loose the focuse, we consider that the user is not pressing any key
 			application.getEventManager().resetKeyPressed();
 		});
 		application.start();
-		//TODO: Make the canvases resizable
-//		var MIN_WIDTH = 600;
-//		var MAX_WIDTH = 1000;
-//		var resize = function() {
-//			var width = Math.min(Math.max(window.innerWidth, MIN_WIDTH), MAX_WIDTH);
-//			$("#canvases").width(width);
-//			canvases.prop({
-//				width : width
-//			});
-//		};
-//		window.addEventListener('load', resize);
-//		window.addEventListener('resize', resize);
 
 		var switchSound = $(".switch-sound");
 		switchSound.click(function() {

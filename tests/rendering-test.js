@@ -6,7 +6,7 @@ $(document).ready(function() {
 	var Note = RH.Note;
 	var GameOptions = RH.GameOptions;
 	var RhythmPatterns = RH.RhythmPatterns;
-	var BackScreen = RH.BackScreen;
+	var Screen = RH.Screen;
 	
 	var WIDTH = 400;
 	//To make the test reproduceable
@@ -35,7 +35,7 @@ $(document).ready(function() {
 		var options = new GameOptions(timeSignature, tempo);
 		var measures = Game.generateMeasures(options, RhythmPatterns.PATTERNS);
 		
-		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
+		var canvasesData = Screen.createMeasuresCanvases(400, measures);
 		displayCanvases(assert.testName, canvasesData);
 		ok(true);
 	});
@@ -48,7 +48,7 @@ $(document).ready(function() {
 		var patterns = patternsS.map(RhythmPatterns.getPattern);
 		var measures = Game.generateMeasures(options, patterns);
 		
-		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
+		var canvasesData = Screen.createMeasuresCanvases(400, measures);
 		displayCanvases(assert.testName, canvasesData);
 		ok(true);
 	});
@@ -60,7 +60,7 @@ $(document).ready(function() {
 		var patterns = RH.RhythmPatterns.generatePatterns(0, RH.RhythmPatterns.MAX_DIFFICULTY, 100);
 		var measures = Game.generateMeasures(options, patterns);
 		
-		var canvasesData = BackScreen.createMeasuresCanvases(400, measures);
+		var canvasesData = Screen.createMeasuresCanvases(400, measures);
 		displayCanvases(assert.testName, canvasesData);
 		ok(true);
 	});
