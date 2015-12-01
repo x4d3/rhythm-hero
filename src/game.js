@@ -34,6 +34,14 @@ RH.Game = (function() {
 			var measureIndex = RH.binarySearch(this.measuresStartTime, ellapsed);
 			var startTime = this.measuresStartTime[measureIndex];
 			var measure = this.measures[measureIndex];
+			
+			var measureInfo = {
+				t : t,
+				startTime : startTime,
+				index : measureIndex,
+				ellapsedBeats : measure.getBeatPerMillisecond() * (ellapsed - startTime),
+				measure : this.measures[measureIndex]
+			};
 			if (measureIndex !== this.currentMeasureIndex) {
 				this.scoreCalculator.addMeasureScore(t, this.currentMeasureIndex);
 				this.currentMeasureIndex = measureIndex;
@@ -43,15 +51,18 @@ RH.Game = (function() {
 					this.isOn = false;
 					return false;
 				}
+				if (RH.isDebug && measureIndex > 1) {
+					var tempCanvaJ = $('<canvas>');
+					tempCanvaJ.prop({
+						width : 400,
+						height : 200
+					});
+					this.screen.drawOnExternalCanvas(tempCanvaJ[0], measureInfo);
+					$('body').append(tempCanvaJ);
+				}
 			}
 
-			var measureInfo = {
-				t : t,
-				startTime : startTime,
-				index : measureIndex,
-				ellapsedBeats : measure.getBeatPerMillisecond() * (ellapsed - startTime),
-				measure : this.measures[measureIndex]
-			};
+
 
 			this.screen.display(measureInfo);
 			this.isOn = (measureIndex < this.measures.length);

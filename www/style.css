@@ -12,7 +12,7 @@ body {
 	top: 0;
 }
 
-canvas {
+#application {
 	left: 0;
 	position: absolute;
 	top: 0;

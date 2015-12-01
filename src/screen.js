@@ -55,9 +55,9 @@ RH.Screen = (function() {
 			this.displayMetronome(canvas, measureInfo);
 		},
 		drawOnExternalCanvas : function(canvas, measureInfo) {
-			this.displayStaves(canvas, measureInfo);
+			this.displayStave(canvas, measureInfo, 0, 0, measureInfo.index-1, -1);
 			this.displayEvents(canvas, measureInfo, 1);
-			this.displayDebug(canvas, measureInfo);
+			this.displayDebug(canvas, 0, 0, measureInfo.index-1);
 		},
 		displayEvents : function(canvas, measureInfo, percentage) {
 			var context = canvas.getContext("2d");
@@ -76,8 +76,8 @@ RH.Screen = (function() {
 				context.lineTo(newX, y);
 				x = newX;
 			});
-			context.moveTo(canvas.width / 4, 0);
-			context.lineTo(canvas.width / 4, canvas.height);
+//			context.moveTo(canvas.width / 4, 0);
+//			context.lineTo(canvas.width / 4, canvas.height);
 			context.stroke();
 			context.closePath();
 		},
