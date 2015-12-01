@@ -53,7 +53,7 @@ RH.Game = (function() {
 				measure : this.measures[measureIndex]
 			};
 
-			this.screen.update(measureInfo);
+			this.screen.display(measureInfo);
 			this.isOn = (measureIndex < this.measures.length);
 			return this.isOn;
 		}

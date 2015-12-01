@@ -16,17 +16,13 @@ RH.Screen = (function() {
 	}
 
 	Screen.prototype = {
-		update : function(measureInfo) {
+		display : function(measureInfo) {
 			var screen = this;
 			var canvas = this.canvas;
 			var context = canvas.getContext("2d");
 			context.clearRect(0, 0, canvas.width, canvas.height);
-
 			var measure = measureInfo.measure;
-			var beatPerBar = measure.getBeatPerBar();
-			var measureDuration = measure.getDuration();
-			var shift = this.measureWidth * (-0.5 + measureInfo.ellapsedBeats / beatPerBar);
-			
+			var shift = this.measureWidth * (-0.5 + measureInfo.ellapsedBeats / measure.getBeatPerBar());
 			if (this.eventManager.isPressed) {
 				context.beginPath();
 				context.arc(canvas.width - 20, 20, 10, 0, 2 * Math.PI, false);
@@ -36,109 +32,38 @@ RH.Screen = (function() {
 				context.strokeStyle = 'black';
 				context.stroke();
 			}
-
+			[ -1, 0, 1, 2 ].forEach(function(i) {
+				var index = measureInfo.index + i;
+				if (index < 0 || index >= screen.measures.length) {
+					return true;
+				}
+				var startBar = i * screen.measureWidth - shift;
+				screen.displayStave(canvas, measureInfo, shift, startBar, index, i);
+			});
+			
 			if (RH.isDebug) {
-				this.displayEvents(measureInfo);
-
-				
-
+				this.displayEvents(canvas, measureInfo, 0.5);
 				[ -1, 0, 1, 2 ].forEach(function(i) {
 					var index = measureInfo.index + i;
 					if (index < 0 || index >= screen.measures.length) {
 						return true;
 					}
-					var currentMeasure = screen.measures[index];
 					var startBar = i * screen.measureWidth - shift;
-					context.fillText(index, startBar + screen.measureWidth / 2, canvas.height * 3 / 4);
-					context.beginPath();
-					for (var j = 0; j < currentMeasure.getBeatPerBar(); j++) {
-						var beatX = startBar + j * (screen.measureWidth / measure.getBeatPerBar());
-						var z = (j === 0) ? 3 / 4 : 7 / 8;
-						context.moveTo(beatX, canvas.height * z);
-						context.lineTo(beatX, canvas.height);
-					}
-					context.stroke();
-					context.closePath();
-
-					context.save();
-					context.beginPath();
-					context.strokeStyle = 'blue';
-					context.lineWidth = 1;
-					var x = startBar;
-
-					var beatLength = screen.measureWidth / currentMeasure.getBeatPerBar();
-					var epsilon = 0.05 * beatLength;
-					var Y_IS_ON = canvas.height * 3 / 16;
-					var Y_IS_OFF = canvas.height / 4;
-					var y = currentMeasure.firstNotePressed ? Y_IS_ON : Y_IS_OFF;
-					currentMeasure.notes.forEach(function(note, j) {
-						context.moveTo(x, y);
-						y = (note.isRest ? Y_IS_OFF : Y_IS_ON);
-						context.lineTo(x, y);
-						var duration = note.duration.value() * beatLength;
-						var newX = x + duration;
-						if (j == (currentMeasure.notes.length - 1) && currentMeasure.lastNotePressed) {
-							context.lineTo(newX, y);
-						} else {
-							context.lineTo(newX - epsilon, y);
-							y = Y_IS_OFF;
-							context.lineTo(newX - epsilon, y);
-							context.lineTo(newX, y);
-						}
-						x = newX;
-					});
-					context.stroke();
-					context.closePath();
-					context.restore();
+					screen.displayDebug(canvas, shift, startBar, index);
 				});
 			}
-			[ -1, 0, 1, 2 ].forEach(function(i) {
-				var startStave = i * screen.measureWidth - shift;
-				var index = measureInfo.index + i;
-				if (index < 0 || index >= screen.measuresCanvases.length) {
-					return;
-				}
-				if (i == -1) {
-					var noteScores = screen.scoreCalculator.measuresScore[index];
-					if (noteScores !== undefined) {
-						context.save();
-						var y = 50;
-						var x = startStave + screen.measureWidth - 20;
-						noteScores.forEach(function(noteScore) {
-							var type = noteScore.getType();
-							var ch = type.icon;
-							context.fillStyle = type.color;
-							context.fillText(ch, x, y);
-							x += context.measureText(ch).width;
-						});
-						context.restore();
-					}
-				}
-				var measureCanvasData = screen.measuresCanvases[index];
-				canvas.getContext('2d').putImageData(measureCanvasData, startStave, 50);
-				// display the count down
-				if (screen.measures[index].isEmpty) {
-					context.beginPath();
-					context.arc(3 + startStave + RH.divide(measureInfo.ellapsedBeats, 1).quotient * screen.measureWidth / screen.measures[index].getBeatPerBar(), 107, 8, 0, 2 * Math.PI, false);
-					context.lineWidth = 1;
-					context.strokeStyle = '#003300';
-					context.stroke();
-				}
-			});
-
-			// Draw Metronome
-			context.save();
-			context.translate(canvas.width / 2 - 25, 5);
-			this.metronome.draw(context, measure.timeSignature, measureInfo.ellapsedBeats);
-			context.restore();
-
+			this.displayMetronome(canvas, measureInfo);
 		},
-		displayEvents : function(measureInfo) {
-			var canvas = this.canvas;
+		drawOnExternalCanvas : function(canvas, measureInfo) {
+			this.displayStaves(canvas, measureInfo);
+			this.displayEvents(canvas, measureInfo, 1);
+			this.displayDebug(canvas, measureInfo);
+		},
+		displayEvents : function(canvas, measureInfo, percentage) {
 			var context = canvas.getContext("2d");
 			var measure = measureInfo.measure;
-			var measureDuration = measure.getBeatPerBar() / measure.getBeatPerMillisecond();
-			var ups = this.eventManager.getEvents(measureInfo.t - measureDuration * 0.5);
+			var measureDuration = measure.getDuration();
+			var ups = this.eventManager.getEvents(measureInfo.t - measureDuration * percentage);
 			var x = 0;
 			var screen = this;
 			context.beginPath();
@@ -155,9 +80,95 @@ RH.Screen = (function() {
 			context.lineTo(canvas.width / 4, canvas.height);
 			context.stroke();
 			context.closePath();
-		}
-	};
+		},
+		displayDebug : function(canvas, shift, startBar, index){
+			var screen = this;
+			var context = canvas.getContext("2d");
+			var currentMeasure = screen.measures[index];
+			context.fillText(index, startBar + screen.measureWidth / 2, canvas.height * 3 / 4);
+			context.beginPath();
+			for (var j = 0; j < currentMeasure.getBeatPerBar(); j++) {
+				var beatX = startBar + j * (screen.measureWidth / currentMeasure.getBeatPerBar());
+				var z = (j === 0) ? 3 / 4 : 7 / 8;
+				context.moveTo(beatX, canvas.height * z);
+				context.lineTo(beatX, canvas.height);
+			}
+			context.stroke();
+			context.closePath();
 
+			context.save();
+			context.beginPath();
+			context.strokeStyle = 'blue';
+			context.lineWidth = 1;
+			var x = startBar;
+
+			var beatLength = screen.measureWidth / currentMeasure.getBeatPerBar();
+			var epsilon = 0.05 * beatLength;
+			var Y_IS_ON = canvas.height * 3 / 16;
+			var Y_IS_OFF = canvas.height / 4;
+			var y = currentMeasure.firstNotePressed ? Y_IS_ON : Y_IS_OFF;
+			currentMeasure.notes.forEach(function(note, j) {
+				context.moveTo(x, y);
+				y = (note.isRest ? Y_IS_OFF : Y_IS_ON);
+				context.lineTo(x, y);
+				var duration = note.duration.value() * beatLength;
+				var newX = x + duration;
+				if (j == (currentMeasure.notes.length - 1) && currentMeasure.lastNotePressed) {
+					context.lineTo(newX, y);
+				} else {
+					context.lineTo(newX - epsilon, y);
+					y = Y_IS_OFF;
+					context.lineTo(newX - epsilon, y);
+					context.lineTo(newX, y);
+				}
+				x = newX;
+			});
+			context.stroke();
+			context.closePath();
+			context.restore();
+
+		},
+		displayStave : function(canvas, measureInfo, shift, startStave, index, i) {
+			var screen = this;
+			var context = canvas.getContext("2d");
+
+			if (i == -1) {
+				var noteScores = screen.scoreCalculator.measuresScore[index];
+				if (noteScores !== undefined) {
+					context.save();
+					var y = 50;
+					var x = startStave + screen.measureWidth - 20;
+					noteScores.forEach(function(noteScore) {
+						var type = noteScore.getType();
+						var ch = type.icon;
+						context.fillStyle = type.color;
+						context.fillText(ch, x, y);
+						x += context.measureText(ch).width;
+					});
+					context.restore();
+				}
+			}
+			var measureCanvasData = screen.measuresCanvases[index];
+			canvas.getContext('2d').putImageData(measureCanvasData, startStave, 50);
+			// display the count down
+			if (screen.measures[index].isEmpty) {
+				context.beginPath();
+				context.arc(3 + startStave + RH.divide(measureInfo.ellapsedBeats, 1).quotient * screen.measureWidth / screen.measures[index].getBeatPerBar(), 107, 8, 0, 2 * Math.PI, false);
+				context.lineWidth = 1;
+				context.strokeStyle = '#003300';
+				context.stroke();
+			}
+
+		},
+		displayMetronome : function(canvas, measureInfo) {
+			var context = canvas.getContext("2d");
+			context.save();
+			context.translate(this.canvas.width / 2 - 25, 5);
+			this.metronome.draw(context, measureInfo.measure.timeSignature, measureInfo.ellapsedBeats);
+			context.restore();
+		}
+
+	};
 
 	return Screen;
 
