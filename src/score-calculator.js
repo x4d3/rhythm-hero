@@ -16,11 +16,11 @@ RH.ScoreCalculator = (function() {
 	}
 
 	var SCORE_TYPES = [
-		new ScoreType(0, "fail", "✗", "red"),
-		new ScoreType(0.5, "boo", "~", "maroon"),
-		new ScoreType(0.7, "good", "-", "grey"),
-		new ScoreType(0.9, "great", "✓", "olive"),
-		new ScoreType(0.95, "perfect", "✔", "green")
+		new ScoreType(0, "fail", "X", "red"),
+		new ScoreType(0.5, "boo", "B", "maroon"),
+		new ScoreType(0.7, "average", "A", "black"),
+		new ScoreType(0.8, "great", "G", "olive"),
+		new ScoreType(0.9, "perfect", "P", "green")
 	];
 	var SCORE_TYPES_VALUES = SCORE_TYPES.map(function(s) {
 		return s.value;

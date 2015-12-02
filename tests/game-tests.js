@@ -11,13 +11,21 @@ test("Game.generateBars", function() {
 	var timeSignature = GameOptions.DEFAULT_TS;
 	var EMPTY = new RH.Measure(tempo, timeSignature, [], false, false);
 	
+	var getPatternsNotes = function(patterns){
+		var result = [];
+		patterns.forEach(function(pattern){
+			result = result.concat(pattern.notes);
+		});
+		return result;
+	};
+	
 	var newNote = function(n, d) {
 		return new Note(new Fraction(n, d), false);
 	};
 	var testMeasures = function(patternsS, awaitedMeasures) {
 		var patterns = patternsS.map(RhythmPatterns.getPattern);
 		var options = new GameOptions(timeSignature, tempo);
-		var measures = Game.generateMeasures(options, patterns);
+		var measures = Game.generateMeasures(options, getPatternsNotes(patterns));
 		deepEqual(measures, [EMPTY ].concat(awaitedMeasures), "measures" + measures + ", " + awaitedMeasures);
 	};
 	testMeasures([ 'crotchet', 'whole', 'minim', 'crotchet' ],

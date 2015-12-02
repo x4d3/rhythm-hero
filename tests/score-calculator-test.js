@@ -8,10 +8,18 @@ module("ScoreCalculator");
 	var ScoreCalculator = RH.ScoreCalculator;
 	var EventManager = RH.EventManager;
 
+	var getPatternsNotes = function(patterns){
+		var result = [];
+		patterns.forEach(function(pattern){
+			result = result.concat(pattern.notes);
+		});
+		return result;
+	};
+	
 	var generateMeasures = function(patternsS) {
 		var patterns = patternsS.map(RhythmPatterns.getPattern);
 		var options = new GameOptions(GameOptions.DEFAULT_TS, GameOptions.DEFAULT_TEMPO);
-		return Game.generateMeasures(options, patterns);
+		return Game.generateMeasures(options, getPatternsNotes(patterns));
 	};
 	var mockEventManager = function(times) {
 		var mockEvent = {

@@ -74,7 +74,25 @@ RH.EventManager = (function() {
 				this.keyChanged.push(this.getTime());
 			}
 			this.isPressed = isPressed;
+		},
+		toJson :function(){
+			//TODO: call copyProperties
+			return JSON.stringify({
+				keyPressed: this.keyPressed,
+				keyChanged:this.keyChanged,
+				isPressed: this.isPressed
+			});
 		}
 	};
+	EventManager.fromJson = function(json, getTimeCallback){
+		var obj = JSON.parse(json);
+		var eventManager = new EventManager(getTimeCallback);
+		//TODO: call copyProperties
+		eventManager.keyPressed = obj.keyPressed;
+		eventManager.keyChanged = obj.keyChanged;
+		eventManager.isPressed = obj.isPressed;
+		return eventManager;
+	};
+	
 	return EventManager;
 }());

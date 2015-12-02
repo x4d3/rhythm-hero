@@ -19,6 +19,26 @@ RH.Note = (function() {
 			return [ new Note(duration, this.isRest), new Note(splitDuration, this.isRest) ];
 		}
 	};
+	Note.parseNotes = function(value) {
+		var notes = [];
+		var split = value.split(",");
+		for (var i = 0; i < split.length; i++) {
+			notes[i] = Note.parseNote(split[i].trim());
+		}
+		return notes;
+	};
+
+	Note.parseNote = function(value) {
+		var isRest;
+		if (value.charAt(value.length - 1) === 'r') {
+			value = value.substring(0, value.length - 1);
+			isRest = true;
+		} else {
+			isRest = false;
+		}
+		var duration =  Fraction.parse(value);
+		return new Note(duration, isRest);
+	};
 
 	return Note;
 })();
@@ -56,34 +76,13 @@ RH.RhythmPatterns = (function() {
 
 	var RhythmPatterns = {};
 
-	var parseNotes = function(value) {
-		var notes = [];
-		var split = value.split(",");
-		for (var i = 0; i < split.length; i++) {
-			notes[i] = parseNote(split[i].trim());
-		}
-		return notes;
-	};
-
-	var parseNote = function(value) {
-		var isRest;
-		if (value.charAt(value.length - 1) === 'r') {
-			value = value.substring(0, value.length - 1);
-			isRest = true;
-		} else {
-			isRest = false;
-		}
-		var duration =  Fraction.parse(value);
-		return new Note(duration, isRest);
-	};
-
 	var PATTERNS = [];
 	var PATTERNS_PER_DESCRIPTION = {};
 	var addPattern = function(description, difficulty, frequency, notesString) {
 		if (description === null){
 			description = notesString;
 		}
-		var notes = parseNotes(notesString);
+		var notes = Note.parseNotes(notesString);
 		var pattern = new Pattern(description, difficulty, frequency, notes);
 		PATTERNS.push(pattern);
 		if (PATTERNS_PER_DESCRIPTION[description] !== undefined) {
@@ -129,7 +128,7 @@ RH.RhythmPatterns = (function() {
 	});
 	RhythmPatterns.MAX_DIFFICULTY = Math.max.apply(Math, difficulties);
 
-	RhythmPatterns.generatePatterns = function(minDifficulty, maxDifficulty, size) {
+	RhythmPatterns.generateNotes = function(minDifficulty, maxDifficulty, size) {
 		var filtered = PATTERNS.filter(function(x) {
 			return x.difficulty >= minDifficulty && x.difficulty <= maxDifficulty;
 		});
@@ -138,16 +137,16 @@ RH.RhythmPatterns = (function() {
 			sumFrequency += x.frequency;
 			return sumFrequency;
 		});
-		var result = [];
+		var notes = [];
 		for (var i = 0; i < size; i++) {
 			var alea = Math.random() * sumFrequency;
 			var index = RH.binarySearch(summedFrequencies, alea) + 1 ;
 			if (index >= filtered.length){
 				throw 'error: ' + index + ",[" + summedFrequencies + "], " + alea +", " + sumFrequency;
 			}
-			result[i] = filtered[index];
+			notes = notes.concat(filtered[index].notes);
 		}
-		return result;
+		return notes;
 	};
 
 	RhythmPatterns.getPattern = function(description) {

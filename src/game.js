@@ -10,8 +10,9 @@ RH.Game = (function() {
 	var Game = function(eventManager, canvas, options) {
 		this.eventManager = eventManager;
 		this.options = options;
-		var patterns = RH.RhythmPatterns.generatePatterns(0, 0, 50);
-		this.measures = Game.generateMeasures(options, patterns);
+		var notes = RH.RhythmPatterns.generateNotes(0, 0, 50);
+		logger.debug("Notes: " + notes);
+		this.measures = Game.generateMeasures(options, notes);
 		var currentTime = 0;
 		this.measuresStartTime = this.measures.map(function(measure) {
 			var result = currentTime;
@@ -59,6 +60,8 @@ RH.Game = (function() {
 					});
 					this.screen.drawOnExternalCanvas(tempCanvaJ[0], measureInfo);
 					$('body').append(tempCanvaJ);
+					logger.debug("Event Manager: " + this.eventManager.toJson());
+					
 				}
 			}
 
@@ -71,7 +74,7 @@ RH.Game = (function() {
 	};
 
 	// static method
-	Game.generateMeasures = function(options, patterns) {
+	Game.generateMeasures = function(options, notes) {
 		//The two first measure are empty
 		var tempo = options.tempo;
 		var timeSignature = options.timeSignature;
@@ -84,35 +87,30 @@ RH.Game = (function() {
 
 		var measureNotes = [];
 		var firstNotePressed = false;
-		for (var i = 0; i < patterns.length; i++) {
-			var pattern = patterns[i];
-			var notes = pattern.notes;
-			for (var j = 0; j < notes.length; j++) {
-				var note = notes[j];
-				var sum = note.duration.add(beats);
-				var compare = sum.compareTo(beatPerBarF);
-				if (compare > 0) {
-					var durationLeft = beatPerBarF.subtract(beats);
-					var split = note.split(durationLeft);
-					measureNotes.push(split[0]);
-					result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, true));
-					firstNotePressed = true;
-					var newDuration = note.duration.subtract(durationLeft);
-					measureNotes = [ split[1] ];
-					beats = split[1].duration;
+		notes.forEach(function(note){
+			var sum = note.duration.add(beats);
+			var compare = sum.compareTo(beatPerBarF);
+			if (compare > 0) {
+				var durationLeft = beatPerBarF.subtract(beats);
+				var split = note.split(durationLeft);
+				measureNotes.push(split[0]);
+				result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, true));
+				firstNotePressed = true;
+				var newDuration = note.duration.subtract(durationLeft);
+				measureNotes = [ split[1] ];
+				beats = split[1].duration;
+			} else {
+				measureNotes.push(note);
+				if (compare === 0) {
+					beats = Fraction.ZERO;
+					result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, false));
+					measureNotes = [];
+					firstNotePressed = false;
 				} else {
-					measureNotes.push(note);
-					if (compare === 0) {
-						beats = Fraction.ZERO;
-						result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, false));
-						measureNotes = [];
-						firstNotePressed = false;
-					} else {
-						beats = sum;
-					}
+					beats = sum;
 				}
 			}
-		}
+		});
 		// we don't fill the last bar
 		return result;
 	};

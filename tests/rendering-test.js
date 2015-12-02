@@ -22,6 +22,14 @@ $(document).ready(function() {
 		$('<div>').append($('<h2>').text(title)).append(canvasJ).appendTo($("#test-output"));
 		return canvasJ[0];
 	};
+
+	var getPatternsNotes = function(patterns){
+		var notes = [];
+		patterns.forEach(function(p){
+			notes = notes.concat(p.notes);
+		});
+		return notes;
+	};
 	
 	var displayCanvases = function(title, canvasesData){
 		var canvas = generateCanvas(title, WIDTH * canvasesData.length);
@@ -33,20 +41,19 @@ $(document).ready(function() {
 		var tempo = GameOptions.DEFAULT_TEMPO;
 		var timeSignature = GameOptions.DEFAULT_TS;
 		var options = new GameOptions(timeSignature, tempo);
-		var measures = Game.generateMeasures(options, RhythmPatterns.PATTERNS);
+		var measures = Game.generateMeasures(options, getPatternsNotes(RhythmPatterns.PATTERNS));
 		
 		var canvasesData = VexUtils.generateMeasuresCanvases(400, measures);
 		displayCanvases(assert.testName, canvasesData);
 		ok(true);
 	});
-
 	test('Defined Patterns', function(assert) {
 		var tempo = GameOptions.DEFAULT_TEMPO;
 		var timeSignature = GameOptions.DEFAULT_TS;
 		var options = new GameOptions(timeSignature, tempo);
 		var patternsS = ['minim','crotchet', 'quaver', 'triplet quaver','dotted crotchet quaver', 'quaver dotted crotchet', 'whole'];
 		var patterns = patternsS.map(RhythmPatterns.getPattern);
-		var measures = Game.generateMeasures(options, patterns);
+		var measures = Game.generateMeasures(options, getPatternsNotes(patterns));
 		
 		var canvasesData = VexUtils.generateMeasuresCanvases(400, measures);
 		displayCanvases(assert.testName, canvasesData);
@@ -57,8 +64,8 @@ $(document).ready(function() {
 		var tempo = GameOptions.DEFAULT_TEMPO;
 		var timeSignature = GameOptions.DEFAULT_TS;
 		var options = new GameOptions(timeSignature, tempo);
-		var patterns = RH.RhythmPatterns.generatePatterns(0, RH.RhythmPatterns.MAX_DIFFICULTY, 100);
-		var measures = Game.generateMeasures(options, patterns);
+		var notes = RH.RhythmPatterns.generateNotes(0, RH.RhythmPatterns.MAX_DIFFICULTY, 100);
+		var measures = Game.generateMeasures(options, notes);
 		
 		var canvasesData = VexUtils.generateMeasuresCanvases(400, measures);
 		displayCanvases(assert.testName, canvasesData);

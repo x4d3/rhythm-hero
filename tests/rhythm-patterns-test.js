@@ -11,10 +11,7 @@ test("general", function() {
 });
 
 test("generatePattern", function() {
-
-	var patterns = RH.RhythmPatterns.generatePatterns(0, RH.RhythmPatterns.MAX_DIFFICULTY, 10);
-	equal(patterns.length, 10);
 	
-	patterns = RH.RhythmPatterns.generatePatterns(0, RH.RhythmPatterns.MAX_DIFFICULTY, 1000);
-	ok(!patterns.some(function(element){return element === undefined;}));
+	var notes = RH.RhythmPatterns.generateNotes(0, RH.RhythmPatterns.MAX_DIFFICULTY, 1000);
+	ok(!notes.some(function(element){return element === undefined;}));
 });

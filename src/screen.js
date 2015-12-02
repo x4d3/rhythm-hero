@@ -132,22 +132,6 @@ RH.Screen = (function() {
 			var screen = this;
 			var context = canvas.getContext("2d");
 
-			if (i == -1) {
-				var noteScores = screen.scoreCalculator.measuresScore[index];
-				if (noteScores !== undefined) {
-					context.save();
-					var y = 50;
-					var x = startStave + screen.measureWidth - 20;
-					noteScores.forEach(function(noteScore) {
-						var type = noteScore.getType();
-						var ch = type.icon;
-						context.fillStyle = type.color;
-						context.fillText(ch, x, y);
-						x += context.measureText(ch).width;
-					});
-					context.restore();
-				}
-			}
 			var measureCanvasData = screen.measuresCanvases[index];
 			canvas.getContext('2d').putImageData(measureCanvasData, startStave, 50);
 			// display the count down
@@ -157,6 +141,23 @@ RH.Screen = (function() {
 				context.lineWidth = 1;
 				context.strokeStyle = '#003300';
 				context.stroke();
+			}
+			if (i == -1) {
+				var noteScores = screen.scoreCalculator.measuresScore[index];
+				if (noteScores !== undefined) {
+					context.save();
+					context.font = '12px sans-serif';
+					var y = 70;
+					var x = startStave + screen.measureWidth - 40;
+					noteScores.forEach(function(noteScore) {
+						var type = noteScore.getType();
+						var ch = type.icon;
+						context.fillStyle = type.color;
+						context.fillText(ch, x, y);
+						x += context.measureText(ch).width;
+					});
+					context.restore();
+				}
 			}
 
 		},
