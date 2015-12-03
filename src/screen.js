@@ -85,24 +85,12 @@ RH.Screen = (function() {
 			var screen = this;
 			var context = canvas.getContext("2d");
 			var currentMeasure = screen.measures[index];
-			//display beats bellow the stave
-			context.fillText(index, startBar + screen.measureWidth / 2, canvas.height * 3 / 4);
-			context.beginPath();
-			for (var j = 0; j < currentMeasure.getBeatPerBar(); j++) {
-				var beatX = startBar + j * (screen.measureWidth / currentMeasure.getBeatPerBar());
-				var z = (j === 0) ? 3 / 4 : 7 / 8;
-				context.moveTo(beatX, canvas.height * z);
-				context.lineTo(beatX, canvas.height);
-			}
-			context.stroke();
-			context.closePath();
 			//display awaited rhythm
 			context.save();
 			context.beginPath();
 			context.strokeStyle = 'blue';
 			context.lineWidth = 1;
 			var x = startBar;
-
 			var beatLength = screen.measureWidth / currentMeasure.getBeatPerBar();
 			var epsilon = RH.REST_PERCENTAGE * beatLength;
 			var Y_IS_ON = canvas.height * 3 / 16;
