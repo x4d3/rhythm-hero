@@ -2,7 +2,7 @@ body {
 	margin: 0px;
 }
 
-#canvases {
+.canvases {
 	bottom: 0;
 	height: 300px;
 	left: 0;
@@ -12,7 +12,7 @@ body {
 	top: 0;
 }
 
-#application {
+.application {
 	left: 0;
 	position: absolute;
 	top: 0;
@@ -128,7 +128,7 @@ body.loading .modal {
 
 /* Smartphones (landscape) ----------- */
 @media only screen and (max-device-width : 800px) { /* Styles */
-	#canvases {
+	.canvases {
 		min-width: 100%;
 	}
 	canvas {
@@ -137,7 +137,7 @@ body.loading .modal {
 }
 
 @media only screen and (min-device-width : 800px) { /* Styles */
-	#canvases {
+	.canvases {
 		width: 800px;
 	}
 }

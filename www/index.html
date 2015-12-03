@@ -1,29 +1,25 @@
 <!DOCTYPE html>
 <html manifest="manifest.appcache">
-	<head>
-		<title>Rhythm Hero</title>
-		<link href='favicon.ico' rel="icon" type='image/x-icon' />
-		<link rel="stylesheet" media="screen" href="style.css" type="text/css" />
-    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0"/>
-	</head>
-	<body class = "loading">
-		<div data-role="page" id="mainPage" class="ui-page ui-body-c ui-page-active">
-			<div data-role="header" class="ui-bar-a ui-header" role="banner">
-				<h1 class="ui-title" tabindex="0" role="heading" aria-level="1">Rhythm Hero</h1>
-			</div>
-			<div id="canvases" class="rounded">
-				<div class="rh-icon switch-sound"></div> 
-				<canvas width=800 height=300 id="application">Canvas is not supported</canvas>
-			</div>
+<head>
+<title>Rhythm Hero</title>
+<link href='favicon.ico' rel="icon" type='image/x-icon' />
+<link rel="stylesheet" media="screen" href="style.css" type="text/css" />
+<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0" />
+</head>
+<body class="loading">
+	<div data-role="page" id="mainPage" class="ui-page ui-body-c ui-page-active">
+		<div data-role="header" class="ui-bar-a ui-header" role="banner">
+			<h1 class="ui-title" tabindex="0" role="heading" aria-level="1">Rhythm Hero</h1>
 		</div>
+	</div>
 	<!-- 	Div used to display loading while the javascript is loading -->
 	<div class="modal">
 		<div class="message">
 			<img src="images/loading.gif"></img><i>Loading...</i>
 		</div>
 	</div>
-	
-	</body>
-	<!-- 	Main Application Script -->
-	<script src="script.js"></script>
+
+</body>
+<!-- 	Main Application Script -->
+<script src="script.js"></script>
 </html>

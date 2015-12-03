@@ -10,9 +10,25 @@ RH.Game = (function() {
 	var Screen = RH.Screen;
 	var logger = RH.logManager.getLogger('Game');
 
-	var Game = function(eventManager, canvas, options) {
+	var Game = function(eventManager, options) {
 		this.eventManager = eventManager;
 		this.options = options;
+
+		this.container = $('<div>').addClass('rounded canvases');
+		var switchSound = $('<div>').addClass('rh-icon switch-sound');
+		switchSound.click(function() {
+			var isOn = RH.SoundsManager.switchSound();
+			switchSound.toggleClass('off', !isOn);
+		});
+		var canvasDiv = $('<canvas>').addClass('application').prop({
+			width : 800,
+			height : 300
+		});
+		this.container.append(switchSound);
+		this.container.append(canvasDiv);
+		var canvas = canvasDiv[0];
+		$('body').append(this.container);
+
 		var notes = RH.RhythmPatterns.generateNotes(0, 0, 50);
 		logger.debug("Notes: " + notes);
 		this.measures = Game.generateMeasures(options, notes);
@@ -34,44 +50,54 @@ RH.Game = (function() {
 
 	Game.prototype = {
 		update : function() {
+			var game = this;
 			var t = RH.getTime();
 			var ellapsed = t - this.t0;
 			var measureIndex = RH.binarySearch(this.measuresStartTime, ellapsed);
 			var startTime = this.measuresStartTime[measureIndex];
 			var measure = this.measures[measureIndex];
-			
+
+			if (measureIndex !== this.currentMeasureIndex) {
+				//new measure, let's calculate the measure score
+				this.scoreCalculator.addMeasureScore(t, this.currentMeasureIndex);
+				this.currentMeasureIndex = measureIndex;
+				logger.debug(measureIndex + "," + measure);
+				if (measureIndex === this.measures.length) {
+					this.isOn = false;
+					this.container.remove();
+					this.measuresStartTime.forEach(function(t, measureIndex) {
+						if (measureIndex < 2 || measureIndex == game.measures.length) {
+							return;
+						}
+						var measure = game.measures[measureIndex];
+						var ellapsed = t - game.t0;
+						var measureInfo = {
+							t : t,
+							index : measureIndex,
+							ellapsedBeats : measure.getBeatPerMillisecond() * (ellapsed - t),
+							measure : measure
+						};
+						var tempCanvaJ = $('<canvas>');
+						tempCanvaJ.prop({
+							width : 400,
+							height : 200
+						});
+						game.screen.drawOnExternalCanvas(tempCanvaJ[0], measureInfo);
+						$('body').append(tempCanvaJ);
+					});
+
+					logger.debug("Event Manager: " + this.eventManager.toJson());
+
+					return false;
+				}
+			}
 			var measureInfo = {
 				t : t,
 				index : measureIndex,
 				ellapsedBeats : measure.getBeatPerMillisecond() * (ellapsed - startTime),
-				measure : this.measures[measureIndex]
+				measure : measure
 			};
-			if (measureIndex !== this.currentMeasureIndex) {
-				this.scoreCalculator.addMeasureScore(t, this.currentMeasureIndex);
-				this.currentMeasureIndex = measureIndex;
-				logger.debug(measureIndex + "," + measure);
-				//new measure, let's calculate the measure score
-				if (measureIndex === this.measures.length) {
-					this.isOn = false;
-					return false;
-				}
-				if (RH.isDebug && measureIndex > 1) {
-					var tempCanvaJ = $('<canvas>');
-					tempCanvaJ.prop({
-						width : 400,
-						height : 200
-					});
-					this.screen.drawOnExternalCanvas(tempCanvaJ[0], measureInfo);
-					$('body').append(tempCanvaJ);
-					logger.debug("Event Manager: " + this.eventManager.toJson());
-					
-				}
-			}
-
-
-
 			this.screen.display(measureInfo);
-			this.isOn = (measureIndex < this.measures.length);
 			return this.isOn;
 		}
 	};
@@ -90,7 +116,7 @@ RH.Game = (function() {
 
 		var measureNotes = [];
 		var firstNotePressed = false;
-		notes.forEach(function(note){
+		notes.forEach(function(note) {
 			var sum = note.duration.add(beats);
 			var compare = sum.compareTo(beatPerBarF);
 			if (compare > 0) {
