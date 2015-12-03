@@ -10,7 +10,7 @@ RH.Screen = (function() {
 		this.scoreCalculator = scoreCalculator;
 		this.measures = measures;
 		this.options = options;
-		this.measureWidth = canvas.width / 2;
+		this.measureWidth = 400;
 		this.metronome = new RH.Metronome(50, 50);
 		this.measuresCanvases = VexUtils.generateMeasuresCanvases(this.measureWidth, measures);
 	}
@@ -85,6 +85,7 @@ RH.Screen = (function() {
 			var screen = this;
 			var context = canvas.getContext("2d");
 			var currentMeasure = screen.measures[index];
+			//display beats bellow the stave
 			context.fillText(index, startBar + screen.measureWidth / 2, canvas.height * 3 / 4);
 			context.beginPath();
 			for (var j = 0; j < currentMeasure.getBeatPerBar(); j++) {
@@ -95,7 +96,7 @@ RH.Screen = (function() {
 			}
 			context.stroke();
 			context.closePath();
-
+			//display awaited rhythm
 			context.save();
 			context.beginPath();
 			context.strokeStyle = 'blue';
@@ -103,7 +104,7 @@ RH.Screen = (function() {
 			var x = startBar;
 
 			var beatLength = screen.measureWidth / currentMeasure.getBeatPerBar();
-			var epsilon = 0.05 * beatLength;
+			var epsilon = RH.REST_PERCENTAGE * beatLength;
 			var Y_IS_ON = canvas.height * 3 / 16;
 			var Y_IS_OFF = canvas.height / 4;
 			var y = currentMeasure.firstNotePressed ? Y_IS_ON : Y_IS_OFF;
@@ -144,18 +145,20 @@ RH.Screen = (function() {
 			}
 			if (i == -1) {
 				var noteScores = screen.scoreCalculator.measuresScore[index];
-				if (noteScores !== undefined) {
+				if (noteScores !== undefined  && !screen.measures[index].isEmpty) {
 					context.save();
 					context.font = '12px sans-serif';
 					var y = 70;
-					var x = startStave + screen.measureWidth - 40;
-					noteScores.forEach(function(noteScore) {
+					var x = startStave + screen.measureWidth - 80;
+					noteScores.notes.forEach(function(noteScore) {
 						var type = noteScore.getType();
 						var ch = type.icon;
 						context.fillStyle = type.color;
 						context.fillText(ch, x, y);
 						x += context.measureText(ch).width;
 					});
+					context.fillStyle = 'black';
+					context.fillText(' ' + numeral(noteScores.value()).format("0%"), x, y);
 					context.restore();
 				}
 			}

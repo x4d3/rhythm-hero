@@ -1,5 +1,6 @@
 module("ScoreCalculator");
 (function() {
+	var logger = RH.logManager.getLogger('ScoreCalculatorTest');
 	RH.debug();
 	var Game = RH.Game;
 	var Measure = RH.Measure;
@@ -7,7 +8,7 @@ module("ScoreCalculator");
 	var RhythmPatterns = RH.RhythmPatterns;
 	var ScoreCalculator = RH.ScoreCalculator;
 	var EventManager = RH.EventManager;
-
+	var Note = RH.Note;
 	var getPatternsNotes = function(patterns){
 		var result = [];
 		patterns.forEach(function(pattern){
@@ -60,4 +61,6 @@ module("ScoreCalculator");
 		ok(true);
 	});
 
+
+	
 })();

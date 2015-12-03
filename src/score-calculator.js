@@ -1,13 +1,8 @@
 RH.ScoreCalculator = (function() {
 	'use strict';
 	var logger = RH.logManager.getLogger('ScoreCalculator');
+	var MAX_START_DIFF = 200;
 
-	function NoteScore(startDiff, durationDiff, notesPlayedBetween) {
-		this.startDiff = startDiff;
-		this.durationDiff = durationDiff;
-		this.notesPlayedBetween = notesPlayedBetween;
-		this.isFailed = !isFinite(startDiff) || !isFinite(durationDiff) || this.notesPlayedBetween;
-	}
 	function ScoreType(value, label, icon, color) {
 		this.value = value;
 		this.label = label;
@@ -15,31 +10,53 @@ RH.ScoreCalculator = (function() {
 		this.color = color;
 	}
 
-	var SCORE_TYPES = [
-		new ScoreType(0, "fail", "X", "red"),
-		new ScoreType(0.5, "boo", "B", "maroon"),
-		new ScoreType(0.7, "average", "A", "black"),
-		new ScoreType(0.8, "great", "G", "olive"),
-		new ScoreType(0.9, "perfect", "P", "green")
-	];
+	var SCORE_TYPES = [ new ScoreType(0, "fail", "✗", "red"), new ScoreType(0.5, "boo", "E", "orange"), new ScoreType(0.6, "average", "D", "maroon"), new ScoreType(0.7, "good", "C", "black"),
+		new ScoreType(0.8, "great", "B", "olive"), new ScoreType(0.9, "awesome", "A", "green"), new ScoreType(0.99, "perfect", "✔", "green") ];
 	var SCORE_TYPES_VALUES = SCORE_TYPES.map(function(s) {
 		return s.value;
 	});
+
+	function MeasureScore(notes) {
+		this.notes = notes;
+	}
+	MeasureScore.prototype = {
+		value : function() {
+			var sum = 0;
+			for (var i = 0; i < this.notes.length; i++) {
+				var score = this.notes[i];
+				if (score.isFailed) {
+					return 0;
+				}
+				sum += score.value();
+			}
+			return sum / this.notes.length;
+		},
+		toString : function() {
+			return this.notes.toString();
+		}
+	};
+	function NoteScore(startDiff, durationDiff, notesPlayedBetween) {
+		this.startDiff = startDiff;
+		this.durationDiff = durationDiff;
+		this.notesPlayedBetween = notesPlayedBetween;
+		this.isFailed = !isFinite(startDiff) || !isFinite(durationDiff) || this.notesPlayedBetween;
+	}
+
 	NoteScore.prototype = {
 		toString : function() {
 			if (this.isFailed) {
 				return "F";
 			} else {
-				return this.startDiff.toFixed(0) + "|" + numeral(this.durationDiff).format('0%');
+				return this.startDiff.toFixed(0) + " " + numeral(100 * this.durationDiff).format('0') + " " + numeral(100 * this.value()).format('0');
 			}
 		},
 		value : function() {
 			if (this.isFailed) {
 				return 0;
 			} else {
-				var x = Math.max(1 - Math.abs(this.startDiff / 100), 0);
+				var x = Math.max(1 - Math.abs(this.startDiff / MAX_START_DIFF), 0);
 				var y = Math.max(1 - Math.abs(this.durationDiff), 0);
-				return 0.5 + 0.35 * x * x + 0.15 * y * y;
+				return 0.5 + 0.30 * x * x + 0.20 * y;
 			}
 		},
 		getType : function() {
@@ -79,16 +96,25 @@ RH.ScoreCalculator = (function() {
 				return;
 			}
 			var bpm = measure.getBeatPerMillisecond();
-
+			var epsilon = RH.REST_PERCENTAGE / bpm;
 			var measureDuration = measure.getDuration();
 
 			var noteStartTime = t - measureDuration;
-			var notesScores = measure.notes.map(function(note, noteIndex) {
-				var expectedDuration = note.duration.value() / bpm;
+			var notes = measure.notes;
+			var notesScores = new MeasureScore(notes.map(function(note, noteIndex) {
+				var originalDuration = note.duration.value() / bpm;
+				var expectedDuration;
+				if (note.isRest) {
+					expectedDuration = originalDuration;
+				} else {
+					expectedDuration = originalDuration - epsilon;
+				}
 				var start = noteStartTime;
 				var end = start + expectedDuration;
 				var events = eventManager.getEventsBetween(start, end);
-				noteStartTime = end;
+				noteStartTime = start + originalDuration;
+
+				var nextNoteIsRest = (noteIndex < notes.length - 1) && (notes[noteIndex + 1].isRest);
 
 				if (events.length === 0) {
 					if (note.isRest) {
@@ -135,13 +161,13 @@ RH.ScoreCalculator = (function() {
 				if (note.isRest) {
 					// if it is the last note, or if the next one is rest as
 					// well
-					if ((noteIndex === measure.notes.length - 1) || (measure.notes[noteIndex + 1].isRest)) {
+					if ((noteIndex === notes.length - 1) || nextNoteIsRest) {
 						eventEnd = Math.min(nextEventT, end);
 					} else {
 						eventEnd = nextEventT;
 					}
 				} else {
-					if (noteIndex === measure.notes.length - 1 && measure.lastNotePressed) {
+					if (noteIndex === notes.length - 1 && measure.lastNotePressed) {
 						eventEnd = Math.min(nextEventT, end);
 					} else {
 						eventEnd = nextEventT;
@@ -149,9 +175,10 @@ RH.ScoreCalculator = (function() {
 				}
 
 				var durationDiff = (eventEnd - eventStart - expectedDuration) / expectedDuration;
-				var notesPlayedBetween = events.length - index > 3;
+				var maxNotes = nextNoteIsRest ? 3 : 4;
+				var notesPlayedBetween = events.length - index > maxNotes;
 				return new NoteScore(startDiff, durationDiff, notesPlayedBetween);
-			});
+			}));
 			logger.debug("addMeasureScore(" + measureIndex + ") " + notesScores);
 			this.measuresScore[measureIndex] = notesScores;
 			return notesScores;

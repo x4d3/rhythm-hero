@@ -1,3 +1,6 @@
+RH.MEASURE_WIDTH = 400;
+RH.REST_PERCENTAGE = 0.05;
+
 RH.Game = (function() {
 	'use strict';
 	var VexUtils = RH.VexUtils;
@@ -24,6 +27,7 @@ RH.Game = (function() {
 		this.screen = new Screen(canvas, eventManager, this.scoreCalculator, this.measures, options);
 		this.isOn = true;
 		this.t0 = RH.getTime();
+		logger.debug("t0:" + this.t0);
 		this.currentMeasureIndex = -1;
 
 	};
@@ -38,7 +42,6 @@ RH.Game = (function() {
 			
 			var measureInfo = {
 				t : t,
-				startTime : startTime,
 				index : measureIndex,
 				ellapsedBeats : measure.getBeatPerMillisecond() * (ellapsed - startTime),
 				measure : this.measures[measureIndex]
@@ -114,6 +117,5 @@ RH.Game = (function() {
 		// we don't fill the last bar
 		return result;
 	};
-
 	return Game;
 }());
