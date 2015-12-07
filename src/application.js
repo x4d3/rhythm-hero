@@ -11,13 +11,11 @@ RH.Application = (function() {
 
 	function Application() {
 		this.eventManager = new EventManager();
+		this.game  = null;
 	}
 
 	Application.prototype = {
-		getEventManager : function() {
-			return this.eventManager;
-		},
-		start : function() {
+		quickGame : function() {
 			var tempo = getParameterByName('tempo');
 			var ts = getParameterByName('ts');
 			var debugMode = getParameterByName('debug');
@@ -27,14 +25,13 @@ RH.Application = (function() {
 			if (parsedDebugMode) {
 				RH.debug();
 			}
-			var game = new Game(this.eventManager, new RH.GameOptions(parsedTS, parsedTempo));
-			(function animloop() {
-				var isOn = game.update();
-				if (isOn) {
-					requestAnimFrame(animloop);
-				}
-			})();
-
+			this.game = new Game(this.eventManager, new RH.GameOptions(parsedTS, parsedTempo));
+			this.game.start();
+		},
+		onEscape : function(){
+			if (this.game){
+				this.game.stop();
+			}
 		}
 	};
 	return Application;
@@ -45,9 +42,12 @@ $(document).ready(function() {
 	var application = new RH.Application();
 	var onEvent = function(isUp, event) {
 		if (isUp) {
-			application.getEventManager().onUp(event);
+			application.eventManager.onUp(event);
 		} else {
-			application.getEventManager().onDown(event);
+			application.eventManager.onDown(event);
+		}
+		if (event.keyCode == 27) { // escape key maps to keycode `27`
+			application.onEscape();
 		}
 		// Don't prevent from calling ctrl + U or ctrl + shift + J etc...
 		if (!event.ctrlKey) {
@@ -65,10 +65,20 @@ $(document).ready(function() {
 	$("body").on('touchend mouseup touchcancel', onUp);
 	$("body").keydown(onDown).keyup(onUp);
 
+	$('.quick-game').on('click', function(e) {
+		application.quickGame();
+	});
+
+	$('.campaign').on('click', function(e) {
+		application.quickGame();
+	});
+	$('.options').on('click', function(e) {
+		application.options();
+	});
+
 	$(window).blur(function() {
 		// If the application loose the focuse, we consider that the user is not pressing any key
-		application.getEventManager().resetKeyPressed();
+		application.eventManager.resetKeyPressed();
 	});
-	application.start();
 	$('body').removeClass('loading');
 });

@@ -1,8 +1,15 @@
-
-
 if (typeof RH === 'undefined') {
 	RH = {};
 }
+if (typeof localStorage === 'undefined') {
+	localStorage = {
+		getItem : function() {
+		},
+		setItem : function() {
+		},
+	};
+}
+
 
 (function() {
 	'use strict';

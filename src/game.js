@@ -14,12 +14,13 @@ RH.Game = (function() {
 		this.eventManager = eventManager;
 		this.options = options;
 
-		this.container = $('<div>').addClass('rounded canvases');
+		this.container = $('<div>').addClass('application-container');
 		var switchSound = $('<div>').addClass('rh-icon switch-sound');
 		switchSound.click(function() {
 			var isOn = RH.SoundsManager.switchSound();
 			switchSound.toggleClass('off', !isOn);
 		});
+		switchSound.toggleClass('off', !RH.SoundsManager.isOn);
 		var canvasDiv = $('<canvas>').addClass('application').prop({
 			width : 800,
 			height : 300
@@ -49,6 +50,19 @@ RH.Game = (function() {
 	};
 
 	Game.prototype = {
+		start:function(){
+			var game = this;
+			(function animloop() {
+				if (game.isOn) {
+					game.update();
+					requestAnimFrame(animloop);
+				}
+			})();
+		},
+		stop: function(){
+			this.container.remove();
+			this.isOn = false;
+		},
 		update : function() {
 			var game = this;
 			var t = RH.getTime();
@@ -65,16 +79,15 @@ RH.Game = (function() {
 				if (measureIndex === this.measures.length) {
 					this.isOn = false;
 					this.container.remove();
-					this.measuresStartTime.forEach(function(t, measureIndex) {
-						if (measureIndex < 2 || measureIndex == game.measures.length) {
+					this.measuresStartTime.forEach(function(startTime, measureIndex) {
+						if (measureIndex < 1 || measureIndex == game.measures.length) {
 							return;
 						}
 						var measure = game.measures[measureIndex];
-						var ellapsed = t - game.t0;
 						var measureInfo = {
-							t : t,
+							t : startTime + game.t0,
 							index : measureIndex,
-							ellapsedBeats : measure.getBeatPerMillisecond() * (ellapsed - t),
+							ellapsedBeats : 0,
 							measure : measure
 						};
 						var tempCanvaJ = $('<canvas>');
@@ -83,12 +96,10 @@ RH.Game = (function() {
 							height : 200
 						});
 						game.screen.drawOnExternalCanvas(tempCanvaJ[0], measureInfo);
-						$('body').append(tempCanvaJ);
+						$('.result').append(tempCanvaJ);
 					});
-
 					logger.debug("Event Manager: " + this.eventManager.toJson());
-
-					return false;
+					return;
 				}
 			}
 			var measureInfo = {
@@ -98,7 +109,6 @@ RH.Game = (function() {
 				measure : measure
 			};
 			this.screen.display(measureInfo);
-			return this.isOn;
 		}
 	};
 
