@@ -31,6 +31,11 @@ RH.ScoreCalculator = (function() {
 			}
 			return sum / this.notes.length;
 		},
+		isFailed : function() {
+			return this.notes.some(function(x) {
+				return x.isFailed;
+			});
+		},
 		toString : function() {
 			return this.notes.toString();
 		}
@@ -72,6 +77,7 @@ RH.ScoreCalculator = (function() {
 		this.measuresScore = [];
 		this.currentMultiplier = 1;
 		this.totalScore = 0;
+		this.goodMeasureCount = 0;
 	}
 	/**
 	 * in milliseconds
@@ -181,6 +187,17 @@ RH.ScoreCalculator = (function() {
 			}));
 			logger.debug("addMeasureScore(" + measureIndex + ") " + notesScores);
 			this.measuresScore[measureIndex] = notesScores;
+			if (notesScores.isFailed()) {
+				this.currentMultiplier = 1;
+				this.goodMeasureCount = 0;
+			} else {
+				this.goodMeasureCount++;
+				if (this.goodMeasureCount == 4) {
+					this.currentMultiplier = Math.min(this.currentMultiplier + 1, 8);
+					this.goodMeasureCount = 0;
+				}
+				this.totalScore+= notesScores.value() * this.currentMultiplier;
+			}
 			return notesScores;
 		}
 	};

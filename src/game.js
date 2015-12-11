@@ -79,8 +79,12 @@ RH.Game = (function() {
 				if (measureIndex === this.measures.length) {
 					this.isOn = false;
 					this.container.remove();
+					var resultDiv = $('.result');
+					resultDiv.empty();
+					resultDiv.append('<h2>Result</h2>');
+					resultDiv.append(renderScore(this.scoreCalculator));
 					this.measuresStartTime.forEach(function(startTime, measureIndex) {
-						if (measureIndex < 1 || measureIndex == game.measures.length) {
+						if (measureIndex < 2 || measureIndex == game.measures.length) {
 							return;
 						}
 						var measure = game.measures[measureIndex];
@@ -96,7 +100,7 @@ RH.Game = (function() {
 							height : 200
 						});
 						game.screen.drawOnExternalCanvas(tempCanvaJ[0], measureInfo);
-						$('.result').append(tempCanvaJ);
+						resultDiv.append(tempCanvaJ);
 					});
 					logger.debug("Event Manager: " + this.eventManager.toJson());
 					return;
@@ -153,5 +157,10 @@ RH.Game = (function() {
 		// we don't fill the last bar
 		return result;
 	};
+	var renderScore = function(scoreCalculator){
+		return  $('<div>');
+		
+	};
+	
 	return Game;
 }());
