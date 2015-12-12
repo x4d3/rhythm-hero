@@ -57,7 +57,7 @@ canvas {
    with position:fixed. Width, height, top and left speak
    for themselves. Background we set to 80% white with
    our animation centered, and no-repeating */
-.modal {
+.loading-modal {
 	display: none;
 	position: fixed;
 	z-index: 1000;
@@ -68,7 +68,7 @@ canvas {
 	background: rgba(255, 255, 255, .8);
 }
 
-.modal .message {
+.loading-modal .message {
 	position: absolute;
 	top: 50%;
 	bottom: 50%;
@@ -76,11 +76,11 @@ canvas {
 	right: 50%;
 }
 
-.modal img {
+.loading-modal img {
 	float: left;
 }
 
-.modal i {
+.loading-modal i {
 	padding-left: 5px;
 	te
 }
@@ -93,6 +93,6 @@ body.loading {
 
 /* Anytime the body has the loading class, our
    modal element will be visible */
-body.loading .modal {
+body.loading .loading-modal {
 	display: block;
 }

@@ -72,9 +72,6 @@ $(document).ready(function() {
 	$('.campaign').on('click touchstart', function(e) {
 		application.quickGame();
 	});
-	$('.options').on('click touchstart', function(e) {
-		application.options();
-	});
 
 	$(window).blur(function() {
 		// If the application loose the focuse, we consider that the user is not pressing any key
