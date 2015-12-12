@@ -65,14 +65,14 @@ $(document).ready(function() {
 	$("body").on('touchend mouseup touchcancel', onUp);
 	$("body").keydown(onDown).keyup(onUp);
 
-	$('.quick-game').on('click', function(e) {
+	$('.quick-game').on('click touchstart', function(e) {
 		application.quickGame();
 	});
 
-	$('.campaign').on('click', function(e) {
+	$('.campaign').on('click touchstart', function(e) {
 		application.quickGame();
 	});
-	$('.options').on('click', function(e) {
+	$('.options').on('click touchstart', function(e) {
 		application.options();
 	});
 
