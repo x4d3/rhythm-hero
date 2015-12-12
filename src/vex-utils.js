@@ -300,11 +300,6 @@ RH.VexUtils = (function() {
 			result.ties.forEach(function(tie) {
 				tie.setContext(context).draw();
 			});
-
-			if (RH.isDebug) {
-				context.fillText(measure, measureWidth * i, 20);
-			}
-
 		});
 		var result = [];
 		for (var i = 0; i < measures.length; i++) {
