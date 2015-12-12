@@ -81,18 +81,16 @@ RH.Screen = (function() {
 			var screen = this;
 			context.beginPath();
 			context.lineWidth = 1;
-			var y = 0;
+			var y = canvas.height / 8;
 			ups.forEach(function(element) {
+				context.moveTo(x,y);
 				y = 0.5 + (element.isPressed ? canvas.height / 16 : canvas.height / 8);
 				context.lineTo(x, y);
 				var newX = x + element.duration * screen.measureWidth / measureDuration;
 				context.lineTo(newX, y);
 				x = newX;
 			});
-			// context.moveTo(canvas.width / 4, 0);
-			// context.lineTo(canvas.width / 4, canvas.height);
 			context.stroke();
-			context.closePath();
 		},
 		displayDebug : function(canvas, shift, startStave, index) {
 			var screen = this;
@@ -126,7 +124,6 @@ RH.Screen = (function() {
 				x = newX;
 			});
 			context.stroke();
-			context.closePath();
 			context.restore();
 
 		},
