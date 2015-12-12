@@ -16,7 +16,7 @@ RH.Game = (function() {
 
 		this.container = $('<div>').addClass('application-container');
 		var switchSound = $('<div>').addClass('rh-icon switch-sound');
-		switchSound.click(function() {
+		switchSound.on("click touchstart", function() {
 			var isOn = RH.SoundsManager.switchSound();
 			switchSound.toggleClass('off', !isOn);
 		});
@@ -90,7 +90,7 @@ RH.Game = (function() {
 						var measure = game.measures[measureIndex];
 						var measureInfo = {
 							t : startTime + game.t0,
-							index : measureIndex,
+							index : measureIndex-1,
 							ellapsedBeats : 0,
 							measure : measure
 						};
