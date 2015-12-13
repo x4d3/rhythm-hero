@@ -138,9 +138,7 @@ RH.Game = (function() {
 				var split = note.split(durationLeft);
 				measureNotes.push(split[0]);
 				result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, !note.isRest));
-				if(!note.isRest){
-					firstNotePressed = true;
-				}
+				firstNotePressed = !note.isRest;
 				var newDuration = note.duration.subtract(durationLeft);
 				measureNotes = [ split[1] ];
 				beats = split[1].duration;

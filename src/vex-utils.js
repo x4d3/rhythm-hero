@@ -117,7 +117,7 @@ RH.VexUtils = (function() {
 		}
 		return undefined;
 	};
-	
+
 	var isPowerTwo = function(n) {
 		return (n & (n - 1)) === 0;
 	};
@@ -130,20 +130,19 @@ RH.VexUtils = (function() {
 			var duration = note.duration;
 			var isRest = note.isRest;
 			var key;
-			if(isRest){
+			if (isRest) {
 				key = "a/4";
-			}else{
+			} else {
 				key = VexUtils.randomKey();
 			}
-		
+
 			var tupletFactor;
-			if (duration.denominator != 1){
+			if (duration.denominator != 1) {
 				var dFactors = PrimeLibrary.factor(duration.denominator);
 				tupletFactor = find(dFactors, function(factor) {
 					return factor != 2;
 				});
 			}
-
 
 			if (tupletFactor !== undefined) {
 				duration = duration.multiply(new Fraction(tupletFactor, 1)).divide(new Fraction(2, 1));
@@ -157,13 +156,13 @@ RH.VexUtils = (function() {
 					} else {
 						var x = 1 << (binary.length - i - 1);
 						var noteDuration = new Fraction(4 * duration.denominator, x);
-						Vex.Flow.sanitizeDuration (fractionToString(noteDuration));
+						Vex.Flow.sanitizeDuration(fractionToString(noteDuration));
 						notesData.push({
 							keys : [ key ],
 							duration : noteDuration,
 							dots : 0,
 							tupletFactor : tupletFactor,
-							type : isRest ? "r":""
+							type : isRest ? "r" : ""
 						});
 					}
 				}
@@ -180,9 +179,9 @@ RH.VexUtils = (function() {
 					keys : noteData.keys,
 					duration : fractionToString(noteData.duration),
 					dots : noteData.dots,
-					type:noteData.type
+					type : noteData.type
 				});
-				for (var i = 0; i < noteData.dots; i++){
+				for (var i = 0; i < noteData.dots; i++) {
 					vxNote.addDotToAll();
 				}
 				if (j > 0) {
@@ -205,7 +204,7 @@ RH.VexUtils = (function() {
 					var n = wholeDuration.numerator;
 					var d = wholeDuration.denominator;
 					if ((n == 1 && isPowerTwo(d)) || (d == 1 && isPowerTwo(1))) {
-						var tupletOption =  {
+						var tupletOption = {
 							num_notes : noteData.tupletFactor,
 							beats_occupied : wholeDuration.value()
 						};
@@ -229,14 +228,14 @@ RH.VexUtils = (function() {
 		};
 
 	};
-	var fractionToString = function(duration){
-		if (duration.denominator == 1){
+	var fractionToString = function(duration) {
+		if (duration.denominator == 1) {
 			return duration.numerator.toString();
-		}else{
+		} else {
 			return duration.toString();
 		}
 	};
-	
+
 	VexUtils.generateMeasuresCanvases = function(measureWidth, measures) {
 		var tempCanvaJ = $('<canvas>');
 
@@ -250,6 +249,7 @@ RH.VexUtils = (function() {
 		var ctx = renderer.getContext();
 		var currentTimeSignature = null;
 		var currentTempo = null;
+		var previousMeasureLastNote = null;
 		measures.forEach(function(measure, i) {
 			if (measure.isEmpty) {
 				// display
@@ -280,7 +280,6 @@ RH.VexUtils = (function() {
 			stave.draw(context);
 			var formatter = new VF.Formatter();
 			var result = generateNotesTupletTiesAndBeams(measure.notes);
-
 			var voice = new VF.Voice({
 				num_beats : timeSignature.numerator,
 				beat_value : timeSignature.denominator,
@@ -290,6 +289,15 @@ RH.VexUtils = (function() {
 			voice.addTickables(result.notes);
 			formatter.joinVoices([ voice ]).formatToStave([ voice ], stave);
 			voice.draw(context, stave);
+			if (measure.firstNotePressed) {
+				var tie = new Vex.Flow.StaveTie({
+					first_note : previousMeasureLastNote,
+					last_note : result.notes[0],
+					first_indices : [ 0 ],
+					last_indices : [ 0 ]
+				});
+				result.ties.push(tie);
+			}
 
 			result.beams.forEach(function(beam) {
 				beam.setContext(context).draw();
@@ -300,6 +308,8 @@ RH.VexUtils = (function() {
 			result.ties.forEach(function(tie) {
 				tie.setContext(context).draw();
 			});
+
+			previousMeasureLastNote = last(result.notes);
 		});
 		var result = [];
 		for (var i = 0; i < measures.length; i++) {
@@ -307,6 +317,6 @@ RH.VexUtils = (function() {
 		}
 		return result;
 	};
-	
+
 	return VexUtils;
 }());
