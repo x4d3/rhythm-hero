@@ -151,7 +151,13 @@ if (typeof localStorage === 'undefined') {
 		}
 		return maxIndex;
 	};
-
+	RH.copyProperties = function(from, to) {
+		Object.keys(from).forEach(function(key) {
+			to[key] = from[key];
+		});
+	};
+	
+	
 	window.requestAnimFrame = (function() {
 		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function(callback) {
 			window.setTimeout(callback, 1000 / 60);

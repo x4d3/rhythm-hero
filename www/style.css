@@ -96,3 +96,8 @@ body.loading {
 body.loading .loading-modal {
 	display: block;
 }
+
+@font-face {
+    font-family: 'scoreboard';
+    src: url('scoreboard.ttf');
+}

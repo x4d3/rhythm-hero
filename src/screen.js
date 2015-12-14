@@ -3,6 +3,7 @@ RH.Screen = (function() {
 	var Preconditions = RH.Preconditions;
 	var VF = Vex.Flow;
 	var VexUtils = RH.VexUtils;
+	var ScoreScreen = RH.ScoreScreen;
 
 	function Screen(canvas, eventManager, scoreCalculator, measures, options) {
 		this.canvas = canvas;
@@ -17,6 +18,21 @@ RH.Screen = (function() {
 			"true" : measuresCanvases,
 			"false" : measuresCanvases.map(brighten)
 		};
+		this.scoreScreen = new ScoreScreen({
+			scoreCalculator : scoreCalculator,
+			measurePosition : {
+				x : this.measureWidth/2 - 80,
+				y : 70
+			},
+			scorePosition : {
+				x : this.measureWidth / 4,
+				y : 15
+			},
+			multiplierPosition : {
+				x : this.measureWidth / 4,
+				y : 35
+			}
+		});
 	}
 
 	Screen.prototype = {
@@ -52,7 +68,7 @@ RH.Screen = (function() {
 					context.stroke();
 				}
 			});
-			this.displayScore(canvas, -screen.measureWidth - shift, measureInfo.index - 1);
+			
 			if (RH.isDebug) {
 				this.displayEvents(canvas, measureInfo, 0.5);
 				[ -1, 0, 1, 2 ].forEach(function(i) {
@@ -65,12 +81,12 @@ RH.Screen = (function() {
 				});
 			}
 			this.displayMetronome(canvas, measureInfo);
+			this.scoreScreen.draw(canvas.getContext("2d"), measureInfo.index - 1, measureInfo.t);
 		},
 		drawOnExternalCanvas : function(canvas, measureInfo) {
 			this.displayStave(canvas, 0, measureInfo.index, true);
 			this.displayEvents(canvas, measureInfo, 1);
 			this.displayDebug(canvas, 0, 0, measureInfo.index);
-			this.displayScore(canvas, 0, measureInfo.index);
 		},
 		displayEvents : function(canvas, measureInfo, percentage) {
 			var context = canvas.getContext("2d");
@@ -83,7 +99,7 @@ RH.Screen = (function() {
 			context.lineWidth = 1;
 			var y = canvas.height / 8;
 			ups.forEach(function(element) {
-				context.moveTo(x,y);
+				context.moveTo(x, y);
 				y = 0.5 + (element.isPressed ? canvas.height / 16 : canvas.height / 8);
 				context.lineTo(x, y);
 				var newX = x + element.duration * screen.measureWidth / measureDuration;
@@ -131,27 +147,6 @@ RH.Screen = (function() {
 			var data = this.measuresCanvases[isActive][index];
 			canvas.getContext('2d').putImageData(data, startStave, 50);
 
-		},
-		displayScore : function(canvas, startStave, index) {
-			var screen = this;
-			var context = canvas.getContext("2d");
-			var noteScores = screen.scoreCalculator.measuresScore[index];
-			if (noteScores !== undefined && !screen.measures[index].isEmpty) {
-				context.save();
-				context.font = '12px sans-serif';
-				var y = 70;
-				var x = startStave + screen.measureWidth - 80;
-				noteScores.notes.forEach(function(noteScore) {
-					var type = noteScore.getType();
-					var ch = type.icon;
-					context.fillStyle = type.color;
-					context.fillText(ch, x, y);
-					x += context.measureText(ch).width;
-				});
-				context.fillStyle = 'black';
-				context.fillText(' ' + numeral(noteScores.value()).format("0%"), x, y);
-				context.restore();
-			}
 		},
 		displayMetronome : function(canvas, measureInfo) {
 			var context = canvas.getContext("2d");

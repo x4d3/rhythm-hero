@@ -75,7 +75,7 @@ RH.ScoreCalculator = (function() {
 		this.eventManager = eventManager;
 		this.measures = measures;
 		this.measuresScore = [];
-		this.currentMultiplier = 1;
+		this.multiplier = 1;
 		this.totalScore = 0;
 		this.goodMeasureCount = 0;
 	}
@@ -83,7 +83,7 @@ RH.ScoreCalculator = (function() {
 	 * in milliseconds
 	 */
 	var EPSILON = 10;
-	var NO_SCORE = [];
+	var NO_SCORE = new MeasureScore([]);
 	ScoreCalculator.prototype = {
 		/**
 		 * awful awful code.. again...
@@ -188,15 +188,15 @@ RH.ScoreCalculator = (function() {
 			logger.debug("addMeasureScore(" + measureIndex + ") " + notesScores);
 			this.measuresScore[measureIndex] = notesScores;
 			if (notesScores.isFailed()) {
-				this.currentMultiplier = 1;
+				this.multiplier = 1;
 				this.goodMeasureCount = 0;
 			} else {
 				this.goodMeasureCount++;
 				if (this.goodMeasureCount == 4) {
-					this.currentMultiplier = Math.min(this.currentMultiplier + 1, 8);
+					this.multiplier = Math.min(this.multiplier + 1, 8);
 					this.goodMeasureCount = 0;
 				}
-				this.totalScore+= notesScores.value() * this.currentMultiplier;
+				this.totalScore+= notesScores.value() * this.multiplier;
 			}
 			return notesScores;
 		}
