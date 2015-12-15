@@ -10,8 +10,9 @@ RH.ScoreCalculator = (function() {
 		this.color = color;
 	}
 
-	var SCORE_TYPES = [ new ScoreType(0, "fail", "✗", "red"), new ScoreType(0.5, "boo", "E", "orange"), new ScoreType(0.6, "average", "D", "maroon"), new ScoreType(0.7, "good", "C", "black"),
-		new ScoreType(0.8, "great", "B", "olive"), new ScoreType(0.9, "awesome", "A", "green"), new ScoreType(0.99, "perfect", "✔", "green") ];
+	var SCORE_TYPES = [new ScoreType(0, "fail", "✗", "red"), new ScoreType(0.5, "boo", "E", "orange"), new ScoreType(0.7, "average", "D", "maroon"), new ScoreType(0.7, "good", "C", "black"),
+		new ScoreType(0.8, "great", "B", "olive"), new ScoreType(0.9, "awesome", "A", "green"), new ScoreType(0.95, "perfect", "✔", "green")
+	];
 	var SCORE_TYPES_VALUES = SCORE_TYPES.map(function(s) {
 		return s.value;
 	});
@@ -20,7 +21,7 @@ RH.ScoreCalculator = (function() {
 		this.notes = notes;
 	}
 	MeasureScore.prototype = {
-		value : function() {
+		value: function() {
 			var sum = 0;
 			for (var i = 0; i < this.notes.length; i++) {
 				var score = this.notes[i];
@@ -31,15 +32,18 @@ RH.ScoreCalculator = (function() {
 			}
 			return sum / this.notes.length;
 		},
-		isFailed : function() {
+		isFailed: function() {
 			return this.notes.some(function(x) {
 				return x.isFailed;
 			});
 		},
-		toString : function() {
+		toString: function() {
 			return this.notes.toString();
+		},getType: function() {
+			return SCORE_TYPES[RH.binarySearch(SCORE_TYPES_VALUES, this.value())];
 		}
 	};
+
 	function NoteScore(startDiff, durationDiff, notesPlayedBetween) {
 		this.startDiff = startDiff;
 		this.durationDiff = durationDiff;
@@ -48,14 +52,14 @@ RH.ScoreCalculator = (function() {
 	}
 
 	NoteScore.prototype = {
-		toString : function() {
+		toString: function() {
 			if (this.isFailed) {
 				return "F";
 			} else {
 				return this.startDiff.toFixed(0) + " " + numeral(100 * this.durationDiff).format('0') + " " + numeral(100 * this.value()).format('0');
 			}
 		},
-		value : function() {
+		value: function() {
 			if (this.isFailed) {
 				return 0;
 			} else {
@@ -63,9 +67,6 @@ RH.ScoreCalculator = (function() {
 				var y = Math.max(1 - Math.abs(this.durationDiff), 0);
 				return 0.5 + 0.30 * x * x + 0.20 * y;
 			}
-		},
-		getType : function() {
-			return SCORE_TYPES[RH.binarySearch(SCORE_TYPES_VALUES, this.value())];
 		}
 	};
 	var PERFECT = new NoteScore(0, 0, false);
@@ -91,7 +92,7 @@ RH.ScoreCalculator = (function() {
 		 * @param t
 		 * @param measureIndex
 		 */
-		addMeasureScore : function(t, measureIndex) {
+		addMeasureScore: function(t, measureIndex) {
 			var eventManager = this.eventManager;
 			if (measureIndex < 0) {
 				return;
@@ -196,7 +197,7 @@ RH.ScoreCalculator = (function() {
 					this.multiplier = Math.min(this.multiplier + 1, 8);
 					this.goodMeasureCount = 0;
 				}
-				this.totalScore+= notesScores.value() * this.multiplier;
+				this.totalScore += notesScores.value() * this.multiplier;
 			}
 			return notesScores;
 		}

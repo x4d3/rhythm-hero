@@ -26,11 +26,11 @@ RH.Screen = (function() {
 			},
 			scorePosition : {
 				x : this.measureWidth / 4,
-				y : 15
+				y : 25
 			},
 			multiplierPosition : {
 				x : this.measureWidth / 4,
-				y : 35
+				y : 45
 			}
 		});
 	}
