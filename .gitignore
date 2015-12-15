@@ -1,3 +1,6 @@
 node_modules
 target
 .settings
+.sublime-grunt.cache
+project.sublime-project
+project.sublime-workspace
