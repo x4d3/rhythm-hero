@@ -25,7 +25,7 @@ RH.ScoreScreen = (function() {
 		RH.copyProperties(options, this);
 		this.end = {
 			x: this.start.x,
-			y: this.start.y - 50
+			y: this.start.y - 25
 		};
 	}
 
@@ -34,8 +34,8 @@ RH.ScoreScreen = (function() {
 			var alpha = (t - this.t0) / TRAJECTORY_TIME;
 			var point = intermediatePoint(this.start, this.end, Math.pow(alpha, 4));
 			context.save();
-			context.font = '12px scoreboard';
-			context.fillStyle = 'black';
+			context.font = '18px Open Sans';
+			context.fillStyle = this.color;
 			context.fillText(this.value, point.x, point.y);
 			context.restore();
 
@@ -47,7 +47,7 @@ RH.ScoreScreen = (function() {
 
 	function ScoreScreen(options) {
 		RH.copyProperties(options, this);
-		this.currentIndex = -1;
+		this.currentIndex = 0;
 		this.scoreProjectiles = [];
 	}
 	ScoreScreen.prototype = {
@@ -61,10 +61,12 @@ RH.ScoreScreen = (function() {
 				this.currentIndex = measureIndex;
 				var score = this.scoreCalculator.measuresScore[measureIndex];
 				if (score !== undefined) {
+					var scoreType = score.getType();
 					var newProjectile = new ScoreProjectile({
 						t0: t,
 						start: this.measurePosition,
-						value: numeral(100 * score.value() * multiplier).format("0")
+						value: scoreType.label,
+						color: scoreType.color
 					});
 					this.scoreProjectiles.push(newProjectile);
 				}
@@ -85,11 +87,11 @@ RH.ScoreScreen = (function() {
 			context.save();
 			context.font = '20px scoreboard';
 			context.fillStyle = 'grey';
-			context.fillText(pad(totalScore, 5), this.scorePosition.x, this.scorePosition.y);
+			context.fillText(pad(Math.round(100 * totalScore), 5), this.scorePosition.x, this.scorePosition.y);
 			context.restore();
 
 			context.save();
-			context.font = '20px arial';
+			context.font = '20px Open Sans';
 			context.fillStyle = 'grey';
 			context.fillText("X" + multiplier, this.multiplierPosition.x, this.multiplierPosition.y);
 			context.restore();

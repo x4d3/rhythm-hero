@@ -9,16 +9,35 @@ RH.Application = (function() {
 	}
  Application.prototype = {
 		quickGame : function() {
+			if(this.game){
+				this.game.stop();
+			}
 			var notes = RH.RhythmPatterns.generateNotes(0, 0, 50);
 			var options = new RH.GameOptions();
 			var measures = Game.generateMeasures(options, notes);
 			this.game = new Game(this.eventManager, measures);
 			this.game.start();
 		},
-		onEscape : function() {
+		onEvent : function(isUp, event) {
+			if (isUp) {
+				this.eventManager.onUp(event);
+			} else {
+				this.eventManager.onDown(event);
+			}
+			if (event.keyCode == 27) { // escape key maps to keycode `27`
+				this.stopGame();
+			}
+			// Only prevent when a game is on
+			// Don't prevent from calling ctrl + U or ctrl + shift + J etc...
+			if (!event.ctrlKey && this.game) {
+				event.preventDefault();
+			}
+		},
+		stopGame : function() {
 			if (this.game) {
 				this.game.stop();
 			}
+			this.game = null;
 		}
 	};
 	return Application;
@@ -46,26 +65,12 @@ $(document).ready(function() {
 	ko.applyBindings(RH.Parameters.model);
 
 	var application = new RH.Application();
-	var onEvent = function(isUp, event) {
-		if (isUp) {
-			application.eventManager.onUp(event);
-		} else {
-			application.eventManager.onDown(event);
-		}
-		if (event.keyCode == 27) { // escape key maps to keycode `27`
-			application.onEscape();
-		}
-		// Don't prevent from calling ctrl + U or ctrl + shift + J etc...
-		// if (!event.ctrlKey) {
-		// event.preventDefault();
-		// }
-	};
 
 	var onDown = function(event) {
-		onEvent(false, event);
+		application.onEvent(false, event);
 	};
 	var onUp = function(event) {
-		onEvent(true, event);
+		application.onEvent(true, event);
 	};
 	$("body").on('touchstart mousedown', onDown);
 	$("body").on('touchend mouseup touchcancel', onUp);

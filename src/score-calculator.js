@@ -6,12 +6,12 @@ RH.ScoreCalculator = (function() {
 	function ScoreType(value, label, icon, color) {
 		this.value = value;
 		this.label = label;
-		this.icon = icon;
+		this.icon = icon;	
 		this.color = color;
 	}
 
-	var SCORE_TYPES = [new ScoreType(0, "fail", "✗", "red"), new ScoreType(0.5, "boo", "E", "orange"), new ScoreType(0.7, "average", "D", "maroon"), new ScoreType(0.7, "good", "C", "black"),
-		new ScoreType(0.8, "great", "B", "olive"), new ScoreType(0.9, "awesome", "A", "green"), new ScoreType(0.95, "perfect", "✔", "green")
+	var SCORE_TYPES = [new ScoreType(0, "Fail", "✗", "red"), new ScoreType(0.5, "Boo", "E", "orange"), new ScoreType(0.7, "Average", "D", "maroon"), new ScoreType(0.7, "Good", "C", "black"),
+		new ScoreType(0.8, "Great", "B", "olive"), new ScoreType(0.9, "Awesome", "A", "green"), new ScoreType(0.95, "Perfect", "✔", "green")
 	];
 	var SCORE_TYPES_VALUES = SCORE_TYPES.map(function(s) {
 		return s.value;

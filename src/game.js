@@ -59,6 +59,7 @@ RH.Game = (function() {
 		stop: function(){
 			this.container.remove();
 			this.isOn = false;
+			$('.result').empty();
 		},
 		update : function() {
 			var game = this;
