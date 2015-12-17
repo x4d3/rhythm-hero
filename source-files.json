@@ -6,6 +6,7 @@
 	"lib/numeral.min.js",
 	"lib/fraction.js",
 	"lib/prime-library.js",
+	"lib/knockout-3.4.0.js",
 	"rh.js",
 	"time-signature.js",
 	"sounds-manager.js",

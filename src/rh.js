@@ -156,7 +156,14 @@ if (typeof localStorage === 'undefined') {
 			to[key] = from[key];
 		});
 	};
-	
+	RH.createSuiteArray = function(min, max, step){
+		var array = [];
+		step = step | 1;
+		for (var i = min; i <max; i +=step){
+			array.push(i);
+		}
+		return array;
+	};
 	
 	window.requestAnimFrame = (function() {
 		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function(callback) {

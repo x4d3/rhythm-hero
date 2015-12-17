@@ -5,12 +5,11 @@ RH.Screen = (function() {
 	var VexUtils = RH.VexUtils;
 	var ScoreScreen = RH.ScoreScreen;
 
-	function Screen(canvas, eventManager, scoreCalculator, measures, options) {
+	function Screen(canvas, eventManager, scoreCalculator, measures) {
 		this.canvas = canvas;
 		this.eventManager = eventManager;
 		this.scoreCalculator = scoreCalculator;
 		this.measures = measures;
-		this.options = options;
 		this.measureWidth = 400;
 		this.metronome = new RH.Metronome(50, 50);
 		var measuresCanvases = VexUtils.generateMeasuresCanvases(this.measureWidth, measures);

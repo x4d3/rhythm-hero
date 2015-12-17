@@ -1,15 +1,16 @@
 module("RH Tests");
 
 test("Game.generateBars", function() {
+	'use strict';
 	var Game = RH.Game;
 	var Measure = RH.Measure;
 	var Note = RH.Note;
 	var GameOptions = RH.GameOptions;
 	var RhythmPatterns = RH.RhythmPatterns;
 	
-	var tempo = GameOptions.DEFAULT_TEMPO;
-	var timeSignature = GameOptions.DEFAULT_TS;
-	var EMPTY = new RH.Measure(tempo, timeSignature, [], false, false);
+	var options = new GameOptions();
+	var tempo = options.tempi[0];
+	var timeSignature = options.timeSignatures[0];
 	
 	var getPatternsNotes = function(patterns){
 		var result = [];
@@ -22,11 +23,12 @@ test("Game.generateBars", function() {
 	var newNote = function(n, d) {
 		return new Note(new Fraction(n, d), false);
 	};
+
 	var testMeasures = function(patternsS, awaitedMeasures) {
 		var patterns = patternsS.map(RhythmPatterns.getPattern);
-		var options = new GameOptions(timeSignature, tempo);
+		
 		var measures = Game.generateMeasures(options, getPatternsNotes(patterns));
-		deepEqual(measures, [EMPTY ].concat(awaitedMeasures), "measures" + measures + ", " + awaitedMeasures);
+		deepEqual(measures, [Game.EMPTY_MEASURE].concat(awaitedMeasures), "measures" + measures + ", " + awaitedMeasures);
 	};
 	testMeasures([ 'crotchet', 'whole', 'minim', 'crotchet' ],
 		[ new Measure(tempo, timeSignature, [ newNote(1, 1), newNote(3, 1) ], false, true), new Measure(tempo, timeSignature, [ newNote(1, 1), newNote(2, 1), newNote(1, 1) ], true, false) ]);

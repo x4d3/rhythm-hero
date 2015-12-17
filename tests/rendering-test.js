@@ -16,7 +16,7 @@ $(document)
 			// To make the test reproduceable
 			Math.seedrandom('Test');
 			RH.debug();
-
+			var options = new GameOptions();
 			var generateCanvas = function(title, width, comment) {
 				var canvasJ = $('<canvas>');
 				canvasJ.prop({
@@ -46,9 +46,6 @@ $(document)
 				}
 			};
 			test('All Patterns', function(assert) {
-				var tempo = GameOptions.DEFAULT_TEMPO;
-				var timeSignature = GameOptions.DEFAULT_TS;
-				var options = new GameOptions(timeSignature, tempo);
 				var measures = Game.generateMeasures(options, getPatternsNotes(RhythmPatterns.PATTERNS));
 
 				var canvasesData = VexUtils.generateMeasuresCanvases(400, measures);
@@ -56,9 +53,6 @@ $(document)
 				ok(true);
 			});
 			test('Defined Patterns', function(assert) {
-				var tempo = GameOptions.DEFAULT_TEMPO;
-				var timeSignature = GameOptions.DEFAULT_TS;
-				var options = new GameOptions(timeSignature, tempo);
 				var patternsS = [ 'minim', 'crotchet', 'quaver', 'triplet quaver', 'dotted crotchet quaver', 'quaver dotted crotchet', 'whole', 'minim', 'crotchet rest', 'crotchet rest',
 					'crotchet rest', 'crotchet rest', 'crotchet rest' ];
 				var patterns = patternsS.map(RhythmPatterns.getPattern);
@@ -70,9 +64,6 @@ $(document)
 			});
 
 			test('Random Patterns', function(assert) {
-				var tempo = GameOptions.DEFAULT_TEMPO;
-				var timeSignature = GameOptions.DEFAULT_TS;
-				var options = new GameOptions(timeSignature, tempo);
 				var notes = RH.RhythmPatterns.generateNotes(0, RH.RhythmPatterns.MAX_DIFFICULTY, 100);
 				var measures = Game.generateMeasures(options, notes);
 
@@ -87,7 +78,7 @@ $(document)
 
 					var NOTES_INPUT = "1/1,1/2,1/1r,1/1,1/2,1/1,1/1r,1/1,2/1,1/1r,1/1,1/1r,1/1r,1/1r,1/1r,1/2,1/1,1/1,1/1,1/1,1/2,1/1r,1/1,1/1r,2/1,1/1,1/1,1/1r,1/1r,1/1,1/1r,1/1,1/1r,1/2,1/2,1/1,1/2,1/1r,1/2,1/1r,1/1,1/2,1/1r,1/1r,1/1,1/1r,1/2,1/1,1/1,1/1";
 					var notes = Note.parseNotes(NOTES_INPUT);
-					var options = new GameOptions(GameOptions.DEFAULT_TS, GameOptions.DEFAULT_TEMPO);
+					
 					var measures = Game.generateMeasures(options, notes);
 					var eventManager = EventManager
 						.fromJson('{"keyPressed":[null,false],"keyChanged":[4031,4949,5100,5765,6474,7350,7509,8059,8175,10189,11869,12702,13975,15137,19082,19407,19579,20316,20473,21327,21490,22326,22481,23182,23343,23898,24758,26058,27051,28590,28815,29700,29832,31095,33061,34014,35001,35983,37174,37331,37500,37790,38031,38564,39078,39545,40401,40780,40915,41249,41932,42944,43107,43672],"isPressed":false}');

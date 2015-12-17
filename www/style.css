@@ -42,14 +42,14 @@ canvas {
 }
 
 .rh-icon.switch-sound {
-	background-image: url("images/on.png");
+	background-image: url("images/sound-on.png");
 	right: 0px;
 	top: -42px;
 	width: 32px;
 }
 
 .rh-icon.switch-sound.off {
-	background-image: url("images/off.png");
+	background-image: url("images/sound-off.png");
 }
 
 /* Start by setting display:none to make this hidden.
@@ -82,7 +82,6 @@ canvas {
 
 .loading-modal i {
 	padding-left: 5px;
-	te
 }
 
 /* When the body has the loading class, we turn

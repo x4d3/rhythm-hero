@@ -10,10 +10,9 @@ RH.Game = (function() {
 	var Screen = RH.Screen;
 	var logger = RH.logManager.getLogger('Game');
 
-	var Game = function(eventManager, options) {
+	var Game = function(eventManager, measures) {
 		this.eventManager = eventManager;
-		this.options = options;
-
+		this.measures = measures;
 		this.container = $('<div>').addClass('application-container');
 		var switchSound = $('<div>').addClass('rh-icon switch-sound');
 		switchSound.on("click touchstart", function() {
@@ -30,9 +29,7 @@ RH.Game = (function() {
 		var canvas = canvasDiv[0];
 		$('body').append(this.container);
 
-		var notes = RH.RhythmPatterns.generateNotes(0, 0, 50);
-		logger.debug("Notes: " + notes);
-		this.measures = Game.generateMeasures(options, notes);
+
 		var currentTime = 0;
 		this.measuresStartTime = this.measures.map(function(measure) {
 			var result = currentTime;
@@ -41,7 +38,7 @@ RH.Game = (function() {
 		});
 		this.measuresStartTime.push(currentTime);
 		this.scoreCalculator = new ScoreCalculator(eventManager, this.measures);
-		this.screen = new Screen(canvas, eventManager, this.scoreCalculator, this.measures, options);
+		this.screen = new Screen(canvas, eventManager, this.scoreCalculator, this.measures);
 		this.isOn = true;
 		this.t0 = RH.getTime();
 		logger.debug("t0:" + this.t0);
@@ -115,17 +112,17 @@ RH.Game = (function() {
 			this.screen.display(measureInfo);
 		}
 	};
-
+	Game.EMPTY_MEASURE = new RH.Measure(60, RH.TS.FOUR_FOUR, [], false, false);
 	// static method
 	Game.generateMeasures = function(options, notes) {
 		//The two first measure are empty
-		var tempo = options.tempo;
-		var timeSignature = options.timeSignature;
+		var tempo = options.tempi[0];
+		var timeSignature = options.timeSignatures[0];
 		var beatPerBar = timeSignature.getBeatPerBar();
 		var beatPerBarF = new Fraction(beatPerBar, 1);
 
-		var EMPTY = new RH.Measure(tempo, timeSignature, [], false, false);
-		var result = [ EMPTY ];
+		
+		var result = [ Game.EMPTY_MEASURE ];
 		var beats = Fraction.ZERO;
 
 		var measureNotes = [];

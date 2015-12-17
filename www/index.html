@@ -114,7 +114,41 @@
 					<h4 class="modal-title">Options</h4>
 				</div>
 				<div class="modal-body">
-					<p>Here are the options</p>
+					<form id="unique">
+						<div class="checkbox">
+							<label> <input type="checkbox" data-bind="checked: beginnerMode"> Beginner Mode</label>
+						</div>
+						<fieldset class="form-group">
+							<label for="difficulty-select">Difficulty</label>
+							<select class="form-control" id="difficulty-select" data-bind="options: difficultyValues, value: difficulty"></select>
+						</fieldset>
+						<fieldset class="form-group">
+							<label for="timesignatures-select">Time Signatures</label>
+							<select multiple="multiple" class="form-control" id="timesignatures-select" data-bind="options: timeSignaturesValues, selectedOptions: timeSignatures"></select>
+						</fieldset>
+						<fieldset class="form-group">
+							<label for="tempi-select">Tempi</label>
+							<select multiple="multiple" class="form-control" id="tempi-select" data-bind="options: tempiValues, selectedOptions: tempi"></select>
+						</fieldset>
+						<label for="scrolling-direction">Scrolling Direction</label>
+						<div class="radio">
+							<label> <input type="radio" name="scrolling-direction" value="horizontal" data-bind="checked: scrollingDirection"> Horizontal
+							</label>
+						</div>
+						<div class="radio">
+							<label> <input type="radio" name="scrolling-direction" value="vertical" data-bind="checked: scrollingDirection"> Vertical
+							</label>
+						</div>
+						<label for="scrolling-mode">Scrolling Mode</label>
+						<div class="radio">
+							<label> <input type="radio" name="scrolling-mode" value="continuous" data-bind="checked: scrollingMode"> Continuous
+							</label>
+						</div>
+						<div class="radio">
+							<label> <input type="radio" name="scrolling-mode" value="perMeasure" data-bind="checked: scrollingMode"> Per Measure
+							</label>
+						</div>
+					</form>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -128,4 +162,5 @@
 <!-- 	Main Application Script -->
 <script src="script.js"></script>
 <script src="bootstrap.min.js"></script>
+<script src='knockout-3.4.0.js'></script>
 </html>

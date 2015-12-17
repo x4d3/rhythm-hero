@@ -3,33 +3,20 @@ RH.Application = (function() {
 	var Game = RH.Game;
 	var EventManager = RH.EventManager;
 
-	function getParameterByName(name) {
-		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"), results = regex.exec(location.search);
-		return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
-	}
-
 	function Application() {
 		this.eventManager = new EventManager();
-		this.game  = null;
+		this.game = null;
 	}
-
-	Application.prototype = {
+ Application.prototype = {
 		quickGame : function() {
-			var tempo = getParameterByName('tempo');
-			var ts = getParameterByName('ts');
-			var debugMode = getParameterByName('debug');
-			var parsedDebugMode = debugMode === 'true';
-			var parsedTempo = tempo ? parseInt(tempo, 10) : null;
-			var parsedTS = ts ? RH.TimeSignature.parse(ts) : null;
-			if (parsedDebugMode) {
-				RH.debug();
-			}
-			this.game = new Game(this.eventManager, new RH.GameOptions(parsedTS, parsedTempo));
+			var notes = RH.RhythmPatterns.generateNotes(0, 0, 50);
+			var options = new RH.GameOptions();
+			var measures = Game.generateMeasures(options, notes);
+			this.game = new Game(this.eventManager, measures);
 			this.game.start();
 		},
-		onEscape : function(){
-			if (this.game){
+		onEscape : function() {
+			if (this.game) {
 				this.game.stop();
 			}
 		}
@@ -39,6 +26,25 @@ RH.Application = (function() {
 
 $(document).ready(function() {
 	'use strict';
+
+	var difficultyValues = RH.createSuiteArray(1, RH.RhythmPatterns.MAX_DIFFICULTY + 1);
+	var timeSignaturesValues = Object.keys(RH.TS).map(function(key){return RH.TS[key].toString();});
+	RH.Parameters = {
+		model : {
+			beginnerMode : ko.observable(true),
+			soundOn : ko.observable(true),
+			difficultyValues : difficultyValues,
+			difficulty : ko.observable(1),
+			timeSignaturesValues:timeSignaturesValues,
+			timeSignatures : ko.observable([ RH.TS.FOUR_FOUR.toString() ]),
+			tempiValues : [60,90,120,150,180],
+			tempi: ko.observable([ 60]),
+			scrollingDirection : ko.observable("horizontal"),			
+			scrollingMode : ko.observable("continuous")
+		}
+	};
+	ko.applyBindings(RH.Parameters.model);
+
 	var application = new RH.Application();
 	var onEvent = function(isUp, event) {
 		if (isUp) {
@@ -50,9 +56,9 @@ $(document).ready(function() {
 			application.onEscape();
 		}
 		// Don't prevent from calling ctrl + U or ctrl + shift + J etc...
-		if (!event.ctrlKey) {
-			event.preventDefault();
-		}
+		// if (!event.ctrlKey) {
+		// event.preventDefault();
+		// }
 	};
 
 	var onDown = function(event) {

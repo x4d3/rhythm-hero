@@ -19,7 +19,7 @@ module("ScoreCalculator");
 	
 	var generateMeasures = function(patternsS) {
 		var patterns = patternsS.map(RhythmPatterns.getPattern);
-		var options = new GameOptions(GameOptions.DEFAULT_TS, GameOptions.DEFAULT_TEMPO);
+		var options = new GameOptions();
 		return Game.generateMeasures(options, getPatternsNotes(patterns));
 	};
 	var mockEventManager = function(times) {
