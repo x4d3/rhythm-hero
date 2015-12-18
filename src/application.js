@@ -69,7 +69,7 @@ $(document).ready(function() {
 	ko.applyBindings(model);
 	RH.Parameters = {
 		model:model,
-		isBeginnerMode(){
+		isBeginnerMode:function(){
 			return model.beginnerModeEnabled() && model.beginnerMode();
 		}
 	};
