@@ -41,15 +41,25 @@ canvas {
 	background-size: 32px;
 }
 
-.rh-icon.switch-sound.on {
-	background-image: url("images/sound-on.png");
-
-}
 .rh-icon.switch-sound{
 	background-image: url("images/sound-off.png");
 	right: 0px;
 	top: -42px;
 	width: 32px;
+}
+
+.rh-icon.switch-sound.on {
+	background-image: url("images/sound-on.png");
+}
+
+.rh-icon.beginner-mode{
+	background-image: url("images/beginner-off.png");
+	right: 42px;
+	top: -42px;
+	width: 32px;
+}
+.rh-icon.beginner-mode.on {
+	background-image: url("images/beginner-on.png");
 }
 
 /* Start by setting display:none to make this hidden.

@@ -68,7 +68,7 @@ RH.Screen = (function() {
 				}
 			});
 			
-			if (RH.isDebug) {
+			if (RH.Parameters.isBeginnerMode()) {
 				this.displayEvents(canvas, measureInfo, 0.5);
 				[ -1, 0, 1, 2 ].forEach(function(i) {
 					var index = measureInfo.index + i;

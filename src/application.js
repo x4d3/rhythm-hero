@@ -51,8 +51,9 @@ $(document).ready(function() {
 	var timeSignaturesValues = Object.keys(RH.TS).map(function(key){return RH.TS[key].toString();});
 	var model =  {
 		beginnerMode : ko.observable(true, {persist: 'RH.beginnerMode'}),
+		toggleBeginnerMode:function () { model.beginnerMode(!model.beginnerMode());},
 		soundsOn : ko.observable(true, {persist: 'RH.soundsOn'}),
-		toggleSoundsOn:function () { model.soundsOn(!model.soundsOn()); },
+		toggleSoundsOn:function () { model.soundsOn(!model.soundsOn());},
 		difficultyValues : difficultyValues,
 		difficulty : ko.observable(1, {persist: 'RH.difficulty'}),
 		timeSignaturesValues:timeSignaturesValues,
@@ -66,7 +67,12 @@ $(document).ready(function() {
 	};
  
 	ko.applyBindings(model);
-	RH.Parameters = {model:model};
+	RH.Parameters = {
+		model:model,
+		isBeginnerMode(){
+			return model.beginnerModeEnabled() && model.beginnerMode();
+		}
+	};
 
 	var application = new RH.Application($("canvas.application")[0]);
 

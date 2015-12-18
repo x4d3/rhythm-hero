@@ -61,6 +61,7 @@
 		</div>
 	</div>
 	<div class="application-container" data-bind="visible: gameOn">
+		<div class="rh-icon beginner-mode" data-bind="click: toggleBeginnerMode, css: { on: beginnerMode}" ></div>
 		<div class="rh-icon switch-sound" data-bind="click: toggleSoundsOn, css: { on: soundsOn}" ></div>
 		<canvas class="application" width=800 height=300></canvas>
 	</div>
