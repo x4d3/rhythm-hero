@@ -10,26 +10,9 @@ RH.Game = (function() {
 	var Screen = RH.Screen;
 	var logger = RH.logManager.getLogger('Game');
 
-	var Game = function(eventManager, measures) {
+	var Game = function(eventManager, measures, canvas) {
 		this.eventManager = eventManager;
 		this.measures = measures;
-		this.container = $('<div>').addClass('application-container');
-		var switchSound = $('<div>').addClass('rh-icon switch-sound');
-		switchSound.on("click touchstart", function() {
-			var isOn = RH.SoundsManager.switchSound();
-			switchSound.toggleClass('off', !isOn);
-		});
-		switchSound.toggleClass('off', !RH.SoundsManager.isOn);
-		var canvasDiv = $('<canvas>').addClass('application').prop({
-			width : 800,
-			height : 300
-		});
-		this.container.append(switchSound);
-		this.container.append(canvasDiv);
-		var canvas = canvasDiv[0];
-		$('body').append(this.container);
-
-
 		var currentTime = 0;
 		this.measuresStartTime = this.measures.map(function(measure) {
 			var result = currentTime;
@@ -49,6 +32,7 @@ RH.Game = (function() {
 	Game.prototype = {
 		start:function(){
 			var game = this;
+			RH.Parameters.model.gameOn(true);
 			(function animloop() {
 				if (game.isOn) {
 					game.update();
@@ -57,7 +41,7 @@ RH.Game = (function() {
 			})();
 		},
 		stop: function(){
-			this.container.remove();
+			RH.Parameters.model.gameOn(false);
 			this.isOn = false;
 			$('.result').empty();
 		},
@@ -76,7 +60,7 @@ RH.Game = (function() {
 				logger.debug(measureIndex + "," + measure);
 				if (measureIndex === this.measures.length) {
 					this.isOn = false;
-					this.container.remove();
+					RH.Parameters.model.gameOn(false);
 					var resultDiv = $('.result');
 					resultDiv.empty();
 					resultDiv.append('<h2>Result</h2>');

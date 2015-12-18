@@ -41,15 +41,15 @@ canvas {
 	background-size: 32px;
 }
 
-.rh-icon.switch-sound {
+.rh-icon.switch-sound.on {
 	background-image: url("images/sound-on.png");
+
+}
+.rh-icon.switch-sound{
+	background-image: url("images/sound-off.png");
 	right: 0px;
 	top: -42px;
 	width: 32px;
-}
-
-.rh-icon.switch-sound.off {
-	background-image: url("images/sound-off.png");
 }
 
 /* Start by setting display:none to make this hidden.

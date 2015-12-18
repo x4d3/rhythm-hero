@@ -20,25 +20,8 @@
 				<ul class="nav navbar-nav">
 					<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">Levels <span class="caret"></span></a>
 						<ul class="dropdown-menu" aria-labelledby="themes">
-							<li><a href="../default/">Default</a></li>
-							<li class="divider"></li>
-							<li><a href="../cerulean/">Cerulean</a></li>
-							<li><a href="../cosmo/">Cosmo</a></li>
-							<li><a href="../cyborg/">Cyborg</a></li>
-							<li><a href="../darkly/">Darkly</a></li>
-							<li><a href="../flatly/">Flatly</a></li>
-							<li><a href="../journal/">Journal</a></li>
-							<li><a href="../lumen/">Lumen</a></li>
-							<li><a href="../paper/">Paper</a></li>
-							<li><a href="../readable/">Readable</a></li>
-							<li><a href="../sandstone/">Sandstone</a></li>
-							<li><a href="../simplex/">Simplex</a></li>
-							<li><a href="../slate/">Slate</a></li>
-							<li><a href="../spacelab/">Spacelab</a></li>
-							<li><a href="../superhero/">Superhero</a></li>
-							<li><a href="../united/">United</a></li>
-							<li><a href="../yeti/">Yeti</a></li>
-						</ul></li>
+						</ul>
+					</li>
 
 
 					<li><a href="#" data-toggle="modal" data-target="#help-modal">Help</a></li>
@@ -77,7 +60,10 @@
 			<div class="col-lg-10 result"></div>
 		</div>
 	</div>
-
+	<div class="application-container" data-bind="visible: gameOn">
+		<div class="rh-icon switch-sound" data-bind="click: toggleSoundsOn, css: { on: soundsOn}" ></div>
+		<canvas class="application" width=800 height=300></canvas>
+	</div>
 	<!-- 	Div used to display loading while the javascript is loading -->
 	<div class="loading-modal">
 		<div class="message">
@@ -162,5 +148,4 @@
 <!-- 	Main Application Script -->
 <script src="script.js"></script>
 <script src="bootstrap.min.js"></script>
-<script src='knockout-3.4.0.js'></script>
 </html>

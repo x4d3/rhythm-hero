@@ -3,7 +3,8 @@ RH.Application = (function() {
 	var Game = RH.Game;
 	var EventManager = RH.EventManager;
 
-	function Application() {
+	function Application(canvas) {
+		this.canvas = canvas;
 		this.eventManager = new EventManager();
 		this.game = null;
 	}
@@ -15,7 +16,7 @@ RH.Application = (function() {
 			var notes = RH.RhythmPatterns.generateNotes(0, 0, 50);
 			var options = new RH.GameOptions();
 			var measures = Game.generateMeasures(options, notes);
-			this.game = new Game(this.eventManager, measures);
+			this.game = new Game(this.eventManager, measures, this.canvas);
 			this.game.start();
 		},
 		onEvent : function(isUp, event) {
@@ -48,23 +49,26 @@ $(document).ready(function() {
 
 	var difficultyValues = RH.createSuiteArray(1, RH.RhythmPatterns.MAX_DIFFICULTY + 1);
 	var timeSignaturesValues = Object.keys(RH.TS).map(function(key){return RH.TS[key].toString();});
-	RH.Parameters = {
-		model : {
-			beginnerMode : ko.observable(true),
-			soundOn : ko.observable(true),
-			difficultyValues : difficultyValues,
-			difficulty : ko.observable(1),
-			timeSignaturesValues:timeSignaturesValues,
-			timeSignatures : ko.observable([ RH.TS.FOUR_FOUR.toString() ]),
-			tempiValues : [60,90,120,150,180],
-			tempi: ko.observable([ 60]),
-			scrollingDirection : ko.observable("horizontal"),			
-			scrollingMode : ko.observable("continuous")
-		}
+	var model =  {
+		beginnerMode : ko.observable(true, {persist: 'RH.beginnerMode'}),
+		soundsOn : ko.observable(true, {persist: 'RH.soundsOn'}),
+		toggleSoundsOn:function () { model.soundsOn(!model.soundsOn()); },
+		difficultyValues : difficultyValues,
+		difficulty : ko.observable(1, {persist: 'RH.difficulty'}),
+		timeSignaturesValues:timeSignaturesValues,
+		timeSignatures : ko.observable([ RH.TS.FOUR_FOUR.toString()] , {persist: 'RH.timeSignatures'}),
+		tempiValues : [60,90,120,150,180],
+		tempi: ko.observable([ 60], {persist: 'RH.tempi'}),
+		scrollingDirection : ko.observable("horizontal", {persist: 'RH.scrollingDirection'}),			
+		scrollingMode : ko.observable("continuous", {persist: 'RH.scrollingMode'}),
+		gameOn:ko.observable(false),
+		beginnerModeEnabled:ko.observable(true),
 	};
-	ko.applyBindings(RH.Parameters.model);
+ 
+	ko.applyBindings(model);
+	RH.Parameters = {model:model};
 
-	var application = new RH.Application();
+	var application = new RH.Application($("canvas.application")[0]);
 
 	var onDown = function(event) {
 		application.onEvent(false, event);
