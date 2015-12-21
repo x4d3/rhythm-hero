@@ -5,43 +5,56 @@ RH.Screen = (function() {
 	var VexUtils = RH.VexUtils;
 	var ScoreScreen = RH.ScoreScreen;
 
+	var MEASURE_WIDTH = 400;
+
+	var METRONOME_POSITION = {
+		x: 3* MEASURE_WIDTH / 4 - 25,
+		y: 5
+	};
+	var SCORE_POSITION = {
+		x: MEASURE_WIDTH - 25,
+		y: 40
+	};
+	var MULTIPLIER_POSITION = {
+		x: MEASURE_WIDTH + 100,
+		y: 40
+	};
+
+	var EVENT_Y = 200;
+	var DEBUG_Y = 178;
+	var SIGNAL_HEIGHT = 20;
+
 	function Screen(canvas, eventManager, scoreCalculator, measures) {
 		this.canvas = canvas;
 		this.eventManager = eventManager;
 		this.scoreCalculator = scoreCalculator;
 		this.measures = measures;
-		this.measureWidth = 400;
+
 		this.metronome = new RH.Metronome(50, 50);
-		var measuresCanvases = VexUtils.generateMeasuresCanvases(this.measureWidth, measures);
+		var measuresCanvases = VexUtils.generateMeasuresCanvases(MEASURE_WIDTH, measures);
 		this.measuresCanvases = {
-			"true" : measuresCanvases,
-			"false" : measuresCanvases.map(brighten)
+			"true": measuresCanvases,
+			"false": measuresCanvases.map(brighten)
 		};
 		this.scoreScreen = new ScoreScreen({
-			scoreCalculator : scoreCalculator,
-			measurePosition : {
-				x : this.measureWidth/2 - 80,
-				y : 70
+			scoreCalculator: scoreCalculator,
+			measurePosition: {
+				x: MEASURE_WIDTH / 2 - 80,
+				y: 70
 			},
-			scorePosition : {
-				x : this.measureWidth / 4,
-				y : 25
-			},
-			multiplierPosition : {
-				x : this.measureWidth / 4,
-				y : 45
-			}
+			scorePosition: SCORE_POSITION,
+			multiplierPosition: MULTIPLIER_POSITION
 		});
 	}
 
 	Screen.prototype = {
-		display : function(measureInfo) {
+		display: function(measureInfo) {
 			var screen = this;
 			var canvas = this.canvas;
 			var context = canvas.getContext("2d");
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			var measure = measureInfo.measure;
-			var shift = this.measureWidth * (-0.5 + measureInfo.ellapsedBeats / measure.getBeatPerBar());
+			var shift = MEASURE_WIDTH * (-0.5 + measureInfo.ellapsedBeats / measure.getBeatPerBar());
 			if (this.eventManager.isPressed) {
 				context.beginPath();
 				context.arc(canvas.width - 20, 20, 10, 0, 2 * Math.PI, false);
@@ -51,63 +64,68 @@ RH.Screen = (function() {
 				context.strokeStyle = 'black';
 				context.stroke();
 			}
-			[ -1, 0, 1, 2 ].forEach(function(i) {
+			[-1, 0, 1, 2].forEach(function(i) {
 				var index = measureInfo.index + i;
 				if (index < 0 || index >= screen.measures.length) {
 					return true;
 				}
-				var startStave = i * screen.measureWidth - shift;
+				var startStave = i * MEASURE_WIDTH - shift;
 				screen.displayStave(canvas, startStave, index, i === 0);
 				// display the count down
 				if (screen.measures[index].isEmpty) {
 					context.beginPath();
-					context.arc(3 + startStave + RH.divide(measureInfo.ellapsedBeats, 1).quotient * screen.measureWidth / screen.measures[index].getBeatPerBar(), 107, 8, 0, 2 * Math.PI, false);
+					context.arc(3 + startStave + RH.divide(measureInfo.ellapsedBeats, 1).quotient * MEASURE_WIDTH / screen.measures[index].getBeatPerBar(), 107, 8, 0, 2 * Math.PI, false);
 					context.lineWidth = 1;
 					context.strokeStyle = '#003300';
 					context.stroke();
 				}
 			});
-			
+
 			if (RH.Parameters.isBeginnerMode()) {
 				this.displayEvents(canvas, measureInfo, 0.5);
-				[ -1, 0, 1, 2 ].forEach(function(i) {
+				[-1, 0, 1, 2].forEach(function(i) {
 					var index = measureInfo.index + i;
 					if (index < 0 || index >= screen.measures.length) {
 						return true;
 					}
-					var startStave = i * screen.measureWidth - shift;
+					var startStave = i * MEASURE_WIDTH - shift;
 					screen.displayDebug(canvas, shift, startStave, index);
 				});
 			}
 			this.displayMetronome(canvas, measureInfo);
 			this.scoreScreen.draw(canvas.getContext("2d"), measureInfo.index - 1, measureInfo.t);
 		},
-		drawOnExternalCanvas : function(canvas, measureInfo) {
+		drawOnExternalCanvas: function(canvas, measureInfo) {
 			this.displayStave(canvas, 0, measureInfo.index, true);
 			this.displayEvents(canvas, measureInfo, 1);
 			this.displayDebug(canvas, 0, 0, measureInfo.index);
 		},
-		displayEvents : function(canvas, measureInfo, percentage) {
+		displayEvents: function(canvas, measureInfo, percentage) {
 			var context = canvas.getContext("2d");
+			
 			var measure = measureInfo.measure;
 			var measureDuration = measure.getDuration();
 			var ups = this.eventManager.getEvents(measureInfo.t - measureDuration * percentage);
 			var x = 0;
 			var screen = this;
+			context.save();
 			context.beginPath();
+			context.strokeStyle = '#003300';
 			context.lineWidth = 1;
+			var Y_IS_ON = EVENT_Y - SIGNAL_HEIGHT;
+			var Y_IS_OFF = EVENT_Y;
 			var y = canvas.height / 8;
 			ups.forEach(function(element) {
-				context.moveTo(x, y);
-				y = 0.5 + (element.isPressed ? canvas.height / 16 : canvas.height / 8);
+				y = 0.5 + (element.isPressed ? Y_IS_ON : Y_IS_OFF);
 				context.lineTo(x, y);
-				var newX = x + element.duration * screen.measureWidth / measureDuration;
+				var newX = x + element.duration * MEASURE_WIDTH / measureDuration;
 				context.lineTo(newX, y);
 				x = newX;
 			});
 			context.stroke();
+			context.restore();
 		},
-		displayDebug : function(canvas, shift, startStave, index) {
+		displayDebug: function(canvas, shift, startStave, index) {
 			var screen = this;
 			var context = canvas.getContext("2d");
 			var currentMeasure = screen.measures[index];
@@ -117,10 +135,10 @@ RH.Screen = (function() {
 			context.strokeStyle = 'blue';
 			context.lineWidth = 1;
 			var x = startStave;
-			var beatLength = screen.measureWidth / currentMeasure.getBeatPerBar();
+			var beatLength = MEASURE_WIDTH / currentMeasure.getBeatPerBar();
 			var epsilon = RH.REST_PERCENTAGE * beatLength;
-			var Y_IS_ON = canvas.height * 3 / 16;
-			var Y_IS_OFF = canvas.height / 4;
+			var Y_IS_ON = DEBUG_Y - SIGNAL_HEIGHT;
+			var Y_IS_OFF = DEBUG_Y;
 			var y = currentMeasure.firstNotePressed ? Y_IS_ON : Y_IS_OFF;
 			currentMeasure.notes.forEach(function(note, j) {
 				context.moveTo(x, y);
@@ -142,15 +160,15 @@ RH.Screen = (function() {
 			context.restore();
 
 		},
-		displayStave : function(canvas, startStave, index, isActive) {
+		displayStave: function(canvas, startStave, index, isActive) {
 			var data = this.measuresCanvases[isActive][index];
 			canvas.getContext('2d').putImageData(data, startStave, 50);
 
 		},
-		displayMetronome : function(canvas, measureInfo) {
+		displayMetronome: function(canvas, measureInfo) {
 			var context = canvas.getContext("2d");
 			context.save();
-			context.translate(this.canvas.width / 2 - 25, 5);
+			context.translate(METRONOME_POSITION.x, METRONOME_POSITION.y);
 			this.metronome.draw(context, measureInfo.measure.timeSignature, measureInfo.ellapsedBeats);
 			context.restore();
 		}

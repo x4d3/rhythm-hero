@@ -107,7 +107,7 @@ RH.Game = (function() {
 		var beatPerBarF = new Fraction(beatPerBar, 1);
 
 		
-		var result = [ Game.EMPTY_MEASURE ];
+		var result = [ new RH.Measure(tempo, RH.TS.FOUR_FOUR, [], false, false)];
 		var beats = Fraction.ZERO;
 
 		var measureNotes = [];

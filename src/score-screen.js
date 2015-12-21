@@ -85,14 +85,14 @@ RH.ScoreScreen = (function() {
 			this.scoreProjectiles = projectiles;
 
 			context.save();
-			context.font = '20px scoreboard';
-			context.fillStyle = 'grey';
+			context.font = '32px scoreboard';
+			context.fillStyle = '#696969';
 			context.fillText(pad(Math.round(100 * totalScore), 5), this.scorePosition.x, this.scorePosition.y);
 			context.restore();
 
 			context.save();
-			context.font = '20px Open Sans';
-			context.fillStyle = 'grey';
+			context.font = '32px Open Sans';
+			context.fillStyle = '#696969';
 			context.fillText("X" + multiplier, this.multiplierPosition.x, this.multiplierPosition.y);
 			context.restore();
 
