@@ -13,12 +13,13 @@ RH.Application = (function() {
 			if(this.game){
 				this.game.stop();
 			}
-			var notes = RH.RhythmPatterns.generateNotes(0, 0, 50);
+			var options = new RH.GameOptions(timeSignatures, tempi, maxDifficulty);
+
 			RH.Parameters.model.beginnerModeEnabled(true);
 			var timeSignatures = RH.Parameters.model.timeSignatures().map(RH.TimeSignature.parse);
 			var tempi = RH.Parameters.model.tempi();
 			var maxDifficulty = RH.Parameters.model.difficulty();
-			var options = new RH.GameOptions(timeSignatures, tempi, maxDifficulty);
+			var notes = RH.RhythmPatterns.generateNotes(0, maxDifficulty, 50);
 			var measures = Game.generateMeasures(options, notes);
 			this.game = new Game(this.eventManager, measures, this.canvas);
 			this.game.start();

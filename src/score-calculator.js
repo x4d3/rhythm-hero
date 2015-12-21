@@ -10,7 +10,7 @@ RH.ScoreCalculator = (function() {
 		this.color = color;
 	}
 
-	var SCORE_TYPES = [new ScoreType(0, "Fail", "✗", "red"), new ScoreType(0.5, "Boo", "E", "orange"), new ScoreType(0.7, "Average", "D", "maroon"), new ScoreType(0.7, "Good", "C", "black"),
+	var SCORE_TYPES = [new ScoreType(0, "Fail", "✗", "red"), new ScoreType(0.5, "Boo", "E", "orange"), new ScoreType(0.7, "Average", "D", "maroon"), new ScoreType(0.7, "Good", "C", "grey"),
 		new ScoreType(0.8, "Great", "B", "olive"), new ScoreType(0.9, "Awesome", "A", "green"), new ScoreType(0.95, "Perfect", "✔", "green")
 	];
 	var SCORE_TYPES_VALUES = SCORE_TYPES.map(function(s) {

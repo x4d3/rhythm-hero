@@ -8,15 +8,15 @@ RH.Note = (function() {
 	};
 
 	Note.prototype = {
-		toString : function() {
+		toString: function() {
 			return this.duration.toString() + (this.isRest ? "r" : "");
 		},
-		split : function(duration) {
+		split: function(duration) {
 			if (this.duration.compareTo(duration) < 0) {
 				throw 'duration: ' + duration + " can't be bigger than note duration: " + this.duration;
 			}
 			var splitDuration = this.duration.subtract(duration);
-			return [ new Note(duration, this.isRest), new Note(splitDuration, this.isRest) ];
+			return [new Note(duration, this.isRest), new Note(splitDuration, this.isRest)];
 		}
 	};
 	Note.parseNotes = function(value) {
@@ -36,7 +36,7 @@ RH.Note = (function() {
 		} else {
 			isRest = false;
 		}
-		var duration =  Fraction.parse(value);
+		var duration = Fraction.parse(value);
 		return new Note(duration, isRest);
 	};
 
@@ -56,12 +56,12 @@ RH.Pattern = (function() {
 	};
 
 	Pattern.prototype = {
-		getDuration : function() {
+		getDuration: function() {
 			return this.notes.reduce(function(sum, note) {
 				return sum.add(note.duration);
 			}, Fraction.ZERO);
 		},
-		toString : function() {
+		toString: function() {
 			return "Pattern[" + this.description + ",D:" + this.difficulty + ",F:" + this.frequency + ",notes:" + this.notes + ",duration:" + this.getDuration() + "]";
 		}
 	};
@@ -79,7 +79,7 @@ RH.RhythmPatterns = (function() {
 	var PATTERNS = [];
 	var PATTERNS_PER_DESCRIPTION = {};
 	var addPattern = function(description, difficulty, frequency, notesString) {
-		if (description === null){
+		if (description === null) {
 			description = notesString;
 		}
 		var notes = Note.parseNotes(notesString);
@@ -92,36 +92,45 @@ RH.RhythmPatterns = (function() {
 	};
 
 	addPattern("whole", 0, 10, "4/1");
-	addPattern("minim", 0, 10, "2/1");
-	addPattern("crotchet", 0, 100, "1/1");
-	addPattern("quaver", 0, 50, "1/2");
-	addPattern("double quaver", 1, 100, "1/2,1/2");
-	addPattern("dotted crotchet quaver", 1, 100, "3/2,1/2");
-	addPattern("quaver dotted crotchet", 1, 100, "1/2,3/2");
+	addPattern("minim", 1, 20, "2/1");
+	addPattern("crotchet", 1, 100, "1/1");
+	addPattern("crotchet rest", 1, 100, "1/1r");
+	addPattern("double quaver", 2, 100, "1/2,1/2");
+	addPattern("quaver rest", 2, 100, "1/2r");
+	addPattern("dotted crotchet quaver", 3, 100, "3/2,1/2");
+	addPattern("quaver dotted crotchet", 3, 100, "1/2,3/2");
+	addPattern("quaver", 3, 50, "1/2");
+	addPattern("quaver rest quaver", 3, 100, "1/2r,1/2");
 
-	addPattern("crotchet rest", 0, 100, "1/1r");
-	addPattern("quaver rest", 1, 100, "1/2r");
-	addPattern("quaver rest quaver", 1, 100, "1/2r,1/2");
-	
-	addPattern(null, 2, 25, "1/4,1/4,1/4,1/4");
-	addPattern(null, 2, 25, "1/4,1/4,1/2");
-	addPattern(null, 2, 25, "1/2,1/4,1/4");
-	addPattern(null, 2, 25, "3/4,1/4");
-	addPattern(null, 2, 25, "1/4,3/4");
-	
-	addPattern(null, 2, 25, "1/4,1/4r,1/4,1/4");
-	addPattern(null, 2, 25, "1/4,1/4r,1/2");
-	addPattern(null, 2, 25, "1/2,1/4r,1/4");
-	addPattern(null, 2, 25, "3/4r,1/4");
-	addPattern(null, 2, 25, "1/4r,3/4");
-	
-	
-	
-	addPattern("triplet quaver", 2, 20, "1/3,1/3,1/3");
-	addPattern("triplet crotchet", 3, 20, "2/3,2/3,2/3");
+	addPattern(null, 4, 25, "1/4,1/4,1/4,1/4");
+	addPattern(null, 5, 25, "1/4,1/4,1/2");
+	addPattern(null, 5, 25, "1/2,1/4,1/4");
+	addPattern(null, 5, 25, "3/4,1/4");
+	addPattern(null, 5, 25, "1/4,3/4");
 
-	addPattern("quintuplet quaver", 5, 20, "1/5,1/5,1/5,1/5,1/5");
-	addPattern("quintuplet crotchet", 6, 20, "2/5,2/5,2/5,2/5,2/5");
+	addPattern(null, 6, 25, "1/4,1/4r,1/4,1/4");
+	addPattern(null, 6, 25, "1/4,1/4r,1/2");
+	addPattern(null, 6, 25, "1/2,1/4r,1/4");
+	addPattern(null, 6, 25, "3/4r,1/4");
+	addPattern(null, 6, 25, "1/4r,3/4");
+
+
+	addPattern("triplet quaver", 7, 20, "1/3,1/3,1/3");
+	addPattern("triplet crotchet", 8, 20, "2/3,2/3,2/3");
+
+	addPattern(null, 8, 5, "1/3r,1/3,1/3");
+	addPattern(null, 8, 5, "1/3r,1/3r,1/3");
+	addPattern(null, 8, 5, "1/3r,1/3r,1/3r");
+
+	addPattern(null, 8, 5, "2/3,1/3");
+	addPattern(null, 8, 5, "1/3,2/3");
+
+
+	addPattern("quintuplet quaver", 9, 20, "1/5,1/5,1/5,1/5,1/5");
+	addPattern("quintuplet crotchet", 10, 1, "2/5,2/5,2/5,2/5,2/5");
+
+	addPattern(null, 10, 1, "2/5,2/5r,2/5,2/5r,2/5");
+
 
 	var difficulties = PATTERNS.map(function(x) {
 		return x.difficulty;
@@ -140,9 +149,9 @@ RH.RhythmPatterns = (function() {
 		var notes = [];
 		for (var i = 0; i < size; i++) {
 			var alea = Math.random() * sumFrequency;
-			var index = RH.binarySearch(summedFrequencies, alea) + 1 ;
-			if (index >= filtered.length){
-				throw 'error: ' + index + ",[" + summedFrequencies + "], " + alea +", " + sumFrequency;
+			var index = RH.binarySearch(summedFrequencies, alea) + 1;
+			if (index >= filtered.length) {
+				throw 'error: ' + index + ",[" + summedFrequencies + "], " + alea + ", " + sumFrequency;
 			}
 			notes = notes.concat(filtered[index].notes);
 		}
