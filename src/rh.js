@@ -3,10 +3,8 @@ if (typeof RH === 'undefined') {
 }
 if (typeof localStorage === 'undefined') {
 	localStorage = {
-		getItem : function() {
-		},
-		setItem : function() {
-		},
+		getItem: function() {},
+		setItem: function() {},
 	};
 }
 
@@ -58,41 +56,42 @@ if (typeof localStorage === 'undefined') {
 			this.name = name;
 		};
 		var LOG_LEVEL = {
-			DEBUG : new LogLevel(0, 'DEBUG'),
-			WARN : new LogLevel(1, 'WARN'),
-			ERROR : new LogLevel(2, 'ERROR')
+			DEBUG: new LogLevel(0, 'DEBUG'),
+			WARN: new LogLevel(1, 'WARN'),
+			ERROR: new LogLevel(2, 'ERROR')
 		};
 		var DEFAULT_LOG_LEVEL = LOG_LEVEL.WARN.level;
+
 		function LogManager() {
 			this.logLevels = {};
 		}
 		LogManager.prototype = {
-			getLogger : function(id) {
+			getLogger: function(id) {
 				if (this.logLevels[id] === undefined) {
 					this.logLevels[id] = DEFAULT_LOG_LEVEL;
 				}
 				var logManager = this;
 				return {
-					debug : function(message) {
+					debug: function(message) {
 						this.log(LOG_LEVEL.DEBUG, message);
 					},
-					warn : function() {
+					warn: function() {
 						this.log(LOG_LEVEL.WARN, message);
 					},
-					error : function() {
+					error: function() {
 						this.log(LOG_LEVEL.ERROR, message);
 					},
-					log : function(severity, message) {
+					log: function(severity, message) {
 						if (severity.level >= logManager.logLevels[id]) {
 							console.log("[" + severity.name + "] " + id + " : " + message);
 						}
 					}
 				};
 			},
-			setLogLevel : function(id, level) {
+			setLogLevel: function(id, level) {
 				this.logLevels[id] = level;
 			},
-			setAllLogLevel : function(level) {
+			setAllLogLevel: function(level) {
 				var logManager = this;
 				Object.keys(this.logLevels).forEach(function(key) {
 					logManager.logLevels[key] = level;
@@ -102,10 +101,8 @@ if (typeof localStorage === 'undefined') {
 		var logManager = new LogManager();
 		return logManager;
 	}());
-	RH.isDebug = false;
 	RH.debug = function() {
 		RH.logManager.setAllLogLevel(0);
-		RH.isDebug = true;
 	};
 
 	RH.identity = function(a) {
@@ -120,8 +117,8 @@ if (typeof localStorage === 'undefined') {
 	RH.divide = function(dividend, divisor) {
 		var quotient = Math.floor(dividend / divisor);
 		return {
-			quotient : quotient,
-			rest : dividend - quotient * divisor
+			quotient: quotient,
+			rest: dividend - quotient * divisor
 		};
 	};
 
@@ -151,20 +148,49 @@ if (typeof localStorage === 'undefined') {
 		}
 		return maxIndex;
 	};
+
 	RH.copyProperties = function(from, to) {
-		Object.keys(from).forEach(function(key) {
-			to[key] = from[key];
-		});
+		for (var property in from){
+			to[property] = from[property];
+		}
+		return to;
 	};
-	RH.createSuiteArray = function(min, max, step){
+
+	RH.createSuiteArray = function(min, max, step) {
 		var array = [];
 		step = step | 1;
-		for (var i = min; i <max; i +=step){
+		for (var i = min; i < max; i += step) {
 			array.push(i);
 		}
 		return array;
 	};
-	
+
+	/**
+	 Basic classical inheritance helper. Usage:
+	  RH.Inherit(Child, Parent, {
+	    getName: function() {return this.name;},
+	    setName: function(name) {this.name = name}
+	  });
+	  Returns 'Child'.
+	*/
+	RH.inherit = (function() {
+		var F = function() {};
+		// `C` is Child. `P` is parent. `O` is an object to
+		// to extend `C` with.
+		return function(C, P, O) {
+			F.prototype = P.prototype;
+			C.prototype = new F();
+			C.superclass = P.prototype;
+			C.prototype.constructor = C;
+			C.prototype.super = function(){
+				P.apply(this, arguments);
+			};
+			RH.copyProperties(O, C.prototype);
+			return C;
+		};
+	}());
+
+
 	window.requestAnimFrame = (function() {
 		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function(callback) {
 			window.setTimeout(callback, 1000 / 60);
