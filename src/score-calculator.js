@@ -6,16 +6,44 @@ RH.ScoreCalculator = (function() {
 	function ScoreType(value, label, icon, color) {
 		this.value = value;
 		this.label = label;
-		this.icon = icon;	
+		this.icon = icon;
 		this.color = color;
 	}
 
-	var SCORE_TYPES = [new ScoreType(0, "Fail", "✗", "red"), new ScoreType(0.5, "Boo", "E", "orange"), new ScoreType(0.7, "Average", "D", "maroon"), new ScoreType(0.7, "Good", "C", "grey"),
-		new ScoreType(0.8, "Great", "B", "olive"), new ScoreType(0.9, "Awesome", "A", "green"), new ScoreType(0.95, "Perfect", "✔", "green")
+	var SCORE_TYPES = [new ScoreType(0, "Fail", "✗", "red"), new ScoreType(0.1, "Boo", "E", "orange"), new ScoreType(0.5, "Average", "D", "maroon"), new ScoreType(0.6, "Good", "C", "grey"),
+		new ScoreType(0.7, "Great", "B", "olive"), new ScoreType(0.8, "Awesome", "A", "green"), new ScoreType(0.9, "Perfect", "✔", "green")
 	];
 	var SCORE_TYPES_VALUES = SCORE_TYPES.map(function(s) {
 		return s.value;
 	});
+
+	function NoteScore(startDiff, durationDiff, notesPlayedBetween) {
+		this.startDiff = startDiff;
+		this.durationDiff = durationDiff;
+		this.notesPlayedBetween = notesPlayedBetween;
+		this.isFailed = !isFinite(startDiff) || !isFinite(durationDiff) || this.notesPlayedBetween || Math.abs(this.startDiff) > MAX_START_DIFF;
+	}
+
+	NoteScore.prototype = {
+		toString: function() {
+			if (this.isFailed) {
+				return "F";
+			} else {
+				return this.startDiff.toFixed(0) + " " + numeral(100 * this.durationDiff).format('0') + " " + numeral(100 * this.value()).format('0');
+			}
+		},
+		value: function() {
+			if (this.isFailed) {
+				return 0;
+			} else {
+				var x = Math.max(1 - Math.abs(this.startDiff / MAX_START_DIFF), 0);
+				var y = Math.max(1 - Math.abs(this.durationDiff), 0);
+				return 0.1 + 0.6 * x * x + 0.2 * y;
+			}
+		}
+	};
+	var PERFECT = new NoteScore(0, 0, false);
+	var FAILED = new NoteScore(Infinity, Infinity, true);
 
 	function MeasureScore(notes) {
 		this.notes = notes;
@@ -38,39 +66,14 @@ RH.ScoreCalculator = (function() {
 			});
 		},
 		toString: function() {
-			return this.notes.toString();
-		},getType: function() {
+			return this.notes.join(" | ");
+		},
+		getType: function() {
 			return SCORE_TYPES[RH.binarySearch(SCORE_TYPES_VALUES, this.value())];
 		}
 	};
 
-	function NoteScore(startDiff, durationDiff, notesPlayedBetween) {
-		this.startDiff = startDiff;
-		this.durationDiff = durationDiff;
-		this.notesPlayedBetween = notesPlayedBetween;
-		this.isFailed = !isFinite(startDiff) || !isFinite(durationDiff) || this.notesPlayedBetween;
-	}
 
-	NoteScore.prototype = {
-		toString: function() {
-			if (this.isFailed) {
-				return "F";
-			} else {
-				return this.startDiff.toFixed(0) + " " + numeral(100 * this.durationDiff).format('0') + " " + numeral(100 * this.value()).format('0');
-			}
-		},
-		value: function() {
-			if (this.isFailed) {
-				return 0;
-			} else {
-				var x = Math.max(1 - Math.abs(this.startDiff / MAX_START_DIFF), 0);
-				var y = Math.max(1 - Math.abs(this.durationDiff), 0);
-				return 0.5 + 0.30 * x * x + 0.20 * y;
-			}
-		}
-	};
-	var PERFECT = new NoteScore(0, 0, false);
-	var FAILED = new NoteScore(Infinity, Infinity, true);
 
 	function ScoreCalculator(eventManager, measures) {
 		this.eventManager = eventManager;

@@ -3,7 +3,7 @@ RH.ScoreScreen = (function() {
 	/**
 	 * time to make the travel from start to x
 	 */
-	var TRAJECTORY_DURATION = 1500;
+	var TRAJECTORY_DURATION = 1000;
 	var UPDATE_SCORE_DURATION = 2000;
 	var intermediatePosition = function(a, b, progress) {
 		return a + (b - a) * progress;
@@ -54,7 +54,7 @@ RH.ScoreScreen = (function() {
 	function FailedScoreProjectile(options){
 		this.super(options);
 		this.end = {
-			x: this.start.x - 10,
+			x: this.start.x - 4,
 			y: this.start.y
 		};
 	}
@@ -62,9 +62,9 @@ RH.ScoreScreen = (function() {
 	RH.inherit(FailedScoreProjectile, AbstractProjectile, {
 		draw: function(context, t) {
 			var alpha = (t - this.t0) / TRAJECTORY_DURATION;
-			var point = intermediatePoint(this.start, this.end, Math.sin(10 * alpha * Math.PI));
+			var point = intermediatePoint(this.start, this.end, Math.sin(15 * alpha * Math.PI));
 			context.save();
-			context.font = 'bold 18px Open Sans';
+			context.font = '18px Open Sans';
 			context.fillStyle = this.color;
 			context.fillText(this.value, point.x, point.y);
 			context.restore();

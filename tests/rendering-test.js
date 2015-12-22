@@ -22,7 +22,7 @@ $(document)
 				var canvasJ = $('<canvas>');
 				canvasJ.prop({
 					width: width,
-					height: 150
+					height: 200
 				});
 				var div = $('<div>').append($('<h2>').text(title)).append(canvasJ);
 				if (comment !== undefined) {
@@ -137,15 +137,16 @@ $(document)
 
 					var t0 = 117;
 					var screen = new Screen(null, eventManager, scoreCalculator, measures, options);
-					for (var i = 2; i < measures.length; i++) {
-						var t = t0 + 4000 * i;
-						var score = scoreCalculator.addMeasureScore(t, i - 1);
+
+					for (var measureIndex = 2; measureIndex < measures.length; measureIndex++) {
+						var t = t0 + 4000 * measureIndex;
+						scoreCalculator.addMeasureScore(t, measureIndex - 1);
 						var measureInfo = {
 							t: t,
-							index: i,
-							measure: measures[i]
+							index: measureIndex-1,
+							measure: measures[measureIndex]
 						};
-						var tempCanvas = generateCanvas(assert.test.testName + " " + i, 400, score);
+						var tempCanvas = generateCanvas(assert.test.testName + " " + measureIndex, 400, scoreCalculator.measuresScore[measureIndex-1]);
 						screen.drawOnExternalCanvas(tempCanvas, measureInfo);
 					}
 

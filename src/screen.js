@@ -103,6 +103,14 @@ RH.Screen = (function() {
 			this.displayStave(canvas, 0, measureInfo.index, true);
 			this.displayEvents(canvas, measureInfo, 1);
 			this.displayDebug(canvas, 0, 0, measureInfo.index);
+			var score = this.scoreCalculator.measuresScore[measureInfo.index];
+			if(score !== undefined){
+				var context = canvas.getContext("2d");
+				context.font = '18px Open Sans';
+				context.fillStyle = 'grey';
+				context.fillText(Math.round(100 * score.value()), SCORE_POSITION.x, SCORE_POSITION.y);
+			}
+
 		},
 		displayEvents: function(canvas, measureInfo, percentage) {
 			var context = canvas.getContext("2d");

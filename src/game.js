@@ -55,8 +55,8 @@ RH.Game = (function() {
 
 			if (measureIndex !== this.currentMeasureIndex) {
 				//new measure, let's calculate the measure score
-				this.scoreCalculator.addMeasureScore(t, this.currentMeasureIndex);
 				this.currentMeasureIndex = measureIndex;
+				this.scoreCalculator.addMeasureScore(t, measureIndex - 1);
 				logger.debug(measureIndex + "," + measure);
 				if (measureIndex === this.measures.length) {
 					this.isOn = false;
