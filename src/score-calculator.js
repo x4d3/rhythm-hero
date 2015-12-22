@@ -196,7 +196,7 @@ RH.ScoreCalculator = (function() {
 				this.goodMeasureCount = 0;
 			} else {
 				this.goodMeasureCount++;
-				if (this.goodMeasureCount == 4) {
+				if (this.goodMeasureCount == 2) {
 					this.multiplier = Math.min(this.multiplier + 1, 8);
 					this.goodMeasureCount = 0;
 				}

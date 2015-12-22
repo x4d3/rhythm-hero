@@ -4,7 +4,7 @@ RH.ScoreScreen = (function() {
 	 * time to make the travel from start to x
 	 */
 	var TRAJECTORY_DURATION = 1000;
-	var UPDATE_SCORE_DURATION = 2000;
+	var UPDATE_SCORE_DURATION = 3000;
 	var intermediatePosition = function(a, b, progress) {
 		return a + (b - a) * progress;
 	};
