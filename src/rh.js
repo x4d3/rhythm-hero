@@ -8,7 +8,6 @@ if (typeof localStorage === 'undefined') {
 	};
 }
 
-
 (function() {
 	'use strict';
 	var Preconditions = {};
