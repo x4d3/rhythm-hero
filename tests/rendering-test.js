@@ -49,7 +49,7 @@ $(document)
 			test('All Patterns', function(assert) {
 				var measures = Game.generateMeasures(options, getPatternsNotes(RhythmPatterns.PATTERNS));
 
-				var canvasesData = VexUtils.generateMeasuresCanvases(400, measures);
+				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
 				displayCanvases(assert.test.testName, canvasesData);
 				ok(true);
 			});
@@ -60,7 +60,7 @@ $(document)
 				var patterns = patternsS.map(RhythmPatterns.getPattern);
 				var measures = Game.generateMeasures(options, getPatternsNotes(patterns));
 
-				var canvasesData = VexUtils.generateMeasuresCanvases(400, measures);
+				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
 				displayCanvases(assert.test.testName, canvasesData);
 				ok(true);
 			});
@@ -69,7 +69,7 @@ $(document)
 				var notes = RH.RhythmPatterns.generateNotes(0, RH.RhythmPatterns.MAX_DIFFICULTY, 100);
 				var measures = Game.generateMeasures(options, notes);
 
-				var canvasesData = VexUtils.generateMeasuresCanvases(400, measures);
+				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
 				displayCanvases(assert.test.testName, canvasesData);
 				ok(true);
 			});

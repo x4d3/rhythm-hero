@@ -236,12 +236,12 @@ RH.VexUtils = (function() {
 		}
 	};
 
-	VexUtils.generateMeasuresCanvases = function(measureWidth, measures) {
+	VexUtils.generateMeasuresCanvases = function(measureWidth, measureHeight, measures) {
 		var tempCanvaJ = $('<canvas>');
 
 		tempCanvaJ.prop({
 			width : measureWidth * measures.length,
-			height : 200
+			height : measureHeight
 		});
 		var tempCanvas = tempCanvaJ[0];
 		var context = tempCanvas.getContext('2d');
@@ -313,7 +313,7 @@ RH.VexUtils = (function() {
 		});
 		var result = [];
 		for (var i = 0; i < measures.length; i++) {
-			result[i] = context.getImageData(measureWidth * i, 0, measureWidth, 200);
+			result[i] = context.getImageData(measureWidth * i, 0, measureWidth, measureHeight);
 		}
 		return result;
 	};
