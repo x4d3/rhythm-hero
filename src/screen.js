@@ -8,7 +8,7 @@ RH.Screen = (function() {
 	var MEASURE_WIDTH = 400;
 	var MEASURE_HEIGHT = 150;
 	var METRONOME_POSITION = {
-		x: 3* MEASURE_WIDTH / 4 - 25,
+		x: 3 * MEASURE_WIDTH / 4 - 25,
 		y: 5
 	};
 	var SCORE_POSITION = {
@@ -23,7 +23,7 @@ RH.Screen = (function() {
 	Screen.MEASURE_WIDTH = MEASURE_WIDTH;
 	Screen.SCORE_POSITION = SCORE_POSITION;
 	Screen.MULTIPLIER_POSITION = MULTIPLIER_POSITION;
-	
+
 	var EVENT_Y = 200;
 	var DEBUG_Y = 178;
 	var SIGNAL_HEIGHT = 20;
@@ -61,7 +61,7 @@ RH.Screen = (function() {
 			var isHorizontal = RH.Parameters.model.scrollingDirection() == 'horizontal';
 			//var shift = MEASURE_WIDTH * (-0.5 + measureInfo.ellapsedBeats / measure.getBeatPerBar());
 			var shift = measureInfo.ellapsedBeats / measure.getBeatPerBar();
-			
+
 			if (this.eventManager.isPressed) {
 				context.beginPath();
 				context.arc(canvas.width - 20, 20, 10, 0, 2 * Math.PI, false);
@@ -71,13 +71,13 @@ RH.Screen = (function() {
 				context.strokeStyle = 'black';
 				context.stroke();
 			}
-			var staveShift = (RH.Parameters.model.scrollingMode() == 'continuous') ? shift:0.5;
-	
+			var staveShift = (RH.Parameters.model.scrollingMode() == 'continuous') ? shift : 0.5;
+
 			var suiteArray;
-			if(isHorizontal){
-				suiteArray = RH.createSuiteArray(-1,3);
-			}else{
-				suiteArray = RH.createSuiteArray(-2,4);
+			if (isHorizontal) {
+				suiteArray = RH.createSuiteArray(-1, 3);
+			} else {
+				suiteArray = RH.createSuiteArray(-2, 4);
 			}
 			suiteArray.forEach(function(i) {
 				var index = measureInfo.index + i;
@@ -86,21 +86,21 @@ RH.Screen = (function() {
 				}
 				var staveX;
 				var staveY;
-				if(isHorizontal){
-					staveX = (i +0.5 - staveShift) * MEASURE_WIDTH;
+				if (isHorizontal) {
+					staveX = (i + 0.5 - staveShift) * MEASURE_WIDTH;
 					staveY = 50;
-				}else{
-					var parity = (index + 4) % 2 ;
-					var alpha = Math.floor(i-parity)/2;
+				} else {
+					var parity = (index + 4) % 2;
+					var alpha = Math.floor(i - parity) / 2;
 					staveX = parity * MEASURE_WIDTH;
-					staveY = (1.5 + alpha - staveShift/2) * MEASURE_HEIGHT;					
+					staveY = (1 + alpha - staveShift / 2) * MEASURE_HEIGHT;
 				}
 				screen.displayStave(canvas, staveX, staveY, index, i === 0);
 				// display the count down
 				if (screen.measures[index].isEmpty && i === 0) {
 					context.lineWidth = 1;
 					context.beginPath();
-					context.arc(3 + staveX + RH.divide(measureInfo.ellapsedBeats, 1).quotient * MEASURE_WIDTH / screen.measures[index].getBeatPerBar(), staveY+55, 8, 0, 2 * Math.PI, false);
+					context.arc(3 + staveX + RH.divide(measureInfo.ellapsedBeats, 1).quotient * MEASURE_WIDTH / screen.measures[index].getBeatPerBar(), staveY + 55, 8, 0, 2 * Math.PI, false);
 					context.strokeStyle = '#003300';
 					context.stroke();
 				}
@@ -114,7 +114,7 @@ RH.Screen = (function() {
 						return true;
 					}
 					var startStave = i * MEASURE_WIDTH - shift;
-					screen.displayDebug(canvas, (i +0.5 - shift) * MEASURE_WIDTH, index);
+					screen.displayDebug(canvas, (i + 0.5 - shift) * MEASURE_WIDTH, index);
 				});
 			}
 			this.displayMetronome(canvas, measureInfo);
@@ -125,7 +125,7 @@ RH.Screen = (function() {
 			this.displayEvents(canvas, measureInfo, 1);
 			this.displayDebug(canvas, 0, measureInfo.index);
 			var score = this.scoreCalculator.measuresScore[measureInfo.index];
-			if(score !== undefined){
+			if (score !== undefined) {
 				var context = canvas.getContext("2d");
 				context.font = '18px Open Sans';
 				context.fillStyle = 'grey';
@@ -135,7 +135,7 @@ RH.Screen = (function() {
 		},
 		displayEvents: function(canvas, measureInfo, percentage) {
 			var context = canvas.getContext("2d");
-			
+
 			var measure = measureInfo.measure;
 			var measureDuration = measure.getDuration();
 			var ups = this.eventManager.getEvents(measureInfo.t - measureDuration * percentage);
