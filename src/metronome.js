@@ -77,7 +77,6 @@ RH.Metronome = (function() {
 	};
 	Metronome.prototype = {
 		draw : function(context, timeSignature, ellapsedBeats) {
-			context.clearRect(0, 0, this.width, this.height);
 			var division = RH.divide(ellapsedBeats, 1);
 			var beatNumber = division.quotient;
 			if (this.currentBeat != beatNumber) {
