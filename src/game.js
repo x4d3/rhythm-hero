@@ -10,9 +10,10 @@ RH.Game = (function() {
 	var Screen = RH.Screen;
 	var logger = RH.logManager.getLogger('Game');
 
-	var Game = function(eventManager, measures, canvas) {
+	var Game = function(eventManager, measures, canvas, withLife, endGameCallback) {
 		this.eventManager = eventManager;
 		this.measures = measures;
+		this.endGameCallback = endGameCallback;
 		var currentTime = 0;
 		this.measuresStartTime = this.measures.map(function(measure) {
 			var result = currentTime;
@@ -30,7 +31,7 @@ RH.Game = (function() {
 	};
 
 	Game.prototype = {
-		start:function(){
+		start: function() {
 			var game = this;
 			RH.Parameters.model.gameOn(true);
 			(function animloop() {
@@ -40,12 +41,19 @@ RH.Game = (function() {
 				}
 			})();
 		},
-		stop: function(){
+		stop: function(forced) {
 			RH.Parameters.model.gameOn(false);
 			this.isOn = false;
 			$('.result').empty();
+			logger.debug("Event Manager: " + this.eventManager.toJson());
+			if (!forced){
+				this.endGameCallback(this);
+			}
 		},
-		update : function() {
+		isFinished: function() {
+			return this.currentMeasureIndex === this.measures.length;
+		},
+		update: function() {
 			var game = this;
 			var t = RH.getTime();
 			var ellapsed = t - this.t0;
@@ -58,43 +66,43 @@ RH.Game = (function() {
 				this.currentMeasureIndex = measureIndex;
 				this.scoreCalculator.addMeasureScore(t, measureIndex - 1);
 				logger.debug(measureIndex + "," + measure);
-				if (measureIndex === this.measures.length) {
-					this.isOn = false;
-					RH.Parameters.model.gameOn(false);
-					var resultDiv = $('.result');
-					resultDiv.empty();
-					resultDiv.append('<h2>Result</h2>');
-					resultDiv.append(renderScore(this.scoreCalculator));
-					this.measuresStartTime.forEach(function(startTime, measureIndex) {
-						if (measureIndex < 2 || measureIndex == game.measures.length) {
-							return;
-						}
-						var measure = game.measures[measureIndex];
-						var measureInfo = {
-							t : startTime + game.t0,
-							index : measureIndex-1,
-							ellapsedBeats : 0,
-							measure : measure
-						};
-						var tempCanvaJ = $('<canvas>');
-						tempCanvaJ.prop({
-							width : 400,
-							height : 200
-						});
-						game.screen.drawOnExternalCanvas(tempCanvaJ[0], measureInfo);
-						resultDiv.append(tempCanvaJ);
-					});
-					logger.debug("Event Manager: " + this.eventManager.toJson());
+				if (this.isFinished()) {
+					this.stop(false);
 					return;
 				}
 			}
 			var measureInfo = {
-				t : t,
-				index : measureIndex,
-				ellapsedBeats : measure.getBeatPerMillisecond() * (ellapsed - startTime),
-				measure : measure
+				t: t,
+				index: measureIndex,
+				ellapsedBeats: measure.getBeatPerMillisecond() * (ellapsed - startTime),
+				measure: measure
 			};
 			this.screen.display(measureInfo);
+		},
+		renderScore: function() {
+			var game = this;
+			var resultDiv = $('<div>');
+			resultDiv.append('<h2>Result</h2>');
+			this.measuresStartTime.forEach(function(startTime, measureIndex) {
+				if (measureIndex < 2 || measureIndex == game.measures.length) {
+					return;
+				}
+				var measure = game.measures[measureIndex];
+				var measureInfo = {
+					t: startTime + game.t0,
+					index: measureIndex - 1,
+					ellapsedBeats: 0,
+					measure: measure
+				};
+				var tempCanvaJ = $('<canvas>');
+				tempCanvaJ.prop({
+					width: 400,
+					height: 200
+				});
+				game.screen.drawOnExternalCanvas(tempCanvaJ[0], measureInfo);
+				resultDiv.append(tempCanvaJ);
+			});
+			return resultDiv;
 		}
 	};
 	Game.EMPTY_MEASURE = new RH.Measure(60, RH.TS.FOUR_FOUR, [], false, false);
@@ -106,8 +114,8 @@ RH.Game = (function() {
 		var beatPerBar = timeSignature.getBeatPerBar();
 		var beatPerBarF = new Fraction(beatPerBar, 1);
 
-		
-		var result = [ new RH.Measure(tempo, RH.TS.FOUR_FOUR, [], false, false)];
+
+		var result = [new RH.Measure(tempo, RH.TS.FOUR_FOUR, [], false, false)];
 		var beats = Fraction.ZERO;
 
 		var measureNotes = [];
@@ -122,7 +130,7 @@ RH.Game = (function() {
 				result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, !note.isRest));
 				firstNotePressed = !note.isRest;
 				var newDuration = note.duration.subtract(durationLeft);
-				measureNotes = [ split[1] ];
+				measureNotes = [split[1]];
 				beats = split[1].duration;
 			} else {
 				measureNotes.push(note);
@@ -139,10 +147,7 @@ RH.Game = (function() {
 		// we don't fill the last bar
 		return result;
 	};
-	var renderScore = function(scoreCalculator){
-		return  $('<div>');
-		
-	};
-	
+
+
 	return Game;
 }());
