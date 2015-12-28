@@ -51,10 +51,10 @@ RH.ScoreScreen = (function() {
 		}
 	});
 
-	function FailedScoreProjectile(options){
+	function FailedScoreProjectile(options) {
 		this.super(options);
 		this.end = {
-			x: this.start.x - 4,
+			x: this.start.x - 3,
 			y: this.start.y
 		};
 	}
@@ -80,7 +80,7 @@ RH.ScoreScreen = (function() {
 		this.totalScoreUpdateTime = 0;
 	}
 	ScoreScreen.prototype = {
-		draw: function(context, measureIndex, t) {
+		draw: function(context, measurePosition, measureIndex, t) {
 			// if (measureIndex < 1) {
 			// return;
 			// }
@@ -89,18 +89,18 @@ RH.ScoreScreen = (function() {
 			if (measureIndex != this.currentIndex) {
 				this.currentIndex = measureIndex;
 				var score = this.scoreCalculator.measuresScore[measureIndex];
-				if (score !== undefined) {
+				if (measureIndex > 0) {
 					var scoreType = score.getType();
 					var options = {
 						t0: t,
-						start: this.measurePosition,
+						start: measurePosition,
 						value: scoreType.label,
 						color: scoreType.color
 					};
 					var newProjectile;
-					if(score.isFailed()){
+					if (score.isFailed()) {
 						newProjectile = new FailedScoreProjectile(options);
-					}else{
+					} else {
 						newProjectile = new GoodScoreProjectile(options);
 					}
 					this.GoodScoreProjectiles.push(newProjectile);
