@@ -27,7 +27,7 @@ test("Game.generateBars", function() {
 	var testMeasures = function(patternsS, awaitedMeasures) {
 		var patterns = patternsS.map(RhythmPatterns.getPattern);
 		
-		var measures = Game.generateMeasures(options, getPatternsNotes(patterns));
+		var measures = RhythmPatterns.generateMeasures(options, getPatternsNotes(patterns));
 		deepEqual(measures, [Game.EMPTY_MEASURE].concat(awaitedMeasures), "measures" + measures + ", " + awaitedMeasures);
 	};
 	testMeasures([ 'crotchet', 'whole', 'minim', 'crotchet' ],

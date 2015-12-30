@@ -2,7 +2,6 @@ module("ScoreCalculator");
 (function() {
 	var logger = RH.logManager.getLogger('ScoreCalculatorTest');
 	RH.debug();
-	var Game = RH.Game;
 	var Measure = RH.Measure;
 	var GameOptions = RH.GameOptions;
 	var RhythmPatterns = RH.RhythmPatterns;
@@ -20,7 +19,7 @@ module("ScoreCalculator");
 	var generateMeasures = function(patternsS) {
 		var patterns = patternsS.map(RhythmPatterns.getPattern);
 		var options = new GameOptions();
-		return Game.generateMeasures(options, getPatternsNotes(patterns));
+		return RhythmPatterns.generateMeasures(options, getPatternsNotes(patterns));
 	};
 	var mockEventManager = function(times) {
 		var mockEvent = {

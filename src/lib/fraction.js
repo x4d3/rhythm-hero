@@ -240,8 +240,12 @@ Fraction = (function() {
 	Fraction.parse = function(s) {
 		var split = s.split('/');
 		var n = parseInt(split[0].trim(), 10);
-		var d = parseInt(split[1].trim(), 10);
-		return new Fraction(n, d);
+		if(split.length === 1){
+			return new Fraction(n, 1);
+		}else{
+			var d = parseInt(split[1].trim(), 10);
+			return new Fraction(n, d);
+		}
 	};
 
 	/**

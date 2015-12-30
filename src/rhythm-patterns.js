@@ -1,7 +1,6 @@
 RH.Note = (function() {
 	'use strict';
 	var Preconditions = RH.Preconditions;
-
 	var Note = function(duration, isRest) {
 		this.duration = Preconditions.checkInstance(duration, Fraction);
 		this.isRest = Preconditions.checkType(isRest, 'boolean');
@@ -73,7 +72,7 @@ RH.RhythmPatterns = (function() {
 	'use strict';
 	var Note = RH.Note;
 	var Pattern = RH.Pattern;
-
+	var Measure = RH.Measure;
 	var RhythmPatterns = {};
 
 	var PATTERNS = [];
@@ -165,6 +164,48 @@ RH.RhythmPatterns = (function() {
 		}
 		return pattern;
 	};
+	// static method
+	RhythmPatterns.generateMeasures = function(options, notes) {
+		//The two first measure are empty
+		var tempo = options.tempi[0];
+		var timeSignature = options.timeSignatures[0];
+		var beatPerBar = timeSignature.getBeatPerBar();
+		var beatPerBarF = new Fraction(beatPerBar, 1);
+
+
+		var result = [new RH.Measure(tempo, RH.TS.FOUR_FOUR, [], false, false)];
+		var beats = Fraction.ZERO;
+
+		var measureNotes = [];
+		var firstNotePressed = false;
+		notes.forEach(function(note) {
+			var sum = note.duration.add(beats);
+			var compare = sum.compareTo(beatPerBarF);
+			if (compare > 0) {
+				var durationLeft = beatPerBarF.subtract(beats);
+				var split = note.split(durationLeft);
+				measureNotes.push(split[0]);
+				result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, !note.isRest));
+				firstNotePressed = !note.isRest;
+				var newDuration = note.duration.subtract(durationLeft);
+				measureNotes = [split[1]];
+				beats = split[1].duration;
+			} else {
+				measureNotes.push(note);
+				if (compare === 0) {
+					beats = Fraction.ZERO;
+					result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, false));
+					measureNotes = [];
+					firstNotePressed = false;
+				} else {
+					beats = sum;
+				}
+			}
+		});
+		// we don't fill the last bar
+		return result;
+	};
+
 
 	RhythmPatterns.PATTERNS = PATTERNS;
 	return RhythmPatterns;

@@ -2,6 +2,10 @@ RH.Application = (function() {
 	'use strict';
 	var Game = RH.Game;
 	var EventManager = RH.EventManager;
+	var LevelManager = RH.LevelManager;
+	var RhythmPatterns = RH.RhythmPatterns;
+	var GameOptions = RH.GameOptions;
+	var TimeSignature = RH.TimeSignature;
 
 	function Application(canvas) {
 		this.canvas = canvas;
@@ -10,17 +14,18 @@ RH.Application = (function() {
 	}
 	Application.prototype = {
 		quickGame: function() {
+			var Parameters = RH.Parameters;
 			if (this.game) {
 				this.game.stop();
 			}
-			var options = new RH.GameOptions(timeSignatures, tempi, maxDifficulty);
 
-			RH.Parameters.model.beginnerModeEnabled(true);
-			var timeSignatures = RH.Parameters.model.timeSignatures().map(RH.TimeSignature.parse);
-			var tempi = RH.Parameters.model.tempi();
-			var maxDifficulty = RH.Parameters.model.difficulty();
-			var notes = RH.RhythmPatterns.generateNotes(0, maxDifficulty, 50);
-			var measures = Game.generateMeasures(options, notes);
+			Parameters.model.beginnerModeEnabled(true);
+			var timeSignatures = Parameters.model.timeSignatures().map(TimeSignature.parse);
+			var tempi = Parameters.model.tempi();
+			var maxDifficulty = Parameters.model.difficulty();
+			var options = new GameOptions(timeSignatures, tempi, maxDifficulty);
+			var notes = RhythmPatterns.generateNotes(0, maxDifficulty, 50);
+			var measures = RhythmPatterns.generateMeasures(options, notes);
 			var endGameCallback = function(game) {
 				$('.result').append(game.renderScore(this.scoreCalculator));
 			};
@@ -28,31 +33,27 @@ RH.Application = (function() {
 			this.game.start();
 		},
 		campaign: function(currentLevel) {
+			var Parameters = RH.Parameters;
 			var app = this;
 			if (this.game) {
 				this.game.stop(true);
 			}
-			RH.Parameters.model.beginnerModeEnabled(false);
-
-			var timeSignatures = RH.Parameters.model.timeSignatures().map(RH.TimeSignature.parse);
-			var tempi = RH.Parameters.model.tempi();
-			var maxDifficulty = RH.Parameters.model.difficulty();
-			var notes = RH.RhythmPatterns.generateNotes(0, maxDifficulty, 50);
-			var measures = Game.generateMeasures(level.options, level.notes);
+			Parameters.model.beginnerModeEnabled(false);
 			var callback = function(previousGame) {
 				if(previousGame !== null){
 					if (previousGame.isFinished()){
-						//display win
-						currentLevel++;
-						if (currentLevel > RH.Parameters.model.maxLevelObtained()){
-							RH.Parameters.model.maxLevelObtained(currentLevel);
+						//TODO: display win
+						if (currentLevel > Parameters.model.maxLevelObtained()){
+							Parameters.model.maxLevelObtained(currentLevel);
 						}
+						currentLevel++;
 					}else{
-						//display louse
+						//TODO: display game lost
 					}
-
 				}
-				app.game = new Game(app.eventManager, measures, app.canvas, true, callback);
+				var level = LevelManager.getLevel(currentLevel);
+
+				app.game = new Game(app.eventManager, level.measures, app.canvas, true, callback);
 				app.game.start();
 			};
 			callback(null);
@@ -124,7 +125,7 @@ $(document).ready(function() {
 		scrollingMode: ko.observable("continuous", {
 			persist: 'RH.scrollingMode'
 		}),
-		maxLevelObtained: ko.observable(0, {
+		maxLevelObtained: ko.observable(-1, {
 			persist: 'RH.maxLevelObtained'
 		}),
 		gameOn: ko.observable(false),

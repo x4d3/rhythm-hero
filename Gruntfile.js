@@ -111,8 +111,8 @@ module.exports = function(grunt) {
 				cache : 'target/**/*'
 			}
 		}
-
 	});
+
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
