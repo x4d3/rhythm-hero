@@ -6,19 +6,21 @@ RH.Application = (function() {
 	var RhythmPatterns = RH.RhythmPatterns;
 	var GameOptions = RH.GameOptions;
 	var TimeSignature = RH.TimeSignature;
+	var EndGameScreen = RH.EndGameScreen;
+	var logger = RH.logManager.getLogger('EventManager');
 
 	function Application(canvas) {
 		this.canvas = canvas;
 		this.eventManager = new EventManager();
 		this.game = null;
+		this.endGameScreen = null;
 	}
 	Application.prototype = {
 		quickGame: function() {
+			this.stop();
 			var Parameters = RH.Parameters;
-			if (this.game) {
-				this.game.stop();
-			}
-
+			var app = this;
+			Parameters.model.displayCanvas(true);
 			Parameters.model.beginnerModeEnabled(true);
 			var timeSignatures = Parameters.model.timeSignatures().map(TimeSignature.parse);
 			var tempi = Parameters.model.tempi();
@@ -27,36 +29,37 @@ RH.Application = (function() {
 			var notes = RhythmPatterns.generateNotes(0, maxDifficulty, 50);
 			var measures = RhythmPatterns.generateMeasures(options, notes);
 			var endGameCallback = function(game) {
-				$('.result').append(game.renderScore(this.scoreCalculator));
+				Parameters.model.displayCanvas(false);
+				$('.result').append(game.renderScore());
+				app.game = null;
 			};
 			this.game = new Game(this.eventManager, measures, this.canvas, false, endGameCallback);
 			this.game.start();
 		},
 		campaign: function(currentLevel) {
+			this.stop();
 			var Parameters = RH.Parameters;
 			var app = this;
-			if (this.game) {
-				this.game.stop(true);
-			}
+			Parameters.model.displayCanvas(true);
 			Parameters.model.beginnerModeEnabled(false);
-			var callback = function(previousGame) {
-				if(previousGame !== null){
-					if (previousGame.isFinished()){
-						//TODO: display win
-						if (currentLevel > Parameters.model.maxLevelObtained()){
-							Parameters.model.maxLevelObtained(currentLevel);
-						}
-						currentLevel++;
-					}else{
-						//TODO: display game lost
-					}
-				}
+			var endLevelCallback = null;
+			var nextLevelCallback = function() {
 				var level = LevelManager.getLevel(currentLevel);
-
-				app.game = new Game(app.eventManager, level.measures, app.canvas, true, callback);
+				app.game = new Game(app.eventManager, level.measures, app.canvas, true, endLevelCallback);
 				app.game.start();
+				app.endGameScreen = null;
 			};
-			callback(null);
+			endLevelCallback = function(game) {
+				app.endGameScreen = new EndGameScreen(app.canvas, game, nextLevelCallback);
+				if (game.isFinished) {
+					if (currentLevel > Parameters.model.maxLevelObtained()) {
+						Parameters.model.maxLevelObtained(currentLevel);
+					}
+					currentLevel++;
+				}
+				app.endGameScreen.start();
+			};
+			nextLevelCallback();
 
 		},
 
@@ -67,19 +70,44 @@ RH.Application = (function() {
 				this.eventManager.onDown(event);
 			}
 			if (event.keyCode == 27) { // escape key maps to keycode `27`
-				this.stopGame();
+				this.stop();
 			}
+			if (RH.isDebug && this.game !== null) {
+				var letterPressed = String.fromCharCode(event.which);
+				if (letterPressed !== "") {
+					logger.debug("Letter Pressed: " + letterPressed);
+					switch (letterPressed) {
+						case "W":
+							logger.debug("Game won automatical");
+							this.game.debug("win");
+							break;
+						case "L":
+							this.game.debug("loose");
+							break;
+					}
+				}
+
+			}
+			if(this.endGameScreen !== null){
+				this.endGameScreen.onEvent(isUp, event);
+			}
+
 			// Only prevent when a game is on
 			// Don't prevent from calling ctrl + U or ctrl + shift + J etc...
 			if (!event.ctrlKey && this.game) {
 				event.preventDefault();
 			}
 		},
-		stopGame: function() {
-			if (this.game) {
+		stop: function() {
+			if (this.game !== null) {
 				this.game.stop(true);
 			}
 			this.game = null;
+			if (this.endGameScreen !== null) {
+				this.endGameScreen.stop(true);
+			}
+			this.endGameScreen = null;
+			RH.Parameters.model.displayCanvas(false);
 		}
 	};
 	return Application;
@@ -87,6 +115,16 @@ RH.Application = (function() {
 
 $(document).ready(function() {
 	'use strict';
+
+	var getParameterByName = function(name) {
+		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+			results = regex.exec(location.search);
+		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	};
+	if ("true" === getParameterByName("debug")) {
+		RH.debug();
+	}
 
 	var application = new RH.Application($("canvas.application")[0]);
 
@@ -128,7 +166,7 @@ $(document).ready(function() {
 		maxLevelObtained: ko.observable(-1, {
 			persist: 'RH.maxLevelObtained'
 		}),
-		gameOn: ko.observable(false),
+		displayCanvas: ko.observable(false),
 		beginnerModeEnabled: ko.observable(true),
 	};
 

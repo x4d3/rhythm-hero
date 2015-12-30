@@ -21,7 +21,7 @@ RH.LevelManager = (function() {
 			} else {
 				//TODO: generate level based on index
 				var options = new GameOptions();
-				var notes = RhythmPatterns.generateNotes(0, maxDifficulty, 50);
+				var notes = RhythmPatterns.generateNotes(0, options.maxDifficulty, 50);
 				var measures = RhythmPatterns.generateMeasures(options, notes);
 				return new Level("Level " + (index + 1), measures);
 			}

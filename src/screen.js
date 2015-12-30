@@ -4,6 +4,7 @@ RH.Screen = (function() {
 	var VF = Vex.Flow;
 	var VexUtils = RH.VexUtils;
 	var ScoreScreen = RH.ScoreScreen;
+	var CanvasUtils = RH.CanvasUtils;
 
 	var MEASURE_WIDTH = 400;
 	var MEASURE_HEIGHT = 150;
@@ -38,7 +39,7 @@ RH.Screen = (function() {
 		var measuresCanvases = VexUtils.generateMeasuresCanvases(MEASURE_WIDTH, MEASURE_HEIGHT, measures);
 		this.measuresCanvases = {
 			"true": measuresCanvases,
-			"false": measuresCanvases.map(brighten)
+			"false": measuresCanvases.map(CanvasUtils.brighten)
 		};
 		this.scoreScreen = new ScoreScreen({
 			scoreCalculator: scoreCalculator,
@@ -57,8 +58,6 @@ RH.Screen = (function() {
 			var isHorizontal = RH.Parameters.model.scrollingDirection() == 'horizontal';
 			var isContinuous = RH.Parameters.model.scrollingMode() == 'continuous';
 			var shift = measureInfo.ellapsedBeats / measure.getBeatPerBar();
-
-
 
 			var staveShift = isContinuous ? shift : 0.5;
 
@@ -222,27 +221,7 @@ RH.Screen = (function() {
 		}
 
 	};
-	var brighten = function(pixels) {
-		var d = new Uint8ClampedArray(pixels.data);
-		for (var i = 0; i < d.length; i += 4) {
-			d[i] = 195;
-			d[i + 1] = 195;
-			d[i + 2] = 195;
-		}
-		return createImageData(d, pixels.width, pixels.height);
-	};
 
-	var createImageData = function(data, width, height) {
-		var canvas = document.createElement('canvas');
-		canvas.width = width;
-		canvas.height = height;
-		var ctx = canvas.getContext('2d');
-		var imageData = ctx.createImageData(width, height);
-		if (imageData.data.set) {
-			imageData.data.set(data);
-		}
-		return imageData;
-	};
 
 	return Screen;
 

@@ -23,17 +23,17 @@ RH.Game = (function() {
 		this.measuresStartTime.push(currentTime);
 		this.scoreCalculator = new ScoreCalculator(eventManager, this.measures);
 		this.screen = new Screen(canvas, eventManager, this.scoreCalculator, this.measures);
-		this.isOn = true;
-		this.t0 = RH.getTime();
-		logger.debug("t0:" + this.t0);
-		this.currentMeasureIndex = -1;
-
+		this.isOn = false;
+		this.isFinished = false;
 	};
 
 	Game.prototype = {
 		start: function() {
 			var game = this;
-			RH.Parameters.model.gameOn(true);
+			this.t0 = RH.getTime();
+			logger.debug("t0:" + this.t0);
+			this.isOn = true;
+			this.currentMeasureIndex = -1;
 			(function animloop() {
 				if (game.isOn) {
 					game.update();
@@ -42,16 +42,12 @@ RH.Game = (function() {
 			})();
 		},
 		stop: function(forced) {
-			RH.Parameters.model.gameOn(false);
 			this.isOn = false;
 			$('.result').empty();
 			logger.debug("Event Manager: " + this.eventManager.toJson());
-			if (!forced){
+			if (!forced) {
 				this.endGameCallback(this);
 			}
-		},
-		isFinished: function() {
-			return this.currentMeasureIndex === this.measures.length;
 		},
 		update: function() {
 			var game = this;
@@ -66,7 +62,8 @@ RH.Game = (function() {
 				this.currentMeasureIndex = measureIndex;
 				this.scoreCalculator.addMeasureScore(t, measureIndex - 1);
 				logger.debug(measureIndex + "," + measure);
-				if (this.isFinished()) {
+				if (this.currentMeasureIndex === this.measures.length) {
+					this.isFinished = true;
 					this.stop(false);
 					return;
 				}
@@ -103,6 +100,23 @@ RH.Game = (function() {
 				resultDiv.append(tempCanvaJ);
 			});
 			return resultDiv;
+		},
+		debug: function(instruction) {
+			if(!this.isOn){
+				return;
+			}
+			switch (instruction) {
+				case "win":
+					this.isFinished = true;
+					this.stop(false);
+					break;
+				case "loose":
+					this.isFinished = false;
+					this.stop(false);
+					break;
+				default:
+					throw "unknown instruction: " + instruction;
+			}
 		}
 	};
 	Game.EMPTY_MEASURE = new RH.Measure(60, RH.TS.FOUR_FOUR, [], false, false);
