@@ -188,5 +188,11 @@ $(document).ready(function() {
 		// If the application loose the focuse, we consider that the user is not pressing any key
 		application.resetKeyPressed();
 	});
+
+	var level = getParameterByName("level");
+	if(level){
+		application.campaign(parseInt(level, 10));
+	}
+
 	$('body').removeClass('loading');
 });
