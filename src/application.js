@@ -190,7 +190,7 @@ $(document).ready(function() {
 	});
 
 	var level = getParameterByName("level");
-	if(level){
+	if (level) {
 		application.campaign(parseInt(level, 10));
 	}
 

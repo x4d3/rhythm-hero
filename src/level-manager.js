@@ -41,11 +41,20 @@ RH.LevelManager = (function() {
 
 	return new LevelManager();
 }());
-
 (function() {
+	var repeat = function(element, count) {
+		var array = new Array(count);
+		for (var i = 0; i < count; i++) {
+			array[i] = element;
+		}
+		return array.join(",");
+	};
+
 	var LEVELS = [
 		["Whole, minims and quaver", "4/4", 60, "4, 2,2, 4, 2,2, 1,1,1,1, 2,1,1, 1,2,1, 1,1,2, 2,4,2"],
-		["Let's rest", "4/4", 60, "1,1r,1,1r, 1,1,2, 1r,2,1r, 1,1,2r"]
+		["Let's rest", "4/4", 60, "1,1r,1,1r, 1,1,2, 1r,2,1r, 1,1,2r"],
+		["Mars Attack!", "4/4", 90, repeat(repeat("1/2,1/2,1/4,1/4,1/4,1/4r",3) + ", 1/2,1/2,1", 2)]
+
 	];
 
 	RH.LevelManager.registerLevels(LEVELS);
