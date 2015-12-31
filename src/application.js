@@ -1,21 +1,34 @@
 RH.Application = (function() {
 	'use strict';
 	var Game = RH.Game;
-	var EventManager = RH.EventManager;
 	var LevelManager = RH.LevelManager;
 	var RhythmPatterns = RH.RhythmPatterns;
 	var GameOptions = RH.GameOptions;
 	var TimeSignature = RH.TimeSignature;
 	var EndGameScreen = RH.EndGameScreen;
-	var logger = RH.logManager.getLogger('EventManager');
+	var logger = RH.logManager.getLogger('Application');
 
 	function Application(canvas) {
 		this.canvas = canvas;
-		this.eventManager = new EventManager();
-		this.game = null;
-		this.endGameScreen = null;
+		this.screen = null;
+		this.isAnimating = false;
 	}
+
 	Application.prototype = {
+		startAnimation: function() {
+			if (this.isAnimating) {
+				return;
+			}
+			var app = this;
+			(function animloop() {
+				if (app.screen === null) {
+					app.isAnimating = false;
+				} else {
+					app.screen.update();
+					requestAnimFrame(animloop);
+				}
+			})();
+		},
 		quickGame: function() {
 			this.stop();
 			var Parameters = RH.Parameters;
@@ -31,10 +44,10 @@ RH.Application = (function() {
 			var endGameCallback = function(game) {
 				Parameters.model.displayCanvas(false);
 				$('.result').append(game.renderScore());
-				app.game = null;
+				app.screen = null;
 			};
-			this.game = new Game(this.eventManager, measures, this.canvas, false, endGameCallback);
-			this.game.start();
+			this.screen = new Game(measures, this.canvas, false, endGameCallback);
+			this.startAnimation();
 		},
 		campaign: function(currentLevel) {
 			this.stop();
@@ -45,68 +58,41 @@ RH.Application = (function() {
 			var endLevelCallback = null;
 			var nextLevelCallback = function() {
 				var level = LevelManager.getLevel(currentLevel);
-				app.game = new Game(app.eventManager, level.measures, app.canvas, true, endLevelCallback);
-				app.game.start();
-				app.endGameScreen = null;
+				app.screen = new Game(level.measures, app.canvas, true, endLevelCallback);
 			};
 			endLevelCallback = function(game) {
-				app.endGameScreen = new EndGameScreen(app.canvas, game, nextLevelCallback);
 				if (game.isFinished) {
 					if (currentLevel > Parameters.model.maxLevelObtained()) {
 						Parameters.model.maxLevelObtained(currentLevel);
 					}
 					currentLevel++;
 				}
-				app.endGameScreen.start();
+				app.screen = new EndGameScreen(app.canvas, game, nextLevelCallback);
+
 			};
 			nextLevelCallback();
-
+			this.startAnimation();
 		},
-
+		resetKeyPressed: function() {
+			if (this.screen !== null && this.screen.resetKeyPressed) {
+				this.screen.resetKeyPressed();
+			}
+		},
 		onEvent: function(isUp, event) {
-			if (isUp) {
-				this.eventManager.onUp(event);
-			} else {
-				this.eventManager.onDown(event);
+			if (this.screen !== null) {
+				this.screen.onEvent(isUp, event);
 			}
 			if (event.keyCode == 27) { // escape key maps to keycode `27`
 				this.stop();
 			}
-			if (RH.isDebug && this.game !== null) {
-				var letterPressed = String.fromCharCode(event.which);
-				if (letterPressed !== "") {
-					logger.debug("Letter Pressed: " + letterPressed);
-					switch (letterPressed) {
-						case "W":
-							logger.debug("Game won automatical");
-							this.game.debug("win");
-							break;
-						case "L":
-							this.game.debug("loose");
-							break;
-					}
-				}
-
-			}
-			if(this.endGameScreen !== null){
-				this.endGameScreen.onEvent(isUp, event);
-			}
-
 			// Only prevent when a game is on
 			// Don't prevent from calling ctrl + U or ctrl + shift + J etc...
-			if (!event.ctrlKey && this.game) {
+			if (!event.ctrlKey && this.screen !== null) {
 				event.preventDefault();
 			}
 		},
 		stop: function() {
-			if (this.game !== null) {
-				this.game.stop(true);
-			}
-			this.game = null;
-			if (this.endGameScreen !== null) {
-				this.endGameScreen.stop(true);
-			}
-			this.endGameScreen = null;
+			this.screen = null;
 			RH.Parameters.model.displayCanvas(false);
 		}
 	};
@@ -200,7 +186,7 @@ $(document).ready(function() {
 
 	$(window).blur(function() {
 		// If the application loose the focuse, we consider that the user is not pressing any key
-		application.eventManager.resetKeyPressed();
+		application.resetKeyPressed();
 	});
 	$('body').removeClass('loading');
 });

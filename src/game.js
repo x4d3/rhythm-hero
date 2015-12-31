@@ -8,9 +8,12 @@ RH.Game = (function() {
 	var Measure = RH.Measure;
 	var ScoreCalculator = RH.ScoreCalculator;
 	var Screen = RH.Screen;
+	var EventManager = RH.EventManager;
+
 	var logger = RH.logManager.getLogger('Game');
 
-	var Game = function(eventManager, measures, canvas, withLife, endGameCallback) {
+	var Game = function(measures, canvas, withLife, endGameCallback) {
+		var eventManager = new EventManager();
 		this.eventManager = eventManager;
 		this.measures = measures;
 		this.endGameCallback = endGameCallback;
@@ -23,31 +26,19 @@ RH.Game = (function() {
 		this.measuresStartTime.push(currentTime);
 		this.scoreCalculator = new ScoreCalculator(eventManager, this.measures);
 		this.screen = new Screen(canvas, eventManager, this.scoreCalculator, this.measures);
-		this.isOn = false;
+		this.isOn = true;
 		this.isFinished = false;
+		this.t0 = RH.getTime();
+		logger.debug("t0:" + this.t0);
+		this.currentMeasureIndex = -1;
 	};
 
 	Game.prototype = {
-		start: function() {
-			var game = this;
-			this.t0 = RH.getTime();
-			logger.debug("t0:" + this.t0);
-			this.isOn = true;
-			this.currentMeasureIndex = -1;
-			(function animloop() {
-				if (game.isOn) {
-					game.update();
-					requestAnimFrame(animloop);
-				}
-			})();
-		},
-		stop: function(forced) {
+		stop: function() {
 			this.isOn = false;
 			$('.result').empty();
 			logger.debug("Event Manager: " + this.eventManager.toJson());
-			if (!forced) {
-				this.endGameCallback(this);
-			}
+			this.endGameCallback(this);
 		},
 		update: function() {
 			var game = this;
@@ -64,7 +55,7 @@ RH.Game = (function() {
 				logger.debug(measureIndex + "," + measure);
 				if (this.currentMeasureIndex === this.measures.length) {
 					this.isFinished = true;
-					this.stop(false);
+					this.stop();
 					return;
 				}
 			}
@@ -101,21 +92,27 @@ RH.Game = (function() {
 			});
 			return resultDiv;
 		},
-		debug: function(instruction) {
-			if(!this.isOn){
-				return;
-			}
-			switch (instruction) {
-				case "win":
-					this.isFinished = true;
-					this.stop(false);
-					break;
-				case "loose":
-					this.isFinished = false;
-					this.stop(false);
-					break;
-				default:
-					throw "unknown instruction: " + instruction;
+		resetKeyPressed: function() {
+			this.eventManager.resetKeyPressed();
+		},
+		onEvent: function(isUp, event) {
+			this.eventManager.onEvent(isUp, event);
+			if (RH.isDebug && this.isOn) {
+				var letterPressed = String.fromCharCode(event.which);
+				if (letterPressed !== "") {
+					logger.debug("Letter Pressed: " + letterPressed);
+					switch (letterPressed) {
+						case "W":
+							logger.debug("Game won automatical");
+							this.isFinished = true;
+							this.stop();
+							break;
+						case "L":
+							this.isFinished = false;
+							this.stop();
+							break;
+					}
+				}
 			}
 		}
 	};

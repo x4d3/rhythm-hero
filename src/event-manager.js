@@ -1,6 +1,7 @@
 RH.EventManager = (function() {
 	'use strict';
 	var logger = RH.logManager.getLogger('EventManager');
+
 	function EventManager(getTimeCallback) {
 		this.keyPressed = [];
 		this.isPressed = false;
@@ -9,35 +10,35 @@ RH.EventManager = (function() {
 	}
 
 	EventManager.prototype = {
-		getEventsBetween : function(startTime, endTime) {
+		getEventsBetween: function(startTime, endTime) {
 			var index1 = RH.binarySearch(this.keyChanged, startTime);
 			var index2 = RH.binarySearch(this.keyChanged, endTime);
-			if(this.keyChanged[index2] < endTime){
+			if (this.keyChanged[index2] < endTime) {
 				index2++;
 			}
 			var isPressed = index1 % 2 === 0;
 			var result = [];
 			for (var i = index1; i < index2 + 1; i++) {
-				if (i>= 0 && i < this.keyChanged.length) {
+				if (i >= 0 && i < this.keyChanged.length) {
 					result.push({
-						isPressed : isPressed,
-						t : this.keyChanged[i],
+						isPressed: isPressed,
+						t: this.keyChanged[i],
 					});
 				}
 				isPressed = !isPressed;
 			}
 			return result;
 		},
-		getEvents : function(t) {
+		getEvents: function(t) {
 			var index = RH.binarySearch(this.keyChanged, t);
 			var isPressed = index % 2 === 0;
 			var result = [];
 			var addToResult = function(t1, t2) {
 				result.push({
-					isPressed : isPressed,
-					duration : t2 - t1,
-					t1 : t1,
-					t2 : t2
+					isPressed: isPressed,
+					duration: t2 - t1,
+					t1: t1,
+					t2: t2
 				});
 				isPressed = !isPressed;
 			};
@@ -53,38 +54,45 @@ RH.EventManager = (function() {
 			}
 			return result;
 		},
-		onUp : function(event) {
+		onUp: function(event) {
 			logger.debug('onUp: ' + event.which);
 			this.keyPressed[event.which] = false;
 			this._update();
 		},
-		resetKeyPressed : function() {
+		resetKeyPressed: function() {
 			logger.debug('resetKeyPressed');
 			this.keyPressed = [];
 			this._update();
 		},
-		onDown : function(event) {
+		onDown: function(event) {
 			logger.debug('onDown: ' + event.which);
 			this.keyPressed[event.which] = true;
 			this._update();
 		},
-		_update : function() {
+		onEvent: function(isUp, event) {
+			if (isUp) {
+				this.onUp(event);
+			} else {
+				this.onDown(event);
+			}
+		},
+		_update: function() {
 			var isPressed = this.keyPressed.some(RH.identity);
 			if (isPressed !== this.isPressed) {
 				this.keyChanged.push(this.getTime());
 			}
 			this.isPressed = isPressed;
 		},
-		toJson :function(){
+		toJson: function() {
 			//TODO: call copyProperties
 			return JSON.stringify({
 				keyPressed: this.keyPressed,
-				keyChanged:this.keyChanged,
+				keyChanged: this.keyChanged,
 				isPressed: this.isPressed
 			});
 		}
 	};
-	EventManager.fromJson = function(json, getTimeCallback){
+	EventManager.fromJson = function(json, getTimeCallback) {
 		var obj = JSON.parse(json);
 		var eventManager = new EventManager(getTimeCallback);
 		//TODO: call copyProperties
@@ -93,6 +101,6 @@ RH.EventManager = (function() {
 		eventManager.isPressed = obj.isPressed;
 		return eventManager;
 	};
-	
+
 	return EventManager;
 }());

@@ -5,20 +5,11 @@ RH.EndGameScreen = (function() {
 		this.canvas = canvas;
 		this.game = game;
 		this.callback = callback;
+		this.t0 = RH.getTime();
+		this.isOn = true;
 	}
 
 	EndGameScreen.prototype = {
-		start: function() {
-			var screen = this;
-			this.t0 = RH.getTime();
-			this.isOn = true;
-			(function animloop() {
-				if (screen.isOn) {
-					screen.update();
-					requestAnimFrame(animloop);
-				}
-			})();
-		},
 		update: function() {
 			var ctx = this.canvas.getContext("2d");
 			ctx.font = "30px Verdana";
@@ -35,18 +26,16 @@ RH.EndGameScreen = (function() {
 				ctx.fillText("LOOSE", 10, 90);
 			}
 			if (RH.getTime() > this.t0 + 5000) {
-				this.stop(false);
+				this.stop();
 			}
 		},
-		stop: function(forced) {
+		stop: function() {
 			this.isOn = false;
-			if (!forced) {
-				this.callback();
-			}
+			this.callback();
 		},
 		onEvent: function(isUp, event) {
-			if (this.isOn) {
-				this.stop(false);
+			if (this.isOn && !isUp) {
+				this.stop();
 			}
 		}
 
