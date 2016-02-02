@@ -101,6 +101,9 @@ RH.ScoreCalculator = (function() {
 	var EPSILON = 10;
 	var NO_SCORE = new MeasureScore([]);
 	ScoreCalculator.prototype = {
+		hasLost: function(){
+			return this.withLife && this.life  === 0;
+		},
 		/**
 		 * awful awful code.. again...
 		 * 

@@ -6,10 +6,9 @@ RH.Measure = (function() {
 		this.notes = Preconditions.checkArrayType(notes, RH.Note);
 		this.firstNotePressed = firstNotePressed;
 		this.lastNotePressed = lastNotePressed;
-		this.isEmpty = false;
+		this.isEmpty = notes.length === 0;
 		this.tempo = Preconditions.checkIsNumber(tempo);
 		this.timeSignature = Preconditions.checkInstance(timeSignature, RH.TimeSignature);
-		this.isEmpty = notes.length === 0;
 	};
 	
 

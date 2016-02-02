@@ -251,14 +251,15 @@ RH.VexUtils = (function() {
 		var currentTempo = null;
 		var previousMeasureLastNote = null;
 		measures.forEach(function(measure, i) {
-			if (measure.isEmpty) {
-				// display
-				var x = measureWidth * i;
+			if (i === 0) {
+				// display couting
 				var beatPerBar = measure.getBeatPerBar();
 				for (var j = 0; j < beatPerBar; j++) {
-					context.fillText(j + 1, x + j * measureWidth / beatPerBar, 60);
+					context.fillText(j + 1, j * measureWidth / beatPerBar, 60);
 				}
-				return true;
+			}
+			if(measure.isEmpty){
+				return;
 			}
 			var timeSignature = measure.timeSignature;
 			var tempo = measure.tempo;

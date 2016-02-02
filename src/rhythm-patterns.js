@@ -173,7 +173,7 @@ RH.RhythmPatterns = (function() {
 		var beatPerBarF = new Fraction(beatPerBar, 1);
 
 
-		var result = [new RH.Measure(tempo, RH.TS.FOUR_FOUR, [], false, false)];
+		var result = [new RH.Measure(tempo, timeSignature, [], false, false)];
 		var beats = Fraction.ZERO;
 
 		var measureNotes = [];
@@ -203,6 +203,7 @@ RH.RhythmPatterns = (function() {
 			}
 		});
 		// we don't fill the last bar
+		result.push(new RH.Measure(tempo, timeSignature, [], false, false));
 		return result;
 	};
 

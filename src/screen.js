@@ -91,7 +91,7 @@ RH.Screen = (function() {
 				}
 				screen.displayStave(canvas, staveX, staveY, index, i === 0);
 				// display the count down
-				if (screen.measures[index].isEmpty && i === 0) {
+				if (index === 0 && i === 0) {
 					context.lineWidth = 1;
 					context.beginPath();
 					context.arc(3 + staveX + RH.divide(measureInfo.ellapsedBeats, 1).quotient * MEASURE_WIDTH / screen.measures[index].getBeatPerBar(), staveY + 55, 8, 0, 2 * Math.PI, false);

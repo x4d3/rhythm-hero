@@ -27,7 +27,6 @@ RH.Game = (function() {
 		this.scoreCalculator = new ScoreCalculator(eventManager, this.measures, withLife);
 		this.screen = new Screen(canvas, eventManager, this.scoreCalculator, this.measures);
 		this.isOn = true;
-		this.isFinished = false;
 		this.t0 = RH.getTime();
 		logger.debug("t0:" + this.t0);
 		this.currentMeasureIndex = -1;
@@ -53,8 +52,7 @@ RH.Game = (function() {
 				this.currentMeasureIndex = measureIndex;
 				this.scoreCalculator.addMeasureScore(t, measureIndex - 1);
 				logger.debug(measureIndex + "," + measure);
-				if (this.currentMeasureIndex === this.measures.length) {
-					this.isFinished = true;
+				if (this.currentMeasureIndex === this.measures.length || this.scoreCalculator.hasLost()) {
 					this.stop();
 					return;
 				}
@@ -104,11 +102,10 @@ RH.Game = (function() {
 					switch (letterPressed) {
 						case "W":
 							logger.debug("Game won automatical");
-							this.isFinished = true;
 							this.stop();
 							break;
 						case "L":
-							this.isFinished = false;
+							this.scoreCalculator.life = 0;
 							this.stop();
 							break;
 					}

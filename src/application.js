@@ -63,7 +63,7 @@ RH.Application = (function() {
 			};
 			endLevelCallback = function(game) {
 				if (game.isFinished) {
-					if (currentLevel > Parameters.model.maxLevelObtained()) {
+					if (!game.scoreCalculator.hasLost()) {
 						Parameters.model.maxLevelObtained(currentLevel);
 					}
 					currentLevel++;
@@ -194,7 +194,7 @@ $(document).ready(function() {
 	});
 
 	var level = getParameterByName("level");
-	if (level) {
+	if (RH.isDebug && level) {
 		application.campaign(parseInt(level, 10));
 	}
 

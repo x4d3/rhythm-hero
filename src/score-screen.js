@@ -4,8 +4,8 @@ RH.ScoreScreen = (function() {
 	 * time to make the travel from start to x
 	 */
 	var TRAJECTORY_DURATION = 1000;
-	var UPDATE_SCORE_DURATION = 3000;
-	var UPDATE_LIFE_DURATION = 2000;
+	var UPDATE_SCORE_DURATION = 2000;
+	var UPDATE_LIFE_DURATION = 1000;
 	var LIFE_WIDTH = 80;
 	var LIFE_HEIGHT = 10;
 

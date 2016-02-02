@@ -20,10 +20,10 @@ RH.EndGameScreen = (function() {
 			gradient.addColorStop("1.0", "red");
 			// Fill with gradient
 			ctx.fillStyle = gradient;
-			if (this.game.isFinished) {
-				ctx.fillText("WIN", 10, 90);
-			} else {
+			if (this.game.scoreCalculator.hasLost()) {
 				ctx.fillText("LOOSE", 10, 90);
+			} else {
+				ctx.fillText("WIN", 10, 90);
 			}
 			if (RH.getTime() > this.t0 + 5000) {
 				this.stop();
