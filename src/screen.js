@@ -20,6 +20,11 @@ RH.Screen = (function() {
 		x: MEASURE_WIDTH + 100,
 		y: 40
 	};
+	var LIFE_POSITION = {
+		x: MEASURE_WIDTH + 200,
+		y: 40
+	};
+
 	Screen.METRONOME_POSITION = METRONOME_POSITION;
 	Screen.MEASURE_WIDTH = MEASURE_WIDTH;
 	Screen.SCORE_POSITION = SCORE_POSITION;
@@ -44,7 +49,8 @@ RH.Screen = (function() {
 		this.scoreScreen = new ScoreScreen({
 			scoreCalculator: scoreCalculator,
 			scorePosition: SCORE_POSITION,
-			multiplierPosition: MULTIPLIER_POSITION
+			multiplierPosition: MULTIPLIER_POSITION,
+			lifePosition: LIFE_POSITION
 		});
 	}
 

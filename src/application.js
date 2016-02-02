@@ -11,7 +11,7 @@ RH.Application = (function() {
 	function Application(canvas) {
 		this.canvas = canvas;
 		this.screen = null;
-		this.isAnimating = false;
+		this.N = false;
 	}
 
 	Application.prototype = {
@@ -46,7 +46,8 @@ RH.Application = (function() {
 				$('.result').append(game.renderScore());
 				app.screen = null;
 			};
-			this.screen = new Game(measures, this.canvas, false, endGameCallback);
+			var withLife = Parameters.model.withLife();
+			this.screen = new Game(measures, this.canvas, withLife, endGameCallback);
 			this.startAnimation();
 		},
 		campaign: function(currentLevel) {
@@ -121,6 +122,9 @@ $(document).ready(function() {
 	var model = {
 		beginnerMode: ko.observable(true, {
 			persist: 'RH.beginnerMode'
+		}),
+		withLife: ko.observable(false, {
+			persist: 'RH.withLife'
 		}),
 		toggleBeginnerMode: function() {
 			model.beginnerMode(!model.beginnerMode());

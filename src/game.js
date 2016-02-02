@@ -24,7 +24,7 @@ RH.Game = (function() {
 			return result;
 		});
 		this.measuresStartTime.push(currentTime);
-		this.scoreCalculator = new ScoreCalculator(eventManager, this.measures);
+		this.scoreCalculator = new ScoreCalculator(eventManager, this.measures, withLife);
 		this.screen = new Screen(canvas, eventManager, this.scoreCalculator, this.measures);
 		this.isOn = true;
 		this.isFinished = false;

@@ -5,6 +5,11 @@ RH.ScoreScreen = (function() {
 	 */
 	var TRAJECTORY_DURATION = 1000;
 	var UPDATE_SCORE_DURATION = 3000;
+	var UPDATE_LIFE_DURATION = 2000;
+	var LIFE_WIDTH = 80;
+	var LIFE_HEIGHT = 10;
+
+
 	var intermediatePosition = function(a, b, progress) {
 		return a + (b - a) * progress;
 	};
@@ -70,19 +75,39 @@ RH.ScoreScreen = (function() {
 			context.restore();
 		}
 	});
-
+	function TargetableScore(updateDuration){
+		this.updateDuration = updateDuration;
+		this.target = null;
+		this.value = null;
+		this.previousValue = null;
+		this.updateTime = null;
+	}
+	TargetableScore.prototype = {
+		update: function(newValue, t) {
+			if (this.target != newValue) {
+				this.target = newValue;
+				this.previousValue = this.value;
+				this.updateTime = t;
+			}
+			if(this.value === null){
+				this.value = this.target;
+			}else{
+				var progress = Math.min(1, (t - this.updateTime) / this.updateDuration);
+				this.value = intermediatePosition(this.previousValue, this.target, progress);
+			}			
+		}
+	};
 	function ScoreScreen(options) {
 		RH.copyProperties(options, this);
 		this.currentIndex = 0;
 		this.GoodScoreProjectiles = [];
-		this.totalScore = 0;
-		this.targetTotalScore = 0;
-		this.totalScoreUpdateTime = 0;
+		this.totalScore = new TargetableScore(UPDATE_SCORE_DURATION);
+		this.life = new TargetableScore(UPDATE_LIFE_DURATION);
 	}
 	ScoreScreen.prototype = {
 		draw: function(context, measurePosition, measureIndex, t) {
 			// if (measureIndex < 1) {
-			// return;
+			// return; = 
 			// }
 			var multiplier = this.scoreCalculator.multiplier;
 			var totalScore = this.scoreCalculator.totalScore;
@@ -120,9 +145,9 @@ RH.ScoreScreen = (function() {
 			context.save();
 			context.font = '32px scoreboard';
 			context.fillStyle = '#696969';
-			this.updateTotalScore(totalScore, t);
+			this.totalScore.update(totalScore, t);
 
-			context.fillText(pad(Math.round(100 * this.totalScore), 5), this.scorePosition.x, this.scorePosition.y);
+			context.fillText(pad(Math.round(100 * this.totalScore.value), 5), this.scorePosition.x, this.scorePosition.y);
 			context.restore();
 
 			context.save();
@@ -131,15 +156,18 @@ RH.ScoreScreen = (function() {
 			context.fillText("X" + multiplier, this.multiplierPosition.x, this.multiplierPosition.y);
 			context.restore();
 
-		},
-		updateTotalScore: function(totalScore, t) {
-			if (this.targetTotalScore != totalScore) {
-				this.targetTotalScore = totalScore;
-				this.totalScoreUpdateTime = t;
+			if(this.scoreCalculator.withLife){
+				this.life.update(this.scoreCalculator.life, t); 
+				context.save();
+				context.strokeStyle = "black";
+				context.rect(this.lifePosition.x, this.lifePosition.y - LIFE_HEIGHT, LIFE_WIDTH, LIFE_HEIGHT);
+				context.stroke();
+				context.fillStyle = '#696969';
+				context.fillRect(this.lifePosition.x, this.lifePosition.y- LIFE_HEIGHT, LIFE_WIDTH* this.life.value, LIFE_HEIGHT);
+				context.restore();
 			}
-			var progress = Math.min(1, (t - this.totalScoreUpdateTime) / UPDATE_SCORE_DURATION);
-			this.totalScore = intermediatePosition(this.totalScore, this.targetTotalScore, progress);
-		}
+		},
+
 	};
 	return ScoreScreen;
 }());

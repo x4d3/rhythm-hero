@@ -11,7 +11,7 @@ RH.Metronome = (function() {
 
 	var drawDot = function(context, x, y) {
 		context.beginPath();
-		context.arc(x, y, 2, 0, 2 * Math.PI, false);
+		context.arc(x, y, 3, 0, 2 * Math.PI, false);
 		context.fillStyle = 'green';
 		context.fill();
 		context.lineWidth = 1;
@@ -77,6 +77,7 @@ RH.Metronome = (function() {
 	};
 	Metronome.prototype = {
 		draw : function(context, timeSignature, ellapsedBeats) {
+			context.save();
 			var division = RH.divide(ellapsedBeats, 1);
 			var beatNumber = division.quotient;
 			if (this.currentBeat != beatNumber) {
@@ -86,6 +87,7 @@ RH.Metronome = (function() {
 			var progression = division.rest;
 			DRAWERS[timeSignature.toString()](this, context, beatNumber, convertProgression(progression));
 			context.fillText(beatNumber + 1, 5, 10);
+			context.restore();
 		}
 	};
 	return Metronome;

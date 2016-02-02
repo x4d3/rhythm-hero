@@ -75,15 +75,27 @@ RH.ScoreCalculator = (function() {
 
 
 
-	function ScoreCalculator(eventManager, measures) {
+	function ScoreCalculator(eventManager, measures, withLife) {
 		this.eventManager = eventManager;
 		this.measures = measures;
+		this.withLife = withLife;
+		this.life = 0.8;
 		this.measuresScore = [];
 		this.multiplier = 1;
 		this.totalScore = 0;
 		this.goodMeasureCount = 0;
 	}
-	/**
+	var keepBetween = function(min, max, value){
+		if(value > max){
+			return max;
+		}else if(value < min){
+			return min;
+		}else{
+			return value;
+		}
+	};
+
+	/**this.life = Math.max(this.life - 0.25, 0);
 	 * in milliseconds
 	 */
 	var EPSILON = 10;
@@ -191,9 +203,11 @@ RH.ScoreCalculator = (function() {
 			}));
 			logger.debug("addMeasureScore(" + measureIndex + ") " + notesScores);
 			this.measuresScore[measureIndex] = notesScores;
+			var lifeChange;
 			if (notesScores.isFailed()) {
 				this.multiplier = 1;
 				this.goodMeasureCount = 0;
+				lifeChange = -0.25;
 			} else {
 				this.goodMeasureCount++;
 				if (this.goodMeasureCount == 2) {
@@ -201,7 +215,9 @@ RH.ScoreCalculator = (function() {
 					this.goodMeasureCount = 0;
 				}
 				this.totalScore += notesScores.value() * this.multiplier;
+				lifeChange = (notesScores.value()-0.5) * 0.3;
 			}
+			this.life = keepBetween(0,1, this.life + lifeChange);
 			return notesScores;
 		}
 	};
