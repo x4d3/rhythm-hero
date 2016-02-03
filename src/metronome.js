@@ -86,6 +86,7 @@ RH.Metronome = (function() {
 			}
 			var progression = division.rest;
 			DRAWERS[timeSignature.toString()](this, context, beatNumber, convertProgression(progression));
+			context.font = "10px Arial, sans-serif";
 			context.fillText(beatNumber + 1, 5, 10);
 			context.restore();
 		}

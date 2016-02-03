@@ -62,8 +62,8 @@ RH.Application = (function() {
 				app.screen = new Game(level.measures, app.canvas, true, endLevelCallback);
 			};
 			endLevelCallback = function(game) {
-				if (game.isFinished) {
-					if (!game.scoreCalculator.hasLost()) {
+				if (!game.scoreCalculator.hasLost()) {
+					if (currentLevel > Parameters.model.maxLevelObtained()) {
 						Parameters.model.maxLevelObtained(currentLevel);
 					}
 					currentLevel++;

@@ -104,6 +104,10 @@ RH.ScoreScreen = (function() {
 		this.totalScore = new TargetableScore(UPDATE_SCORE_DURATION);
 		this.life = new TargetableScore(UPDATE_LIFE_DURATION);
 	}
+	ScoreScreen.formatTotal = function(totalScore){
+		return pad(Math.round(100 * totalScore), 5);
+	};
+
 	ScoreScreen.prototype = {
 		draw: function(context, measurePosition, measureIndex, t) {
 			// if (measureIndex < 1) {
@@ -147,7 +151,7 @@ RH.ScoreScreen = (function() {
 			context.fillStyle = '#696969';
 			this.totalScore.update(totalScore, t);
 
-			context.fillText(pad(Math.round(100 * this.totalScore.value), 5), this.scorePosition.x, this.scorePosition.y);
+			context.fillText(ScoreScreen.formatTotal(this.totalScore.value), this.scorePosition.x, this.scorePosition.y);
 			context.restore();
 
 			context.save();
@@ -169,5 +173,7 @@ RH.ScoreScreen = (function() {
 		},
 
 	};
+
+	
 	return ScoreScreen;
 }());

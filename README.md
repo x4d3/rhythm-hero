@@ -12,7 +12,7 @@ Installation
 ```sh
 $ grunt
 ```
-will start a server on: (http://localhost:4000/)
+will start a server on: (http://localhost:4567/)
 
 Manually Publish to GH Page
 ------------
