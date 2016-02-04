@@ -47,7 +47,7 @@ RH.Application = (function() {
 				app.screen = null;
 			};
 			var withLife = Parameters.model.withLife();
-			this.screen = new Game(measures, this.canvas, withLife, endGameCallback);
+			this.screen = new Game(measures, "Practice Mode - Difficulty: " + maxDifficulty , this.canvas, withLife, endGameCallback);
 			this.startAnimation();
 		},
 		campaign: function(currentLevel) {
@@ -59,7 +59,7 @@ RH.Application = (function() {
 			var endLevelCallback = null;
 			var nextLevelCallback = function() {
 				var level = LevelManager.getLevel(currentLevel);
-				app.screen = new Game(level.measures, app.canvas, true, endLevelCallback);
+				app.screen = new Game(level.measures, level.description, app.canvas, true, endLevelCallback);
 			};
 			endLevelCallback = function(game) {
 				if (!game.scoreCalculator.hasLost()) {

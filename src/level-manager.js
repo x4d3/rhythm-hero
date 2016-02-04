@@ -27,14 +27,14 @@ RH.LevelManager = (function() {
 			}
 		},
 		registerLevels: function(levels) {
-			this.levels = levels.map(function(level) {
+			this.levels = levels.map(function(level, index) {
 				var description = level[0];
 				var timeSignature = RH.TimeSignature.parse(level[1]);
 				var tempo = level[2];
 				var notes = Note.parseNotes(level[3]);
 				var options = new GameOptions([timeSignature], [tempo], 1);
 				var measures = RhythmPatterns.generateMeasures(options, notes);
-				return new Level(description, measures);
+				return new Level("Level " + (index + 1) + ": " + description, measures);
 			});
 		}
 	};

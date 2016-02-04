@@ -8,7 +8,11 @@ RH.GameOptions = (function() {
 		this.tempi = tempi ? tempi : [ DEFAULT_TEMPO ];
 		this.maxDifficulty = maxDifficulty ? maxDifficulty : RH.RhythmPatterns.MAX_DIFFICULTY;
 	}
-
+	GameOptions.prototype = {
+		toString : function() {
+			return "TS: " + this.timeSignatures + " Tempi: " + this.tempi + " Difficulty: " + this.maxDifficulty;
+		}
+	};
 	GameOptions.DEFAULT_TEMPO = DEFAULT_TEMPO;
 	GameOptions.DEFAULT_TS = DEFAULT_TS;
 

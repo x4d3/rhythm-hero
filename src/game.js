@@ -12,11 +12,12 @@ RH.Game = (function() {
 
 	var logger = RH.logManager.getLogger('Game');
 
-	var Game = function(measures, canvas, withLife, endGameCallback) {
+	var Game = function(measures, title, canvas, withLife, endGameCallback) {
 		var eventManager = new EventManager();
 		this.eventManager = eventManager;
 		this.measures = measures;
 		this.endGameCallback = endGameCallback;
+		this.title = title;
 		var currentTime = 0;
 		this.measuresStartTime = this.measures.map(function(measure) {
 			var result = currentTime;
@@ -25,7 +26,7 @@ RH.Game = (function() {
 		});
 		this.measuresStartTime.push(currentTime);
 		this.scoreCalculator = new ScoreCalculator(eventManager, this.measures, withLife);
-		this.screen = new Screen(canvas, eventManager, this.scoreCalculator, this.measures);
+		this.screen = new Screen(canvas, eventManager, this.scoreCalculator, this.measures, title);
 		this.isOn = true;
 		this.t0 = RH.getTime();
 		logger.debug("t0:" + this.t0);

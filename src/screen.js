@@ -12,6 +12,12 @@ RH.Screen = (function() {
 		x: 3 * MEASURE_WIDTH / 4 - 25,
 		y: 5
 	};
+
+	var TITLE_POSITION = {
+		x: MEASURE_WIDTH - 60,
+		y: 40
+	};
+
 	var SCORE_POSITION = {
 		x: MEASURE_WIDTH - 25,
 		y: 40
@@ -34,12 +40,12 @@ RH.Screen = (function() {
 	var DEBUG_Y = 178;
 	var SIGNAL_HEIGHT = 20;
 
-	function Screen(canvas, eventManager, scoreCalculator, measures) {
+	function Screen(canvas, eventManager, scoreCalculator, measures, title) {
 		this.canvas = canvas;
 		this.eventManager = eventManager;
 		this.scoreCalculator = scoreCalculator;
 		this.measures = measures;
-
+		this.title = title;
 		this.metronome = new RH.Metronome(50, 50);
 		var measuresCanvases = VexUtils.generateMeasuresCanvases(MEASURE_WIDTH, MEASURE_HEIGHT, measures);
 		this.measuresCanvases = {
@@ -73,6 +79,7 @@ RH.Screen = (function() {
 			} else {
 				suiteArray = RH.createSuiteArray(-2, 4);
 			}
+
 			suiteArray.forEach(function(i) {
 				var index = measureInfo.index + i;
 				if (index < 0 || index >= screen.measures.length) {
@@ -127,8 +134,16 @@ RH.Screen = (function() {
 				};
 
 			}
-
-			this.scoreScreen.draw(context, measurePosition, previousMeasureIndex, measureInfo.t);
+			if (measureInfo.index < 1){
+		        context.save();
+		        context.font = '26px Open Sans';
+		        context.fillStyle = "#696969";
+		        //context.textAlign = "center";
+		        //context.textBaseline = "middle";
+            	context.fillText(this.title, TITLE_POSITION.x, TITLE_POSITION.y);
+			}else{
+				this.scoreScreen.draw(context, measurePosition, previousMeasureIndex, measureInfo.t);
+			}
 
 			if (this.eventManager.isPressed) {
 				context.beginPath();
@@ -139,6 +154,7 @@ RH.Screen = (function() {
 				context.strokeStyle = 'black';
 				context.stroke();
 			}
+
 		},
 		drawOnExternalCanvas: function(canvas, measureInfo) {
 			this.displayStave(canvas, 0, 0, measureInfo.index, true);
