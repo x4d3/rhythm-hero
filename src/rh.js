@@ -191,6 +191,13 @@ if (typeof localStorage === 'undefined') {
 		};
 	}());
 
+	RH.getVersion = function(){
+		if(RH.VERSION !== undefined){
+			return RH.VERSION.version;
+		}else{
+			return "Dev Mode";
+		}
+	};
 
 	window.requestAnimFrame = (function() {
 		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function(callback) {

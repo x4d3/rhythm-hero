@@ -120,6 +120,7 @@ $(document).ready(function() {
 		return RH.TS[key].toString();
 	});
 	var model = {
+		version: ko.observable(RH.getVersion()),
 		beginnerMode: ko.observable(true, {
 			persist: 'RH.beginnerMode'
 		}),
