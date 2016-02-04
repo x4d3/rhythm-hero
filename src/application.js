@@ -47,7 +47,7 @@ RH.Application = (function() {
 				app.screen = null;
 			};
 			var withLife = Parameters.model.withLife();
-			this.screen = new Game(measures, "Practice Mode - Difficulty: " + maxDifficulty , this.canvas, withLife, endGameCallback);
+			this.screen = new Game(measures, "Practice Mode - Difficulty: " + maxDifficulty, this.canvas, withLife, endGameCallback);
 			this.startAnimation();
 		},
 		campaign: function(currentLevel) {

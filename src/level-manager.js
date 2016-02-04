@@ -53,7 +53,7 @@ RH.LevelManager = (function() {
 	var LEVELS = [
 		["Whole, minims and quaver", "4/4", 60, "4, 2,2, 4, 2,2, 1,1,1,1, 2,1,1, 1,2,1, 1,1,2, 2,4,2"],
 		["Let's rest", "4/4", 60, "1,1r,1,1r, 1,1,2, 1r,2,1r, 1,1,2r"],
-		["Mars Attack!", "4/4", 90, repeat(repeat("1/2,1/2,1/4,1/4,1/4,1/4r",3) + ", 1/2,1/2,1", 2)]
+		["Mars Attack!", "4/4", 90, repeat(repeat("1/2,1/2,1/4,1/4,1/4,1/4r", 3) + ", 1/2,1/2,1", 2)]
 
 	];
 

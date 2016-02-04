@@ -119,7 +119,6 @@ RH.Screen = (function() {
 				});
 			}
 			this.displayMetronome(canvas, measureInfo);
-
 			var previousMeasureIndex = measureInfo.index - 1;
 			var measurePosition;
 			if (isHorizontal) {
@@ -134,14 +133,15 @@ RH.Screen = (function() {
 				};
 
 			}
-			if (measureInfo.index < 1){
-		        context.save();
-		        context.font = '26px Open Sans';
-		        context.fillStyle = "#696969";
-		        //context.textAlign = "center";
-		        //context.textBaseline = "middle";
-            	context.fillText(this.title, TITLE_POSITION.x, TITLE_POSITION.y);
-			}else{
+			//display title
+			if (measureInfo.index < 1) {
+				context.save();
+				context.font = '26px Open Sans';
+				context.fillStyle = "#696969";
+				//context.textAlign = "center";
+				//context.textBaseline = "middle";
+				context.fillText(this.title, TITLE_POSITION.x, TITLE_POSITION.y);
+			} else {
 				this.scoreScreen.draw(context, measurePosition, previousMeasureIndex, measureInfo.t);
 			}
 
