@@ -1,157 +1,174 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>Rhythm Hero</title>
-<link href='favicon.ico' rel="icon" type='image/x-icon' />
-<link rel="stylesheet" media="screen" href="bootstrap.css" type="text/css" />
-<link rel="stylesheet" media="screen" href="style.css" type="text/css" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body class="loading">
-	<div class="navbar navbar-default navbar-fixed-top"  data-bind="visible: !displayCanvas()">
-		<div class="container">
-			<div class="navbar-header">
-				<a href="../" class="navbar-brand">Rhythm Hero</a>
-				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+	<head>
+		<title>Rhythm Hero</title>
+		<link href='favicon.ico' rel="icon" type='image/x-icon' />
+		<link rel="stylesheet" media="screen" href="bootstrap.css" type="text/css" />
+		<link rel="stylesheet" media="screen" href="style.css" type="text/css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body class="loading">
+		<div class="navbar navbar-default navbar-fixed-top"  data-bind="visible: !displayCanvas()">
+			<div class="container">
+				<div class="navbar-header">
+					<a href="../" class="navbar-brand">Rhythm Hero</a>
+					<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
 					<span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-				</button>
-			</div>
-			<div class="navbar-collapse collapse" id="navbar-main">
-				<ul class="nav navbar-nav">
-					<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">Levels <span class="caret"></span></a>
-						<ul class="dropdown-menu" aria-labelledby="themes">
-						</ul>
-					</li>
-
-
-					<li><a href="#" data-toggle="modal" data-target="#help-modal">Help</a></li>
-					<li><a href="#" data-toggle="modal" data-target="#options-modal">Options</a></li>
-				</ul>
-
-				<ul class="nav navbar-nav navbar-right">
-					<li><a href="https://github.com/x4d3/rhythm-hero">GitHub</a></li>
-					<li><a href="http://xade.eu">xade.eu</a></li>
-				</ul>
-
+					</button>
+				</div>
+				<div class="navbar-collapse collapse" id="navbar-main">
+					<ul class="nav navbar-nav">
+						<li><a href="#" data-toggle="modal" data-target="#help-modal">Help</a></li>
+						<li><a href="#" data-toggle="modal" data-target="#options-modal">Options</a></li>
+						<li><a href="#" data-toggle="modal" data-target="#scores-modal">Scores</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="https://github.com/x4d3/rhythm-hero">GitHub</a></li>
+						<li><a href="http://xade.eu">xade.eu</a></li>
+					</ul>
+				</div>
 			</div>
 		</div>
-	</div>
-
-	<div class="container" data-bind="visible: !displayCanvas()">
-		<div class="page-header" id="banner">
+		<div class="container" data-bind="visible: !displayCanvas()">
+			<div class="page-header" id="banner">
+				<div class="row">
+					<div class="col-lg-8 col-md-7 col-sm-6">
+						<h1>Rhythm Hero</h1>
+						<p class="lead" data-bind="text: version"></p>
+						<p class="lead">Learn your rhythm playing</p>
+					</div>
+				</div>
+			</div>
 			<div class="row">
-				<div class="col-lg-8 col-md-7 col-sm-6">
-					<h1>Rhythm Hero</h1>
-					<p class="lead" data-bind="text: version"></p>
-					<p class="lead">Learn your rhythm playing</p>
+				<div class="col-lg-4"></div>
+				<div class="col-lg-4 text-center">
+					<button class="btn btn-default btn-block" data-bind="event: { click: startPractice, touchstart: startPractice }">Practice</button>
+					<button class="btn btn-default btn-block" data-bind="event: { click: startCampaign, touchstart: startCampaign}">Campaign</button>
+					<button class="btn btn-default btn-block" data-toggle="modal" data-target="#options-modal">Options</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-2"></div>
+				<div class="col-lg-10 result"></div>
+			</div>
+		</div>
+		<div class="application-container" data-bind="visible: displayCanvas">
+			<div class="rh-icon beginner-mode" data-bind="click: toggleBeginnerMode, css: { on: beginnerMode}, visible:beginnerModeEnabled" ></div>
+			<div class="rh-icon switch-sound" data-bind="click: toggleSoundsOn, css: { on: soundsOn}" ></div>
+			<canvas class="application" width=800 height=300></canvas>
+		</div>
+		<!-- 	Div used to display loading while the javascript is loading -->
+		<div class="loading-modal">
+			<div class="message">
+				<img src="images/loading.gif"></img><i>Loading...</i>
+			</div>
+		</div>
+		<!-- Modal -->
+		<div id="scores-modal" class="modal fade" role="dialog" tabindex="-1">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Scores</h4>
+					</div>
+					<div class="modal-body">
+						<p data-bind="visible: scores().length == 0">You haven't any score yet.</p>
+						<table class="table scores">
+							<tbody data-bind="foreach: scoresDisplay">
+								<tr >
+									<td data-bind="text: description"> </td>
+									<td class="text-right score" data-bind="text: score"> </td>
+									<td class="text-right"><button type="button" class="btn btn-default" data-dismiss="modal" data-bind="click: $parent.startLevel">Retry</button></td>
+								</tr>
+							</table>
+						</tbody>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-bind="event: { click: resetScores, touchstart: resetScores }">Reset Scores</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
 				</div>
 			</div>
 		</div>
-
-		<div class="row">
-			<div class="col-lg-4"></div>
-			<div class="col-lg-4 text-center">
-				<button class="btn btn-default btn-block quick-game">Practice</button>
-				<button class="btn btn-default btn-block campaign">Campaign</button>
-				<button class="btn btn-default btn-block" data-toggle="modal" data-target="#options-modal">Options</button>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-2"></div>
-			<div class="col-lg-10 result"></div>
-		</div>
-	</div>
-	<div class="application-container" data-bind="visible: displayCanvas">
-		<div class="rh-icon beginner-mode" data-bind="click: toggleBeginnerMode, css: { on: beginnerMode}, visible:beginnerModeEnabled" ></div>
-		<div class="rh-icon switch-sound" data-bind="click: toggleSoundsOn, css: { on: soundsOn}" ></div>
-		<canvas class="application" width=800 height=300></canvas>
-	</div>
-	<!-- 	Div used to display loading while the javascript is loading -->
-	<div class="loading-modal">
-		<div class="message">
-			<img src="images/loading.gif"></img><i>Loading...</i>
-		</div>
-	</div>
-	<!-- Modal -->
-	<div id="help-modal" class="modal fade" role="dialog" tabindex="-1">
-		<div class="modal-dialog">
-
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Modal Header</h4>
-				</div>
-				<div class="modal-body">
-					<p>Some text in the modal.</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		<!-- Modal -->
+		<div id="help-modal" class="modal fade" role="dialog" tabindex="-1">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">How to play Rhythm-Hero</h4>
+					</div>
+					<div class="modal-body">
+						<p>Press the rhythm while the music is displayed.</p>
+						<p>Pay attention to the metronome, he is the one giving you the beat.</p>
+						<p>Don't hesitate to start the practice mode, to get the hang of it.</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
 				</div>
 			</div>
-
 		</div>
-	</div>
-	<div id="options-modal" class="modal fade" role="dialog" tabindex="-1">
-		<div class="modal-dialog">
-
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Options</h4>
-				</div>
-				<div class="modal-body">
-					<form id="unique">
-						<div class="checkbox">
-							<label> <input type="checkbox" data-bind="checked: beginnerMode"> Beginner Mode</label>
-						</div>
-						<div class="checkbox">
-							<label> <input type="checkbox" data-bind="checked: withLife"> With Life</label>
-						</div>
-						<fieldset class="form-group">
-							<label for="difficulty-select">Difficulty</label>
+		<div id="options-modal" class="modal fade" role="dialog" tabindex="-1">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Options</h4>
+					</div>
+					<div class="modal-body">
+						<form id="unique">
+							<div class="checkbox">
+								<label> <input type="checkbox" data-bind="checked: beginnerMode"> Beginner Mode</label>
+							</div>
+							<div class="checkbox">
+								<label> <input type="checkbox" data-bind="checked: withLife"> With Life</label>
+							</div>
+							<fieldset class="form-group">
+								<label for="difficulty-select">Difficulty</label>
 							<select class="form-control" id="difficulty-select" data-bind="options: difficultyValues, value: difficulty"></select>
 						</fieldset>
 						<fieldset class="form-group">
 							<label for="timesignatures-select">Time Signatures</label>
-							<select multiple="multiple" class="form-control" id="timesignatures-select" data-bind="options: timeSignaturesValues, selectedOptions: timeSignatures"></select>
-						</fieldset>
-						<fieldset class="form-group">
-							<label for="tempi-select">Tempi</label>
-							<select multiple="multiple" class="form-control" id="tempi-select" data-bind="options: tempiValues, selectedOptions: tempi"></select>
-						</fieldset>
-						<label for="scrolling-direction">Scrolling Direction</label>
-						<div class="radio">
-							<label> <input type="radio" name="scrolling-direction" value="horizontal" data-bind="checked: scrollingDirection"> Horizontal
-							</label>
-						</div>
-						<div class="radio">
-							<label> <input type="radio" name="scrolling-direction" value="vertical" data-bind="checked: scrollingDirection"> Vertical
-							</label>
-						</div>
-						<label for="scrolling-mode">Scrolling Mode</label>
-						<div class="radio">
-							<label> <input type="radio" name="scrolling-mode" value="continuous" data-bind="checked: scrollingMode"> Continuous
-							</label>
-						</div>
-						<div class="radio">
-							<label> <input type="radio" name="scrolling-mode" value="perMeasure" data-bind="checked: scrollingMode"> Per Measure
-							</label>
-						</div>
-					</form>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
+						<select multiple="multiple" class="form-control" id="timesignatures-select" data-bind="options: timeSignaturesValues, selectedOptions: timeSignatures"></select>
+					</fieldset>
+					<fieldset class="form-group">
+						<label for="tempi-select">Tempi</label>
+					<select multiple="multiple" class="form-control" id="tempi-select" data-bind="options: tempiValues, selectedOptions: tempi"></select>
+				</fieldset>
+				<label for="scrolling-direction">Scrolling Direction</label>
+				<div class="radio">
+					<label> <input type="radio" name="scrolling-direction" value="horizontal" data-bind="checked: scrollingDirection"> Horizontal
+				</label>
 			</div>
-
+			<div class="radio">
+				<label> <input type="radio" name="scrolling-direction" value="vertical" data-bind="checked: scrollingDirection"> Vertical
+			</label>
 		</div>
+		<label for="scrolling-mode">Scrolling Mode</label>
+		<div class="radio">
+			<label> <input type="radio" name="scrolling-mode" value="continuous" data-bind="checked: scrollingMode"> Continuous
+		</label>
 	</div>
-
+	<div class="radio">
+		<label> <input type="radio" name="scrolling-mode" value="perMeasure" data-bind="checked: scrollingMode"> Per Measure
+	</label>
+</div>
+</form>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+</div>
+</div>
+</div>
+</div>
 </body>
 <!-- 	Main Application Script -->
 <script src="script.js"></script>
 <script src="bootstrap.min.js"></script>
+<script src="bootbox.min.js"></script>
 <script src="version.js"></script>
 </html>

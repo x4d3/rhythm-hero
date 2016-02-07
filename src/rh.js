@@ -195,7 +195,7 @@ if (typeof localStorage === 'undefined') {
 		if(RH.VERSION !== undefined){
 			return RH.VERSION.version;
 		}else{
-			return "Dev Mode";
+			return "DEV";
 		}
 	};
 

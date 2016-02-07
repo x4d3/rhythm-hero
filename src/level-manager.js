@@ -13,7 +13,6 @@ RH.LevelManager = (function() {
 		this.levels = [];
 	};
 
-
 	LevelManager.prototype = {
 		getLevel: function(index) {
 			if (index < this.levels.length) {

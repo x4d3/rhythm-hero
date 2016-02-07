@@ -62,13 +62,12 @@ RH.Application = (function() {
 				app.screen = new Game(level.measures, level.description, app.canvas, true, endLevelCallback);
 			};
 			endLevelCallback = function(game) {
+				var bestScore = null;
 				if (!game.scoreCalculator.hasLost()) {
-					if (currentLevel > Parameters.model.maxLevelObtained()) {
-						Parameters.model.maxLevelObtained(currentLevel);
-					}
+					bestScore = RH.Parameters.saveScore(currentLevel, game.scoreCalculator.totalScore);
 					currentLevel++;
 				}
-				app.screen = new EndGameScreen(app.canvas, game, nextLevelCallback);
+				app.screen = new EndGameScreen(app.canvas, game, bestScore, nextLevelCallback);
 
 			};
 			nextLevelCallback();
@@ -112,13 +111,20 @@ $(document).ready(function() {
 	if ("true" === getParameterByName("debug")) {
 		RH.debug();
 	}
-
 	var application = new RH.Application($("canvas.application")[0]);
 
 	var difficultyValues = RH.createSuiteArray(1, RH.RhythmPatterns.MAX_DIFFICULTY + 1);
 	var timeSignaturesValues = Object.keys(RH.TS).map(function(key) {
 		return RH.TS[key].toString();
 	});
+	//If the version changes, we reset the scores
+	var previousVersion = localStorage.getItem("RH.version");
+	var version = RH.getVersion();
+	if (previousVersion !== version && version != "DEV") {
+		localStorage.setItem("RH.version", version);
+		localStorage.setItem('RH.scores', []);
+	}
+
 	var model = {
 		version: ko.observable(RH.getVersion()),
 		beginnerMode: ko.observable(true, {
@@ -154,22 +160,58 @@ $(document).ready(function() {
 		scrollingMode: ko.observable("continuous", {
 			persist: 'RH.scrollingMode'
 		}),
-		maxLevelObtained: ko.observable(-1, {
-			persist: 'RH.maxLevelObtained'
-		}),
 		displayCanvas: ko.observable(false),
 		beginnerModeEnabled: ko.observable(true),
+		scores: ko.observable([], {
+			persist: 'RH.scores'
+		}),
+		resetScores: function() {
+			bootbox.confirm("Are you sure you want to reset all your scores ?", function(result) {
+				if (result) {
+					model.scores([]);
+				}
+			});
+		},
+		startPractice: function() {
+			application.quickGame();
+		},
+		startCampaign: function() {
+			application.campaign(model.scores().length);
+		},
+		startLevel: function(score) {
+			application.campaign(score.index);
+		}
 	};
-
+	model.scoresDisplay = ko.computed(function() {
+		return model.scores().map(function(score, index) {
+			return {
+				description: RH.LevelManager.getLevel(index).description,
+				score: RH.ScoreScreen.formatTotal(score),
+				index:index
+			};
+		});
+	});
 	ko.applyBindings(model);
 	RH.Parameters = {
 		model: model,
 		isBeginnerMode: function() {
 			return model.beginnerModeEnabled() && model.beginnerMode();
+		},
+		/**
+		 * save the score if it is the best
+		 * @return the current Best Score
+		 */
+		saveScore: function(index, score) {
+			var scores = model.scores();
+			var previousScore = scores[index];
+			if (previousScore !== undefined && previousScore > score) {
+				return previousScore;
+			} else {
+				scores[index] = score;
+				return score;
+			}
 		}
 	};
-
-
 
 	var onDown = function(event) {
 		application.onEvent(false, event);
@@ -180,14 +222,6 @@ $(document).ready(function() {
 	$("body").on('touchstart mousedown', onDown);
 	$("body").on('touchend mouseup touchcancel', onUp);
 	$("body").keydown(onDown).keyup(onUp);
-
-	$('.quick-game').on('click touchstart', function(e) {
-		application.quickGame();
-	});
-
-	$('.campaign').on('click touchstart', function(e) {
-		application.campaign(RH.Parameters.model.maxLevelObtained() + 1);
-	});
 
 	$(window).blur(function() {
 		// If the application loose the focuse, we consider that the user is not pressing any key

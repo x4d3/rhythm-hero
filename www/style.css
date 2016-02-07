@@ -106,7 +106,20 @@ body.loading .loading-modal {
 	display: block;
 }
 
+.table.scores tbody>tr>td{
+    vertical-align: middle; 
+}
+
+td.score{
+	font-family: "scoreboard";
+	font-size: 2em;
+}
+
 @font-face {
     font-family: 'scoreboard';
     src: url('scoreboard.ttf');
+}
+@font-face {
+    font-family: 'arcadeclassic';
+    src: url('dpcomic.ttf');
 }

@@ -57,14 +57,14 @@ module.exports = function(grunt) {
 		watch: {
 			scripts: {
 				files: ['<%= jshint.files %>'],
-				tasks: ['jshint', 'concat', 'qunit'],
+				tasks: ['test'],
 				options: {
 					livereload: true
 				}
 			},
 			html: {
 				files: ['www/*'],
-				tasks: ['clean', 'copy', 'jshint', 'concat', 'qunit'],
+				tasks: ['test'],
 				options: {
 					livereload: true
 				}
@@ -127,7 +127,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-version');
 	grunt.loadNpmTasks('grunt-appcache');
 	grunt.loadNpmTasks('grunt-git-describe');
-	grunt.event.once('git-describe', function(rev) {
+	grunt.event.on('git-describe', function(rev) {
 		var revision = {
 			"tag: ": rev.tag,
 			"since: ": rev.since,

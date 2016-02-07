@@ -20,7 +20,7 @@ RH.Screen = (function() {
 
 	var SCORE_POSITION = {
 		x: MEASURE_WIDTH - 25,
-		y: 40
+		y: 35
 	};
 	var MULTIPLIER_POSITION = {
 		x: MEASURE_WIDTH + 100,
@@ -108,14 +108,14 @@ RH.Screen = (function() {
 			});
 
 			if (RH.Parameters.isBeginnerMode()) {
-				this.displayEvents(canvas, measureInfo, 0.5);
+				this.displayEvents(canvas, EVENT_Y, measureInfo, 0.5);
 				[-1, 0, 1, 2].forEach(function(i) {
 					var index = measureInfo.index + i;
 					if (index < 0 || index >= screen.measures.length) {
 						return;
 					}
 					var startStave = i * MEASURE_WIDTH - shift;
-					screen.displayDebug(canvas, (i + 0.5 - shift) * MEASURE_WIDTH, index);
+					screen.displayDebug(canvas, DEBUG_Y, (i + 0.5 - shift) * MEASURE_WIDTH, index);
 				});
 			}
 			this.displayMetronome(canvas, measureInfo);
@@ -136,7 +136,7 @@ RH.Screen = (function() {
 			//display title
 			if (measureInfo.index < 1) {
 				context.save();
-				context.font = '26px Open Sans';
+				context.font = '24px arcadeclassic';
 				context.fillStyle = "#696969";
 				//context.textAlign = "center";
 				//context.textBaseline = "middle";
@@ -158,8 +158,8 @@ RH.Screen = (function() {
 		},
 		drawOnExternalCanvas: function(canvas, measureInfo) {
 			this.displayStave(canvas, 0, 0, measureInfo.index, true);
-			this.displayEvents(canvas, measureInfo, 1);
-			this.displayDebug(canvas, 0, measureInfo.index);
+			this.displayEvents(canvas, 150, measureInfo, 1);
+			this.displayDebug(canvas, 120, 0, measureInfo.index);
 			var score = this.scoreCalculator.measuresScore[measureInfo.index];
 			if (score !== undefined) {
 				var context = canvas.getContext("2d");
@@ -169,7 +169,7 @@ RH.Screen = (function() {
 			}
 
 		},
-		displayEvents: function(canvas, measureInfo, percentage) {
+		displayEvents: function(canvas, eventY, measureInfo, percentage) {
 			var context = canvas.getContext("2d");
 
 			var measure = measureInfo.measure;
@@ -181,8 +181,8 @@ RH.Screen = (function() {
 			context.beginPath();
 			context.strokeStyle = '#003300';
 			context.lineWidth = 1;
-			var Y_IS_ON = EVENT_Y - SIGNAL_HEIGHT;
-			var Y_IS_OFF = EVENT_Y;
+			var Y_IS_ON = eventY - SIGNAL_HEIGHT;
+			var Y_IS_OFF = eventY;
 			var y = canvas.height / 8;
 			ups.forEach(function(element) {
 				y = 0.5 + (element.isPressed ? Y_IS_ON : Y_IS_OFF);
@@ -194,7 +194,7 @@ RH.Screen = (function() {
 			context.stroke();
 			context.restore();
 		},
-		displayDebug: function(canvas, startStave, index) {
+		displayDebug: function(canvas, debugY, startStave, index) {
 			var screen = this;
 			var context = canvas.getContext("2d");
 			var currentMeasure = screen.measures[index];
@@ -206,8 +206,8 @@ RH.Screen = (function() {
 			var x = startStave;
 			var beatLength = MEASURE_WIDTH / currentMeasure.getBeatPerBar();
 			var epsilon = RH.REST_PERCENTAGE * beatLength;
-			var Y_IS_ON = DEBUG_Y - SIGNAL_HEIGHT;
-			var Y_IS_OFF = DEBUG_Y;
+			var Y_IS_ON = debugY - SIGNAL_HEIGHT;
+			var Y_IS_OFF = debugY;
 			var y = currentMeasure.firstNotePressed ? Y_IS_ON : Y_IS_OFF;
 			currentMeasure.notes.forEach(function(note, j) {
 				context.moveTo(x, y);

@@ -155,7 +155,7 @@ RH.ScoreScreen = (function() {
 			context.restore();
 
 			context.save();
-			context.font = '32px Open Sans';
+			context.font = '32px arcadeclassic';
 			context.fillStyle = '#696969';
 			context.fillText("X" + multiplier, this.multiplierPosition.x, this.multiplierPosition.y);
 			context.restore();
