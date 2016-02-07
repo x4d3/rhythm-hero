@@ -210,6 +210,7 @@ $(document).ready(function() {
 				return previousScore;
 			} else {
 				scores[index] = score;
+				model.scores(scores);
 				return score;
 			}
 		}

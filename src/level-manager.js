@@ -19,9 +19,8 @@ RH.LevelManager = (function() {
 				return this.levels[index];
 			} else {
 				//TODO: generate level based on index
-				var options = new GameOptions();
-				var notes = RhythmPatterns.generateNotes(0, options.maxDifficulty, 50);
-				var measures = RhythmPatterns.generateMeasures(options, notes);
+				var notes = RhythmPatterns.generateNotes(5, 15, 50);
+				var measures = RhythmPatterns.generateMeasures([120],[RH.TS.FOUR_FOUR], notes);
 				return new Level("Level " + (index + 1), measures);
 			}
 		},
@@ -47,11 +46,23 @@ RH.LevelManager = (function() {
 		}
 		return array.join(",");
 	};
-
+	var bolero = "";
 	var LEVELS = [
-		["Whole, minims and quaver", ["4/4"], [60], "4, 2,2, 4, 2,2, 1,1,1,1, 2,1,1, 1,2,1, 1,1,2, 2,4,2"],
-		["Let's rest", ["4/4"], [60], "1,1r,1,1r, 1,1,2, 1r,2,1r, 1,1,2r"],
-		["Mars Attack!", ["4/4"], [90], repeat(repeat("1/2,1/2,1/4,1/4,1/4,1/4r", 3) + ", 1/2,1/2,1", 2)]
+		["Whole, minims and quaver", ["4/4"],
+			[60], "4, 2,2, 4, 2,2, 1,1,1,1, 2,1,1, 1,2,1, 1,1,2, 2,4,2"
+		],
+		["Let's rest", ["4/4"],
+			[60], "1,1r,1,1r, 1,1,2, 1r,2,1r, 1,1,2r"
+		],
+
+
+		["Bolero", ["3/4"],
+			[72], repeat("1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/2,1/2, 1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/6,1/6,1/6,1/6,1/6,1/6", 4)
+		],
+
+		["Mars Attack!", ["4/4"],
+			[90], repeat(repeat("1/2,1/2,1/4,1/4,1/4,1/4r", 3) + ", 1/2,1/2,1", 2)
+		]
 
 	];
 

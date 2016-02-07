@@ -2,57 +2,57 @@ RH.VexUtils = (function() {
 	'use strict';
 	var VexUtils = {};
 	var VF = Vex.Flow;
-	var DIATONIC_ACCIDENTALS = [ "unison", "m2", "M2", "m3", "M3", "p4", "dim5", "p5", "m6", "M6", "b7", "M7" ];
+	var DIATONIC_ACCIDENTALS = ["unison", "m2", "M2", "m3", "M3", "p4", "dim5", "p5", "m6", "M6", "b7", "M7"];
 
 	var ALL_NOTES = {
-		'C' : {
-			root_index : 0,
-			int_val : 0
+		'C': {
+			root_index: 0,
+			int_val: 0
 		},
-		'Db' : {
-			root_index : 1,
-			int_val : 1
+		'Db': {
+			root_index: 1,
+			int_val: 1
 		},
-		'D' : {
-			root_index : 1,
-			int_val : 2
+		'D': {
+			root_index: 1,
+			int_val: 2
 		},
 
-		'Eb' : {
-			root_index : 2,
-			int_val : 3
+		'Eb': {
+			root_index: 2,
+			int_val: 3
 		},
-		'E' : {
-			root_index : 2,
-			int_val : 4
+		'E': {
+			root_index: 2,
+			int_val: 4
 		},
-		'F' : {
-			root_index : 3,
-			int_val : 5
+		'F': {
+			root_index: 3,
+			int_val: 5
 		},
-		'F#' : {
-			root_index : 3,
-			int_val : 6
+		'F#': {
+			root_index: 3,
+			int_val: 6
 		},
-		'G' : {
-			root_index : 4,
-			int_val : 7
+		'G': {
+			root_index: 4,
+			int_val: 7
 		},
-		'Ab' : {
-			root_index : 5,
-			int_val : 8
+		'Ab': {
+			root_index: 5,
+			int_val: 8
 		},
-		'A' : {
-			root_index : 5,
-			int_val : 9
+		'A': {
+			root_index: 5,
+			int_val: 9
 		},
-		'Bb' : {
-			root_index : 6,
-			int_val : 10
+		'Bb': {
+			root_index: 6,
+			int_val: 10
 		},
-		'B' : {
-			root_index : 6,
-			int_val : 11
+		'B': {
+			root_index: 6,
+			int_val: 11
 		},
 	};
 
@@ -83,8 +83,8 @@ RH.VexUtils = (function() {
 
 	VexUtils.newNote = function(key, duration) {
 		return new VF.StaveNote({
-			keys : [ key ],
-			duration : duration.toString()
+			keys: [key],
+			duration: duration.toString()
 		});
 	};
 	// TODO: please re implement correctly.
@@ -158,11 +158,11 @@ RH.VexUtils = (function() {
 						var noteDuration = new Fraction(4 * duration.denominator, x);
 						Vex.Flow.sanitizeDuration(fractionToString(noteDuration));
 						notesData.push({
-							keys : [ key ],
-							duration : noteDuration,
-							dots : 0,
-							tupletFactor : tupletFactor,
-							type : isRest ? "r" : ""
+							keys: [key],
+							duration: noteDuration,
+							dots: 0,
+							tupletFactor: tupletFactor,
+							type: isRest ? "r" : ""
 						});
 					}
 				}
@@ -172,24 +172,25 @@ RH.VexUtils = (function() {
 		var vxNotes = [];
 		var ties = [];
 		var tuplets = [];
+		var beams = [];
 		var currentTuplet = [];
 		allNotes.forEach(function(notesData) {
 			notesData.forEach(function(noteData, j) {
 				var vxNote = new VF.StaveNote({
-					keys : noteData.keys,
-					duration : fractionToString(noteData.duration),
-					dots : noteData.dots,
-					type : noteData.type
+					keys: noteData.keys,
+					duration: fractionToString(noteData.duration),
+					dots: noteData.dots,
+					type: noteData.type
 				});
 				for (var i = 0; i < noteData.dots; i++) {
 					vxNote.addDotToAll();
 				}
 				if (j > 0) {
 					var tie = new Vex.Flow.StaveTie({
-						first_note : last(vxNotes),
-						last_note : vxNote,
-						first_indices : [ 0 ],
-						last_indices : [ 0 ]
+						first_note: last(vxNotes),
+						last_note: vxNote,
+						first_indices: [0],
+						last_indices: [0]
 					});
 					ties.push(tie);
 				}
@@ -205,11 +206,15 @@ RH.VexUtils = (function() {
 					var d = wholeDuration.denominator;
 					if ((n == 1 && isPowerTwo(d)) || (d == 1 && isPowerTwo(1))) {
 						var tupletOption = {
-							num_notes : noteData.tupletFactor,
-							beats_occupied : wholeDuration.value()
+							num_notes: noteData.tupletFactor,
+							beats_occupied: wholeDuration.value()
 						};
-						var tuplet = new VF.Tuplet(vxNotes.slice(-currentTuplet.length), tupletOption);
+						var tupletNotes = vxNotes.slice(-currentTuplet.length);
+						var tuplet = new VF.Tuplet(tupletNotes, tupletOption);
 						tuplets.push(tuplet);
+						// if (d == 1) {
+						// 	beams.push(new Vex.Flow.Beam(tupletNotes));
+						// }
 						currentTuplet = [];
 					}
 				}
@@ -217,14 +222,14 @@ RH.VexUtils = (function() {
 			});
 		});
 		var beamsOption = {
-			beam_rests : true,
-			beam_middle_only : true
+			beam_rests: true,
+			beam_middle_only: true
 		};
 		return {
-			notes : vxNotes,
-			tuplets : tuplets,
-			ties : ties,
-			beams : VF.Beam.generateBeams(vxNotes, beamsOption)
+			notes: vxNotes,
+			tuplets: tuplets,
+			ties: ties,
+			beams: VF.Beam.generateBeams(vxNotes, beamsOption)
 		};
 
 	};
@@ -240,8 +245,8 @@ RH.VexUtils = (function() {
 		var tempCanvaJ = $('<canvas>');
 
 		tempCanvaJ.prop({
-			width : measureWidth * measures.length,
-			height : measureHeight
+			width: measureWidth * measures.length,
+			height: measureHeight
 		});
 		var tempCanvas = tempCanvaJ[0];
 		var context = tempCanvas.getContext('2d');
@@ -258,7 +263,7 @@ RH.VexUtils = (function() {
 					context.fillText(j + 1, j * measureWidth / beatPerBar, 60);
 				}
 			}
-			if(measure.isEmpty){
+			if (measure.isEmpty) {
 				return;
 			}
 			var timeSignature = measure.timeSignature;
@@ -273,8 +278,8 @@ RH.VexUtils = (function() {
 			if (currentTempo === null || currentTempo != tempo) {
 				currentTempo = tempo;
 				stave.setTempo({
-					duration : "q",
-					bpm : tempo
+					duration: "q",
+					bpm: tempo
 				}, 0);
 			}
 
@@ -282,29 +287,30 @@ RH.VexUtils = (function() {
 			var formatter = new VF.Formatter();
 			var result = generateNotesTupletTiesAndBeams(measure.notes);
 			var voice = new VF.Voice({
-				num_beats : timeSignature.numerator,
-				beat_value : timeSignature.denominator,
-				resolution : VF.RESOLUTION
+				num_beats: timeSignature.numerator,
+				beat_value: timeSignature.denominator,
+				resolution: VF.RESOLUTION
 			});
 			voice.setStrict(false);
 			voice.addTickables(result.notes);
-			formatter.joinVoices([ voice ]).formatToStave([ voice ], stave);
+			formatter.joinVoices([voice]).formatToStave([voice], stave);
 			voice.draw(context, stave);
 			if (measure.firstNotePressed) {
 				var tie = new Vex.Flow.StaveTie({
-					first_note : previousMeasureLastNote,
-					last_note : result.notes[0],
-					first_indices : [ 0 ],
-					last_indices : [ 0 ]
+					first_note: previousMeasureLastNote,
+					last_note: result.notes[0],
+					first_indices: [0],
+					last_indices: [0]
 				});
 				result.ties.push(tie);
 			}
 
-			result.beams.forEach(function(beam) {
-				beam.setContext(context).draw();
-			});
+
 			result.tuplets.forEach(function(tuplet) {
 				tuplet.setContext(context).draw();
+			});
+			result.beams.forEach(function(beam) {
+				beam.setContext(context).draw();
 			});
 			result.ties.forEach(function(tie) {
 				tie.setContext(context).draw();
