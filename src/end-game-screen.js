@@ -16,7 +16,7 @@ RH.EndGameScreen = (function() {
 		ctx.textBaseline = "middle";
 		var score = this.game.scoreCalculator.totalScore;
 		var w = this.canvas.width / 2;
-		var h = this.canvas.height / 2;
+		var h = this.canvas.height / 2 + 10;
 		var writeText = function(text) {
 			ctx.fillText(text, w, h);
 			h += 50;
@@ -24,13 +24,15 @@ RH.EndGameScreen = (function() {
 
 		if (this.game.scoreCalculator.hasLost()) {
 			writeText("Game Over");
+			h += 50;
 			writeText("Press a button to restart level");
 		} else {
 			writeText("Congratulation");
-			writeText("You scored " + ScoreScreen.formatTotal(this.game.scoreCalculator.totalScore) + " points");
+			var message = "You scored " + ScoreScreen.formatTotal(this.game.scoreCalculator.totalScore) + " points";
 			if (score === bestScore) {
-				writeText("This is a new record");
+				message += " This is a new record";
 			}	
+			writeText(message);
 			writeText("Press a button to go the next level");
 		}
 		ctx.restore();

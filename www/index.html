@@ -42,7 +42,7 @@
 			<div class="row">
 				<div class="col-lg-4"></div>
 				<div class="col-lg-4 text-center">
-					<button class="btn btn-default btn-block" data-bind="event: { click: startPractice, touchstart: startPractice }">Practice</button>
+					<button class="btn btn-default btn-block" data-bind="event: { click: startPractice, touchstart: startPractice}">Practice</button>
 					<button class="btn btn-default btn-block" data-bind="event: { click: startCampaign, touchstart: startCampaign}">Campaign</button>
 					<button class="btn btn-default btn-block" data-toggle="modal" data-target="#options-modal">Options</button>
 				</div>
@@ -53,8 +53,9 @@
 			</div>
 		</div>
 		<div class="application-container" data-bind="visible: displayCanvas">
-			<div class="rh-icon beginner-mode" data-bind="click: toggleBeginnerMode, css: { on: beginnerMode}, visible:beginnerModeEnabled" ></div>
-			<div class="rh-icon switch-sound" data-bind="click: toggleSoundsOn, css: { on: soundsOn}" ></div>
+			<div class="rh-icon beginner-mode" data-bind="event: { click: toggleBeginnerMode, touchstart: toggleBeginnerMode}, css: { on: beginnerMode}, visible:beginnerModeEnabled" ></div>
+			<div class="rh-icon switch-sound" data-bind="event: { click: toggleSoundsOn, touchstart: toggleSoundsOn}, css: { on: soundsOn}" ></div>
+			<div class="rh-icon close-app" data-bind="event: { click: close, touchstart: close}" ></div>
 			<canvas class="application" width=800 height=300></canvas>
 		</div>
 		<!-- 	Div used to display loading while the javascript is loading -->

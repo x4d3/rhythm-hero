@@ -38,9 +38,8 @@ RH.Application = (function() {
 			var timeSignatures = Parameters.model.timeSignatures().map(TimeSignature.parse);
 			var tempi = Parameters.model.tempi();
 			var maxDifficulty = Parameters.model.difficulty();
-			var options = new GameOptions(timeSignatures, tempi, maxDifficulty);
 			var notes = RhythmPatterns.generateNotes(0, maxDifficulty, 50);
-			var measures = RhythmPatterns.generateMeasures(options, notes);
+			var measures = RhythmPatterns.generateMeasures(tempi, timeSignatures, notes);
 			var endGameCallback = function(game) {
 				Parameters.model.displayCanvas(false);
 				$('.result').append(game.renderScore());
@@ -180,6 +179,9 @@ $(document).ready(function() {
 		},
 		startLevel: function(score) {
 			application.campaign(score.index);
+		},
+		close :function(){
+			application.stop();
 		}
 	};
 	model.scoresDisplay = ko.computed(function() {

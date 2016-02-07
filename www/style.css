@@ -32,6 +32,8 @@ canvas {
 	background-repeat: no-repeat;
 	background-size: 28px;
 	height: 32px;
+	width: 32px;
+	top: -42px;
 	position: absolute;
 	cursor: pointer;
 }
@@ -43,9 +45,8 @@ canvas {
 
 .rh-icon.switch-sound{
 	background-image: url("images/sound-off.png");
-	right: 0px;
-	top: -42px;
-	width: 32px;
+	right: 42px;
+
 }
 
 .rh-icon.switch-sound.on {
@@ -54,12 +55,15 @@ canvas {
 
 .rh-icon.beginner-mode{
 	background-image: url("images/beginner-off.png");
-	right: 42px;
-	top: -42px;
-	width: 32px;
+	right: 84px;
 }
 .rh-icon.beginner-mode.on {
 	background-image: url("images/beginner-on.png");
+}
+
+.rh-icon.close-app {
+	background-image: url("images/close.png");
+	right: 0px;
 }
 
 /* Start by setting display:none to make this hidden.

@@ -26,9 +26,8 @@ test("Game.generateBars", function() {
 
 	var testMeasures = function(patternsS, awaitedMeasures) {
 		var patterns = patternsS.map(RhythmPatterns.getPattern);
-		
-		var measures = RhythmPatterns.generateMeasures(options, getPatternsNotes(patterns));
-		deepEqual(measures, [Game.EMPTY_MEASURE].concat(awaitedMeasures).concat([Game.EMPTY_MEASURE]), "measures" + measures + ", " + awaitedMeasures);
+		var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, getPatternsNotes(patterns)).slice(1, -1);
+		deepEqual(measures, awaitedMeasures, "Got    : " + measures + "\nAwaited: " + awaitedMeasures);
 	};
 	testMeasures([ 'crotchet', 'whole', 'minim', 'crotchet' ],
 		[ new Measure(tempo, timeSignature, [ newNote(1, 1), newNote(3, 1) ], false, true), new Measure(tempo, timeSignature, [ newNote(1, 1), newNote(2, 1), newNote(1, 1) ], true, false) ]);

@@ -28,11 +28,10 @@ RH.LevelManager = (function() {
 		registerLevels: function(levels) {
 			this.levels = levels.map(function(level, index) {
 				var description = level[0];
-				var timeSignature = RH.TimeSignature.parse(level[1]);
-				var tempo = level[2];
+				var timeSignatures = level[1].map(RH.TimeSignature.parse);
+				var tempi = level[2];
 				var notes = Note.parseNotes(level[3]);
-				var options = new GameOptions([timeSignature], [tempo], 1);
-				var measures = RhythmPatterns.generateMeasures(options, notes);
+				var measures = RhythmPatterns.generateMeasures(tempi, timeSignatures, notes);
 				return new Level("Level " + (index + 1) + ": " + description, measures);
 			});
 		}
@@ -50,9 +49,9 @@ RH.LevelManager = (function() {
 	};
 
 	var LEVELS = [
-		["Whole, minims and quaver", "4/4", 60, "4, 2,2, 4, 2,2, 1,1,1,1, 2,1,1, 1,2,1, 1,1,2, 2,4,2"],
-		["Let's rest", "4/4", 60, "1,1r,1,1r, 1,1,2, 1r,2,1r, 1,1,2r"],
-		["Mars Attack!", "4/4", 90, repeat(repeat("1/2,1/2,1/4,1/4,1/4,1/4r", 3) + ", 1/2,1/2,1", 2)]
+		["Whole, minims and quaver", ["4/4"], [60], "4, 2,2, 4, 2,2, 1,1,1,1, 2,1,1, 1,2,1, 1,1,2, 2,4,2"],
+		["Let's rest", ["4/4"], [60], "1,1r,1,1r, 1,1,2, 1r,2,1r, 1,1,2r"],
+		["Mars Attack!", ["4/4"], [90], repeat(repeat("1/2,1/2,1/4,1/4,1/4,1/4r", 3) + ", 1/2,1/2,1", 2)]
 
 	];
 

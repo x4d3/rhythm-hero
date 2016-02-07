@@ -165,42 +165,48 @@ RH.RhythmPatterns = (function() {
 		return pattern;
 	};
 	// static method
-	RhythmPatterns.generateMeasures = function(options, notes) {
+
+	RhythmPatterns.generateMeasures = function(tempi, timeSignatures, notes) {
 		//The two first measure are empty
-		var tempo = options.tempi[0];
-		var timeSignature = options.timeSignatures[0];
-		var beatPerBar = timeSignature.getBeatPerBar();
-		var beatPerBarF = new Fraction(beatPerBar, 1);
+		var tempo = tempi[0];
+		var timeSignature = timeSignatures[0];
+		var beatPerBarF = new Fraction(timeSignature.getBeatPerBar(), 1);
 
 
 		var result = [new RH.Measure(tempo, timeSignature, [], false, false)];
-		var beats = Fraction.ZERO;
 
-		var measureNotes = [];
+		var measure = {
+			beats: Fraction.ZERO,
+			notes: []
+		};
+
 		var firstNotePressed = false;
 		notes.forEach(function(note) {
-			var sum = note.duration.add(beats);
+			var sum = note.duration.add(measure.beats);
 			var compare = sum.compareTo(beatPerBarF);
-			if (compare > 0) {
-				var durationLeft = beatPerBarF.subtract(beats);
+			while (compare >= 0) {
+				var durationLeft = beatPerBarF.subtract(measure.beats);
 				var split = note.split(durationLeft);
-				measureNotes.push(split[0]);
-				result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, !note.isRest));
-				firstNotePressed = !note.isRest;
-				var newDuration = note.duration.subtract(durationLeft);
-				measureNotes = [split[1]];
-				beats = split[1].duration;
-			} else {
-				measureNotes.push(note);
-				if (compare === 0) {
-					beats = Fraction.ZERO;
-					result.push(new Measure(tempo, timeSignature, measureNotes, firstNotePressed, false));
-					measureNotes = [];
-					firstNotePressed = false;
-				} else {
-					beats = sum;
-				}
+				measure.notes.push(split[0]);
+				var lastNotPressed = !note.isRest && compare !== 0;
+				result.push(new Measure(tempo, timeSignature, measure.notes, firstNotePressed, lastNotPressed));
+				tempo = RH.getArrayElement(tempi, result.length);
+				timeSignature = RH.getArrayElement(timeSignatures, result.length);
+				beatPerBarF = new Fraction(timeSignature.getBeatPerBar(), 1);
+				measure = {
+					beats: Fraction.ZERO,
+					notes: []
+				};
+				firstNotePressed = lastNotPressed;
+				note = split[1];
+				sum = measure.beats.add(note.duration);
+				compare = sum.compareTo(beatPerBarF);
 			}
+			measure.beats = sum;
+			if (!note.duration.equals(Fraction.ZERO)) {
+				measure.notes.push(note);
+			}
+
 		});
 		// we don't fill the last bar
 		result.push(new RH.Measure(tempo, timeSignature, [], false, false));
