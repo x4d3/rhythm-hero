@@ -199,7 +199,7 @@ RH.VexUtils = (function() {
 				if (noteData.tupletFactor !== undefined) {
 					currentTuplet.push(noteData);
 					var wholeDuration = currentTuplet.reduce(function(sum, note) {
-						return sum.add(note.duration);
+						return sum.add(note.duration.inverse());
 					}, Fraction.ZERO);
 					wholeDuration = wholeDuration.divide(new Fraction(noteData.tupletFactor, 1));
 					var n = wholeDuration.numerator;
@@ -212,9 +212,6 @@ RH.VexUtils = (function() {
 						var tupletNotes = vxNotes.slice(-currentTuplet.length);
 						var tuplet = new VF.Tuplet(tupletNotes, tupletOption);
 						tuplets.push(tuplet);
-						// if (d == 1) {
-						// 	beams.push(new Vex.Flow.Beam(tupletNotes));
-						// }
 						currentTuplet = [];
 					}
 				}
@@ -304,13 +301,11 @@ RH.VexUtils = (function() {
 				});
 				result.ties.push(tie);
 			}
-
-
-			result.tuplets.forEach(function(tuplet) {
-				tuplet.setContext(context).draw();
-			});
 			result.beams.forEach(function(beam) {
 				beam.setContext(context).draw();
+			});
+			result.tuplets.forEach(function(tuplet) {
+				tuplet.setContext(context).draw();
 			});
 			result.ties.forEach(function(tie) {
 				tie.setContext(context).draw();

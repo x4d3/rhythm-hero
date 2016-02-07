@@ -56,7 +56,7 @@ $(document).ready(function() {
 		Vex.Flow.Formatter.FormatAndDraw(ctx, stave, notes);
 	});
 
-	testCanvas('first', function(canvas) {
+	testCanvas('Tuplets and Beams', function(canvas) {
 		var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
 		var context = renderer.getContext();
 		var stave = new Vex.Flow.Stave(10, 0, 500);

@@ -125,6 +125,8 @@ RH.RhythmPatterns = (function() {
 	addPattern(null, 8, 5, "1/3,2/3");
 
 
+	addPattern(null, 8, 5, "1/6,1/6,1/6");
+
 	addPattern("quintuplet quaver", 9, 20, "1/5,1/5,1/5,1/5,1/5");
 	addPattern("quintuplet crotchet", 10, 1, "2/5,2/5,2/5,2/5,2/5");
 

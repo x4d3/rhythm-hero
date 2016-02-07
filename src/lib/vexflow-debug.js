@@ -6528,6 +6528,10 @@ Vex.Flow.Beam = (function() {
       }
 
       var tuplet = firstNote.tuplet;
+      //Workaround
+      if(tuplet === null){
+        return;
+      }
 
       if (firstNote.beam) tuplet.setBracketed(false);
       if (firstNote.stem_direction == Stem.DOWN) {
