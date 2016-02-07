@@ -151,7 +151,7 @@ RH.VexUtils = (function() {
 
 			for (var i = 0; i < binary.length; i++) {
 				if (binary[i]) {
-					if (i > 0 && binary[i - 1]) {
+					if (!isRest && i > 0 && binary[i - 1]) {
 						last(notesData).dots++;
 					} else {
 						var x = 1 << (binary.length - i - 1);
@@ -162,7 +162,7 @@ RH.VexUtils = (function() {
 							duration: noteDuration,
 							dots: 0,
 							tupletFactor: tupletFactor,
-							type: isRest ? "r" : ""
+							isRest: isRest ? "r" : ""
 						});
 					}
 				}
@@ -180,12 +180,12 @@ RH.VexUtils = (function() {
 					keys: noteData.keys,
 					duration: fractionToString(noteData.duration),
 					dots: noteData.dots,
-					type: noteData.type
+					type: noteData.isRest ? "r" : ""
 				});
 				for (var i = 0; i < noteData.dots; i++) {
 					vxNote.addDotToAll();
 				}
-				if (j > 0) {
+				if (j > 0 && !noteData.isRest) {
 					var tie = new Vex.Flow.StaveTie({
 						first_note: last(vxNotes),
 						last_note: vxNote,

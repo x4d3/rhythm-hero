@@ -66,7 +66,7 @@ $(document)
 			});
 			test('Defined Patterns 2', function(assert) {
 				var notes = Note.parseNotes(
-					"1/3,1/3,1/3,2/3,2/3,2/3," + 
+					"1/3,1/3,1/3,2/3,2/3,2/3," +
 					"1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/2,1/2, 1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/6,1/6,1/6,1/6,1/6,1/6");
 				var measures = RhythmPatterns.generateMeasures(options.tempi, [RH.TS.THREE_FOUR], notes);
 
@@ -82,6 +82,16 @@ $(document)
 				displayCanvases(assert.test.testName, canvasesData);
 				ok(true);
 			});
+
+			test('All Levels', function(assert) {
+				RH.LevelManager.levels.forEach(function(level) {
+					var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, level.measures);
+					displayCanvases(level.description, canvasesData);
+				});
+				ok(true);
+			});
+
+
 			test(
 				"Score Computation - Display",
 				function(assert) {
@@ -89,7 +99,7 @@ $(document)
 					var context = canvas.getContext("2d");
 					var NOTES_INPUT = "1/1,1/2,1/1r,1/1,1/2,1/1,1/1r,1/1,2/1,1/1r,1/1,1/1r,1/1r,1/1r,1/1r,1/2,1/1,1/1,1/1,1/1,1/2,1/1r,1/1,1/1r,2/1,1/1,1/1,1/1r,1/1r,1/1,1/1r,1/1,1/1r,1/2,1/2,1/1,1/2,1/1r,1/2,1/1r,1/1,1/2,1/1r,1/1r,1/1,1/1r,1/2,1/1,1/1,1/1";
 					var notes = Note.parseNotes(NOTES_INPUT);
-					var measures = RhythmPatterns.generateMeasures([120],[RH.TS.FOUR_FOUR], notes);
+					var measures = RhythmPatterns.generateMeasures([120], [RH.TS.FOUR_FOUR], notes);
 					var eventManager = EventManager
 						.fromJson('{"keyPressed":[null,false],"keyChanged":[4031,4949,5100,5765,6474,7350,7509,8059,8175,10189,11869,12702,13975,15137,19082,19407,19579,20316,20473,21327,21490,22326,22481,23182,23343,23898,24758,26058,27051,28590,28815,29700,29832,31095,33061,34014,35001,35983,37174,37331,37500,37790,38031,38564,39078,39545,40401,40780,40915,41249,41932,42944,43107,43672],"isPressed":false}');
 

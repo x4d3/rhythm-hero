@@ -20,7 +20,7 @@ RH.LevelManager = (function() {
 			} else {
 				//TODO: generate level based on index
 				var notes = RhythmPatterns.generateNotes(5, 15, 50);
-				var measures = RhythmPatterns.generateMeasures([120],[RH.TS.FOUR_FOUR], notes);
+				var measures = RhythmPatterns.generateMeasures([120], [RH.TS.FOUR_FOUR], notes);
 				return new Level("Level " + (index + 1), measures);
 			}
 		},
@@ -55,14 +55,30 @@ RH.LevelManager = (function() {
 			[60], "1,1r,1,1r, 1,1,2, 1r,2,1r, 1,1,2r"
 		],
 
-
-		["Bolero", ["3/4"],
-			[72], repeat("1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/2,1/2, 1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/6,1/6,1/6,1/6,1/6,1/6", 4)
+		["Wiganor", ["4/4"],
+			[60],
+			[
+				"13/3, 1/3,1/3, 1/3 ,1/3 ,1/3 ,5/6,1,9/2",
+				repeat("1/3", 12),
+				"1/2,1/2,1/2r,1/2,1/2r,1/2,1/2r,1/2",
+				"1r,1/2,3/2r,1/2,1/2r"
+			].join(",")
 		],
+
 
 		["Mars Attack!", ["4/4"],
 			[90], repeat(repeat("1/2,1/2,1/4,1/4,1/4,1/4r", 3) + ", 1/2,1/2,1", 2)
+		],
+
+		["Bolero", ["3/4"],
+			[72],
+			[repeat("1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/2,1/2, 1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/6,1/6,1/6,1/6,1/6,1/6", 4),
+				"6/4,1/4,1/4,1/4,1/4,1/4,1/4,  1/2,1/4,1/4, 6/4,1/4,1/4,  1/4,1/4,1/4,1/4,9/4, 1/4,1/4,1/4 ,1/4,1/4,1/4,1/4,  9/4",
+				"1/4,1/4,1/4 , 1/4,1/4,1/4,1/4 , 1/4,1/4,1 ,1/4,1/4, 1/2,1/2,1,5"
+			].join(",")
 		]
+
+
 
 	];
 
