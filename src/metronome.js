@@ -1,17 +1,18 @@
 RH.Metronome = (function() {
 	'use strict';
 	var SoundsManager = RH.SoundsManager;
+
 	function Metronome(width, height) {
 		this.width = width;
 		this.height = height;
 		this.currentBeat = -1;
 	}
 
-	var DRAWERS = {};
+	var POINTS = {};
 
 	var drawDot = function(context, x, y) {
 		context.beginPath();
-		context.arc(x, y, 3, 0, 2 * Math.PI, false);
+		context.arc(x, y, 5, 0, 2 * Math.PI, false);
 		context.fillStyle = 'green';
 		context.fill();
 		context.lineWidth = 1;
@@ -24,59 +25,12 @@ RH.Metronome = (function() {
 		return Math.pow(rest, 5);
 	};
 
-	DRAWERS[RH.TS.THREE_FOUR.toString()] = function(metronome, context, beatNumber, progression) {
-
-		var x;
-		var y;
-		switch (beatNumber) {
-		case 0:
-			x = progression;
-			y = Math.sqrt(3 / 4);
-			break;
-		case 1:
-			x = 1 - 1 / 2 * progression;
-			y = Math.sqrt(3 / 4) * (1 - progression);
-			break;
-		case 2:
-			x = 1 / 2 * (1 - progression);
-			y = progression * Math.sqrt(3 / 4);
-			break;
-		}
-		drawDot(context, metronome.width * x, metronome.height * y);
-	};
-	DRAWERS[RH.TS.FOUR_FOUR.toString()] = function(metronome, context, beatNumber, progression) {
-		var x;
-		var y;
-		switch (beatNumber) {
-		case 0:
-			x = 1 / 2 * (1 - progression);
-			y = 1 - 1 / 2 * progression;
-			break;
-		case 1:
-			x = progression;
-			y = 1 / 2;
-			break;
-		case 2:
-			x = 1 - progression * 1 / 2;
-			y = 1 / 2 * (1 - progression);
-			break;
-		case 3:
-			x = 1 / 2;
-			y = progression;
-			break;
-		}
-		context.beginPath();
-		context.lineWidth = 1;
-		context.moveTo(0.5 * metronome.width, 0);
-		context.lineTo(0.5 * metronome.width, metronome.height);
-		context.moveTo(0, 0.5 * metronome.height);
-		context.lineTo(metronome.width, 0.5 * metronome.height);
-		context.stroke();
-
-		drawDot(context, metronome.width * x, metronome.height * y);
-	};
+	POINTS[RH.TS.THREE_FOUR.toString()] = [{x:1/2,y:1}, {x:1,y:1/2}, {x:1/2,y:0}];
+	POINTS[RH.TS.FOUR_FOUR.toString()] = [{x:1/2,y:1},{x:0,y:1/2},{x:1,y:1/2},{x:1/2,y:0}];
 	Metronome.prototype = {
-		draw : function(context, timeSignature, ellapsedBeats) {
+		draw: function(context, timeSignature, ellapsedBeats) {
+			var width = this.width;
+			var height = this.height;
 			context.save();
 			var division = RH.divide(ellapsedBeats, 1);
 			var beatNumber = division.quotient;
@@ -84,8 +38,21 @@ RH.Metronome = (function() {
 				this.currentBeat = beatNumber;
 				SoundsManager.play(beatNumber === 0 ? 'TIC' : 'TOC');
 			}
-			var progression = division.rest;
-			DRAWERS[timeSignature.toString()](this, context, beatNumber, convertProgression(progression));
+			var points = POINTS[timeSignature.toString()];
+			context.beginPath();
+			context.strokeStyle = '#696969';
+			context.lineWidth = 1;
+			points.forEach(function(point, index) {
+				context.moveTo(point.x * width, point.y * height);
+				var nextPoint = RH.getArrayElement(points, index + 1);
+				context.lineTo(nextPoint.x * width, nextPoint.y * height);
+			});
+			context.stroke();
+			var p1 = RH.getArrayElement(points, beatNumber);
+			var p2 = RH.getArrayElement(points, beatNumber + 1);
+			var p = RH.intermediatePoint(p1, p2, convertProgression(division.rest));
+			drawDot(context, width * p.x, height * p.y);
+
 			context.font = "10px Arial, sans-serif";
 			context.fillText(beatNumber + 1, 5, 10);
 			context.restore();

@@ -9,7 +9,7 @@ RH.Screen = (function() {
 	var MEASURE_WIDTH = 400;
 	var MEASURE_HEIGHT = 150;
 	var METRONOME_POSITION = {
-		x: 3 * MEASURE_WIDTH / 4 - 25,
+		x: MEASURE_WIDTH / 2 - 25,
 		y: 5
 	};
 

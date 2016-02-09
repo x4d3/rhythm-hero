@@ -166,6 +166,18 @@ if (typeof localStorage === 'undefined') {
 		return array;
 	};
 
+
+
+	RH.intermediatePosition = function(a, b, progress) {
+		return a + (b - a) * progress;
+	};
+	RH.intermediatePoint = function(pointA, pointB, progress) {
+		return {
+			x: RH.intermediatePosition(pointA.x, pointB.x, progress),
+			y: RH.intermediatePosition(pointA.y, pointB.y, progress)
+		};
+	};
+
 	/**
 	 Basic classical inheritance helper. Usage:
 	  RH.Inherit(Child, Parent, {

@@ -8,17 +8,9 @@ RH.ScoreScreen = (function() {
 	var UPDATE_LIFE_DURATION = 1000;
 	var LIFE_WIDTH = 80;
 	var LIFE_HEIGHT = 10;
+	var intermediatePoint = RH.intermediatePoint;
+	var intermediatePosition = RH.intermediatePosition;
 
-
-	var intermediatePosition = function(a, b, progress) {
-		return a + (b - a) * progress;
-	};
-	var intermediatePoint = function(pointA, pointB, progress) {
-		return {
-			x: intermediatePosition(pointA.x, pointB.x, progress),
-			y: intermediatePosition(pointA.y, pointB.y, progress)
-		};
-	};
 
 	var pad = function(n, width, joiner) {
 		joiner = joiner || '0';
