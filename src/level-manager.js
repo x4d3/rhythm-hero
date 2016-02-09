@@ -57,6 +57,18 @@ RH.LevelManager = (function() {
 			[60], "q qr q qr q qr q qr    qr q qr q qr q qr q   q 1 1 1 qr  1 1 1 1 q 1 q q 1 q   qr 1 1 1  1 1 1 1 q 4"
 		],
 
+		["Triolet", ["4/4"],
+			[60],
+			[
+				repeat("1", 4),
+				repeat("q", 8), repeat("tq", 12),
+				repeat("q", 4), repeat("tq", 6),
+				repeat("1", 2), repeat("tq", 6),
+				"1 q q  tq tq tq q q tq tq tq q q 1 1 4"
+			].join(" ")
+
+
+		],
 		["Wiganor", ["4/4"],
 			[60],
 			["13/3  tq tq  tq  tq  tq  5/6 1 9/2",
