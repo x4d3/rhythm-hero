@@ -25,8 +25,42 @@ RH.Metronome = (function() {
 		return Math.pow(rest, 5);
 	};
 
-	POINTS[RH.TS.THREE_FOUR.toString()] = [{x:1/2,y:1}, {x:1,y:1/2}, {x:1/2,y:0}];
-	POINTS[RH.TS.FOUR_FOUR.toString()] = [{x:1/2,y:1},{x:0,y:1/2},{x:1,y:1/2},{x:1/2,y:0}];
+
+	POINTS[RH.TS.TWO_FOUR.toString()] = [{
+		x: 1 / 2,
+		y: 1
+	}, {
+		x: 1 / 2,
+		y: 0
+	}];
+
+
+
+	POINTS[RH.TS.THREE_FOUR.toString()] = [{
+		x: 1 / 2,
+		y: 1
+	}, {
+		x: 1,
+		y: 1 / 2
+	}, {
+		x: 1 / 2,
+		y: 0
+	}];
+
+	POINTS[RH.TS.FOUR_FOUR.toString()] = [{
+		x: 1 / 2,
+		y: 1
+	}, {
+		x: 0,
+		y: 1 / 2
+	}, {
+		x: 1,
+		y: 1 / 2
+	}, {
+		x: 1 / 2,
+		y: 0
+	}];
+
 	Metronome.prototype = {
 		draw: function(context, timeSignature, ellapsedBeats) {
 			var width = this.width;
@@ -53,7 +87,7 @@ RH.Metronome = (function() {
 			var p = RH.intermediatePoint(p1, p2, convertProgression(division.rest));
 			drawDot(context, width * p.x, height * p.y);
 
-			context.font = "10px Arial, sans-serif";
+			context.font = "14px Arial, sans-serif";
 			context.fillText(beatNumber + 1, 5, 10);
 			context.restore();
 		}

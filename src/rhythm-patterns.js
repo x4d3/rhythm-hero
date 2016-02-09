@@ -211,7 +211,7 @@ RH.RhythmPatterns = (function() {
 
 		});
 		// we don't fill the last bar
-		result.push(new RH.Measure(tempo, timeSignature, [], false, false));
+		result.push(new RH.Measure(tempo, RH.TS.TWO_FOUR, [], false, false));
 		return result;
 	};
 

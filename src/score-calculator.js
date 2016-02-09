@@ -38,7 +38,7 @@ RH.ScoreCalculator = (function() {
 			} else {
 				var x = Math.max(1 - Math.abs(this.startDiff / MAX_START_DIFF), 0);
 				var y = Math.max(1 - Math.abs(this.durationDiff), 0);
-				return 0.1 + 0.6 * x * x + 0.2 * y;
+				return 0.1 + 0.6 * x * x + 0.3 * y;
 			}
 		}
 	};
@@ -85,12 +85,12 @@ RH.ScoreCalculator = (function() {
 		this.totalScore = 0;
 		this.goodMeasureCount = 0;
 	}
-	var keepBetween = function(min, max, value){
-		if(value > max){
+	var keepBetween = function(min, max, value) {
+		if (value > max) {
 			return max;
-		}else if(value < min){
+		} else if (value < min) {
 			return min;
-		}else{
+		} else {
 			return value;
 		}
 	};
@@ -101,12 +101,12 @@ RH.ScoreCalculator = (function() {
 	var EPSILON = 10;
 	var NO_SCORE = new MeasureScore([]);
 	ScoreCalculator.prototype = {
-		hasLost: function(){
-			return this.withLife && this.life  === 0;
+		hasLost: function() {
+			return this.withLife && this.life === 0;
 		},
 		/**
 		 * awful awful code.. again...
-		 * 
+		 *
 		 * @param t
 		 * @param measureIndex
 		 */
@@ -184,8 +184,7 @@ RH.ScoreCalculator = (function() {
 				}
 				var eventEnd;
 				if (note.isRest) {
-					// if it is the last note, or if the next one is rest as
-					// well
+					// if it is the last note, or if the next one is rest as well
 					if ((noteIndex === notes.length - 1) || nextNoteIsRest) {
 						eventEnd = Math.min(nextEventT, end);
 					} else {
@@ -218,9 +217,9 @@ RH.ScoreCalculator = (function() {
 					this.goodMeasureCount = 0;
 				}
 				this.totalScore += notesScores.value() * this.multiplier;
-				lifeChange = (notesScores.value()-0.5) * 0.3;
+				lifeChange = (notesScores.value() - 0.5) * 0.3;
 			}
-			this.life = keepBetween(0,1, this.life + lifeChange);
+			this.life = keepBetween(0, 1, this.life + lifeChange);
 			return notesScores;
 		}
 	};

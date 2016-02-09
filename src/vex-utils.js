@@ -253,13 +253,6 @@ RH.VexUtils = (function() {
 		var currentTempo = null;
 		var previousMeasureLastNote = null;
 		measures.forEach(function(measure, i) {
-			if (i === 0) {
-				// display couting
-				var beatPerBar = measure.getBeatPerBar();
-				for (var j = 0; j < beatPerBar; j++) {
-					context.fillText(j + 1, j * measureWidth / beatPerBar, 60);
-				}
-			}
 			if (measure.isEmpty) {
 				return;
 			}

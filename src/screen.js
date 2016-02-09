@@ -99,11 +99,16 @@ RH.Screen = (function() {
 				screen.displayStave(canvas, staveX, staveY, index, i === 0);
 				// display the count down
 				if (index === 0 && i === 0) {
-					context.lineWidth = 1;
-					context.beginPath();
-					context.arc(3 + staveX + RH.divide(measureInfo.ellapsedBeats, 1).quotient * MEASURE_WIDTH / screen.measures[index].getBeatPerBar(), staveY + 55, 8, 0, 2 * Math.PI, false);
-					context.strokeStyle = '#003300';
-					context.stroke();
+
+					context.fillStyle = 'grey';
+					var division = RH.divide(measureInfo.ellapsedBeats, 1).quotient;
+					var beatPerBar = screen.measures[index].getBeatPerBar();
+					for (var beat = 0; beat < beatPerBar; beat++) {
+						context.font = beat === division ? 'bolder 36px Open Sans' : '16px Open Sans';
+						context.fillText(beat + 1, staveX + beat * MEASURE_WIDTH / beatPerBar, staveY + 70);
+
+					}
+
 				}
 			});
 
@@ -235,11 +240,13 @@ RH.Screen = (function() {
 
 		},
 		displayMetronome: function(canvas, measureInfo) {
-			var context = canvas.getContext("2d");
-			context.save();
-			context.translate(METRONOME_POSITION.x, METRONOME_POSITION.y);
-			this.metronome.draw(context, measureInfo.measure.timeSignature, measureInfo.ellapsedBeats);
-			context.restore();
+			if (measureInfo.index !== this.measures.length - 1) {
+				var context = canvas.getContext("2d");
+				context.save();
+				context.translate(METRONOME_POSITION.x, METRONOME_POSITION.y);
+				this.metronome.draw(context, measureInfo.measure.timeSignature, measureInfo.ellapsedBeats);
+				context.restore();
+			}
 		}
 
 	};
