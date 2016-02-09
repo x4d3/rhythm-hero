@@ -15,12 +15,12 @@ Fraction = (function() {
 		}
 		return value;
 	};
-	
+
 	/**
-	 * Initialize the Fraction, numerator and denominator 
+	 * Initialize the Fraction, numerator and denominator
 	 * @class Fraction
 	 * @constructor
-	 * @param {Integer} numerator of the fraction 
+	 * @param {Integer} numerator of the fraction
 	 * @param {Integer} denominator the fraction must not be equal to 0
 	 */
 	var Fraction = function(numerator, denominator, noCheck) {
@@ -41,7 +41,7 @@ Fraction = (function() {
 	};
 
 	/**
-	 * 
+	 *
 	 * @method value
 	 * @return {Number} the float number represented by the fraction
 	 */
@@ -51,7 +51,7 @@ Fraction = (function() {
 
 	/**
 	 * clone the Fraction
-	 * 
+	 *
 	 * @method clone
 	 * @return {Fraction} Returns a clone of the fraction
 	 */
@@ -61,7 +61,7 @@ Fraction = (function() {
 
 	/**
 	 * inverse the Fraction
-	 * 
+	 *
 	 * @method inverse
 	 * @return {Fraction} Returns the inverse of the fraction
 	 */
@@ -70,7 +70,7 @@ Fraction = (function() {
 	};
 	/**
 	 * pretty-printer, converts fractions into whole numbers and fractions
-	 * 
+	 *
 	 * @method toString
 	 * @returns {String}
 	 */
@@ -81,7 +81,7 @@ Fraction = (function() {
 
 	/**
 	 * pretty-printer to support TeX notation (using with MathJax, KaTeX, etc)
-	 * 
+	 *
 	 * @method toTeX
 	 * @returns {String}
 	 */
@@ -117,7 +117,7 @@ Fraction = (function() {
 
 	/**
 	 * Adds the value of this fraction to another, returning the result in reduced form.
-	 * 
+	 *
 	 * @method add
 	 * @returns {Fraction}
 	 */
@@ -134,7 +134,7 @@ Fraction = (function() {
 
 	/**
 	 * Subtracts the value of another fraction from the value of this one, returning the result in reduced form
-	 * 
+	 *
 	 * @method subtract
 	 * @returns {Fraction}
 	 */
@@ -211,7 +211,7 @@ Fraction = (function() {
 	// Adapted from Ratio.js
 	/**
 	 * Takes two numbers and returns their greatest common factor
-	 * 
+	 *
 	 * @static
 	 * @method gcf
 	 * @returns {Number}
@@ -232,7 +232,7 @@ Fraction = (function() {
 	};
 	/**
 	 * parse a string of the format a/b to a Fraction
-	 * 
+	 *
 	 * @static
 	 * @method parse
 	 * @returns {Fraction}
@@ -240,10 +240,16 @@ Fraction = (function() {
 	Fraction.parse = function(s) {
 		var split = s.split('/');
 		var n = parseInt(split[0].trim(), 10);
-		if(split.length === 1){
+		if (isNaN(n)) {
+			throw "can't parse: " + s;
+		}
+		if (split.length === 1) {
 			return new Fraction(n, 1);
-		}else{
+		} else {
 			var d = parseInt(split[1].trim(), 10);
+			if (isNaN(n)) {
+				throw "can't parse: " + s;
+			}
 			return new Fraction(n, d);
 		}
 	};

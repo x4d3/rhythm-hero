@@ -8,11 +8,9 @@ RH.LevelManager = (function() {
 		this.description = description;
 		this.measures = measures;
 	};
-
 	var LevelManager = function() {
 		this.levels = [];
 	};
-
 	LevelManager.prototype = {
 		getLevel: function(index) {
 			if (index < this.levels.length) {
@@ -35,7 +33,6 @@ RH.LevelManager = (function() {
 			});
 		}
 	};
-
 	return new LevelManager();
 }());
 (function() {
@@ -44,44 +41,35 @@ RH.LevelManager = (function() {
 		for (var i = 0; i < count; i++) {
 			array[i] = element;
 		}
-		return array.join(",");
+		return array.join(" ");
 	};
-	var bolero = "";
 	var LEVELS = [
 		["Whole, minims and quaver", ["4/4"],
-			[60], "4, 2,2, 4, 2,2, 1,1,1,1, 2,1,1, 1,2,1, 1,1,2, 2,4,2"
+			[60], "4  2 2  4  2 2  1 1 1 1  2 1 1  1 2 1  1 1 2  2 4 2  1 4 2 1"
 		],
 		["Let's rest", ["4/4"],
-			[60], "1,1r,1,1r, 1,1,2, 1r,2,1r, 1,1,2r"
+			[60], "1 r 1 r  1 1 2  r 2 r  1 1 2r  1 r 1 r  2 1 r  1 2r 1"
 		],
-
+		["Half Beat", ["4/4"],
+			[60], "1 q q 1 q q   1 1 q q q q    1 q q  q q 1   q q 2 q q  q q  4  q q 1 1 "
+		],
 		["Wiganor", ["4/4"],
 			[60],
-			[
-				"13/3, 1/3,1/3, 1/3 ,1/3 ,1/3 ,5/6,1,9/2",
-				repeat("1/3", 12),
-				"1/2,1/2,1/2r,1/2,1/2r,1/2,1/2r,1/2",
-				"1r,1/2,3/2r,1/2,1/2r"
-			].join(",")
+			["13/3  tq tq  tq  tq  tq  5/6 1 9/2",
+				repeat("tq", 12), "q q qr q qr q qr q", "r q 3/2r q qr"
+			].join(" ")
 		],
-
-
 		["Mars Attack!", ["4/4"],
-			[90], repeat(repeat("1/2,1/2,1/4,1/4,1/4,1/4r", 3) + ", 1/2,1/2,1", 2)
+			[90], repeat(repeat("q q s s s sr", 3) + "  q q 1", 2)
 		],
-
 		["Bolero", ["3/4"],
 			[72],
-			[repeat("1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/2,1/2, 1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/6,1/6,1/6,1/6,1/6,1/6", 4),
-				"6/4,1/4,1/4,1/4,1/4,1/4,1/4,  1/2,1/4,1/4, 6/4,1/4,1/4,  1/4,1/4,1/4,1/4,9/4, 1/4,1/4,1/4 ,1/4,1/4,1/4,1/4,  9/4",
-				"1/4,1/4,1/4 , 1/4,1/4,1/4,1/4 , 1/4,1/4,1 ,1/4,1/4, 1/2,1/2,1,5"
-			].join(",")
+			[
+				repeat("q  1/6  1/6  1/6   q  1/6  1/6  1/6   q  q   q  1/6  1/6  1/6   q  1/6  1/6  1/6   1/6  1/6  1/6  1/6  1/6  1/6", 4),
+				"6/4  s  s  s  s  s  s    q  s  s   6/4  s  s    s  s  s  s  9/4   s  s  s   s  s  s  s    9/4",
+				"s  s  s    s  s  s  s    s  s  1   s  s   q  q  1  5"
+			].join(" ")
 		]
-
-
-
 	];
-
 	RH.LevelManager.registerLevels(LEVELS);
-
 }());
