@@ -53,6 +53,10 @@ RH.LevelManager = (function() {
 		["Half Beat", ["4/4"],
 			[60], "1 q q 1 q q   1 1 q q q q    1 q q  q q 1   q q 2 q q  q q  4  q q 1 1 "
 		],
+		["Syncopation", ["4/4"],
+			[60], "q qr q qr q qr q qr    qr q qr q qr q qr q   q 1 1 1 qr  1 1 1 1 q 1 q q 1 q   qr 1 1 1  1 1 1 1 q 4"
+		],
+
 		["Wiganor", ["4/4"],
 			[60],
 			["13/3  tq tq  tq  tq  tq  5/6 1 9/2",

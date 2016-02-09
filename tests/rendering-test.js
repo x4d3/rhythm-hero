@@ -66,8 +66,8 @@ $(document)
 			});
 			test('Defined Patterns 2', function(assert) {
 				var notes = Note.parseNotes(
-					"1/3,1/3,1/3,2/3,2/3,2/3," +
-					"1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/2,1/2, 1/2,1/6,1/6,1/6, 1/2,1/6,1/6,1/6, 1/6,1/6,1/6,1/6,1/6,1/6");
+					"1/3 1/3 1/3 2/3 2/3 2/3 " +
+					"q 1/6 1/6 1/6  q 1/6 1/6 1/6  q q  q 1/6 1/6 1/6  q 1/6 1/6 1/6  1/6 1/6 1/6 1/6 1/6 1/6");
 				var measures = RhythmPatterns.generateMeasures(options.tempi, [RH.TS.THREE_FOUR], notes);
 
 				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
@@ -97,7 +97,7 @@ $(document)
 				function(assert) {
 					var canvas = generateCanvas(assert.test.testName, Screen.MEASURE_WIDTH * 2);
 					var context = canvas.getContext("2d");
-					var NOTES_INPUT = "1/1,1/2,1/1r,1/1,1/2,1/1,1/1r,1/1,2/1,1/1r,1/1,1/1r,1/1r,1/1r,1/1r,1/2,1/1,1/1,1/1,1/1,1/2,1/1r,1/1,1/1r,2/1,1/1,1/1,1/1r,1/1r,1/1,1/1r,1/1,1/1r,1/2,1/2,1/1,1/2,1/1r,1/2,1/1r,1/1,1/2,1/1r,1/1r,1/1,1/1r,1/2,1/1,1/1,1/1";
+					var NOTES_INPUT = "1/1 q 1/1r 1/1 q 1/1 1/1r 1/1 2/1 1/1r 1/1 1/1r 1/1r 1/1r 1/1r q 1/1 1/1 1/1 1/1 q 1/1r 1/1 1/1r 2/1 1/1 1/1 1/1r 1/1r 1/1 1/1r 1/1 1/1r q q 1/1 q 1/1r q 1/1r 1/1 q 1/1r 1/1r 1/1 1/1r q 1/1 1/1 1/1";
 					var notes = Note.parseNotes(NOTES_INPUT);
 					var measures = RhythmPatterns.generateMeasures([120], [RH.TS.FOUR_FOUR], notes);
 					var eventManager = EventManager
@@ -143,7 +143,7 @@ $(document)
 				"Score Computation - drawOnExternalCanvas",
 				function(assert) {
 
-					var NOTES_INPUT = "1/1,1/2,1/1r,1/1,1/2,1/1,1/1r,1/1,2/1,1/1r,1/1,1/1r,1/1r,1/1r,1/1r,1/2,1/1,1/1,1/1,1/1,1/2,1/1r,1/1,1/1r,2/1,1/1,1/1,1/1r,1/1r,1/1,1/1r,1/1,1/1r,1/2,1/2,1/1,1/2,1/1r,1/2,1/1r,1/1,1/2,1/1r,1/1r,1/1,1/1r,1/2,1/1,1/1,1/1";
+					var NOTES_INPUT = "1/1,q,1/1r,1/1,q,1/1,1/1r,1/1,2/1,1/1r,1/1,1/1r,1/1r,1/1r,1/1r,q,1/1,1/1,1/1,1/1,q,1/1r,1/1,1/1r,2/1,1/1,1/1,1/1r,1/1r,1/1,1/1r,1/1,1/1r,q,q,1/1,q,1/1r,q,1/1r,1/1,q,1/1r,1/1r,1/1,1/1r,q,1/1,1/1,1/1";
 					var notes = Note.parseNotes(NOTES_INPUT);
 
 					var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, notes);
