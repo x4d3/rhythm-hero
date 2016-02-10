@@ -184,7 +184,9 @@ $(document).ready(function() {
 
 		},
 		startLevel: function(score) {
-			application.campaign(score.index);
+			initAudio(function() {
+				application.campaign(score.index);
+			});
 		},
 		close: function() {
 			application.stop();
@@ -239,7 +241,10 @@ $(document).ready(function() {
 
 	var level = getParameterByName("level");
 	if (RH.isDebug && level) {
-		application.campaign(parseInt(level, 10));
+		initAudio(function() {
+			application.campaign(parseInt(level, 10));
+		});
+
 	}
 	var audioInitilialised = false;
 	var initAudio = function(callback) {
