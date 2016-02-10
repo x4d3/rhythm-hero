@@ -8,6 +8,7 @@
 	"lib/prime-library.js",
 	"lib/knockout-3.4.0.js",
 	"lib/knockout.localStorage.js",
+	"lib/jquery.mb.audio.js",
 	"rh.js",
 	"canvas-utils.js",
 	"sounds-manager.js",

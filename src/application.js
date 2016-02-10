@@ -172,15 +172,21 @@ $(document).ready(function() {
 			});
 		},
 		startPractice: function() {
-			application.quickGame();
+			initAudio(function() {
+				application.quickGame();
+			});
+
 		},
 		startCampaign: function() {
-			application.campaign(model.scores().length);
+			initAudio(function() {
+				application.campaign(model.scores().length);
+			});
+
 		},
 		startLevel: function(score) {
 			application.campaign(score.index);
 		},
-		close :function(){
+		close: function() {
 			application.stop();
 		}
 	};
@@ -189,7 +195,7 @@ $(document).ready(function() {
 			return {
 				description: RH.LevelManager.getLevel(index).description,
 				score: RH.ScoreScreen.formatTotal(score),
-				index:index
+				index: index
 			};
 		});
 	});
@@ -235,6 +241,14 @@ $(document).ready(function() {
 	if (RH.isDebug && level) {
 		application.campaign(parseInt(level, 10));
 	}
+	var audioInitilialised = false;
+	var initAudio = function(callback) {
+		if (!audioInitilialised) {
+			audioInitilialised = true;
+			$.mbAudio.pause('effectSprite', callback);
+		}
+		callback();
+	};
 
 	$('body').removeClass('loading');
 });

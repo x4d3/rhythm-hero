@@ -37,3 +37,4 @@ The project use:
 - [Numeral-js](https://github.com/adamwdraper/Numeral-js)
 - [fraction.js](https://github.com/x4d3/fraction.js)
 - [prime-library.js](https://github.com/x4d3/prime-library.js)
+- [jquery.mb.audio](https://github.com/pupunzi/jquery.mb.audio)
