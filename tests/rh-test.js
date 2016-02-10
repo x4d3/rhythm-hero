@@ -29,7 +29,6 @@ test("binarySearch", function() {
 	testBinarySearch(array3, 675.9780231211334, 9);
 
 
-
 });
 
 test("divide", function() {
@@ -103,4 +102,16 @@ test("RH.inherit", function() {
 	equal(p1.a, "a");
 	equal(p1.b, "b");
 	equal(p1.getA(), "a");
+});
+
+
+test("RH.isInteger", function() {
+	ok(RH.isInteger("1"));
+	ok(RH.isInteger("-1"));
+	ok(RH.isInteger("0"));
+	ok(RH.isInteger("101"));
+	ok(RH.isInteger("+1"));
+	ok(!RH.isInteger("a"));
+	ok(!RH.isInteger("1.1"));
+	ok(!RH.isInteger("o"));
 });

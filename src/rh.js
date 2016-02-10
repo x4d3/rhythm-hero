@@ -106,6 +106,11 @@ if (typeof localStorage === 'undefined') {
 		RH.isDebug = true;
 	};
 
+
+	RH.isInteger = function(s) {
+		return s.match(/^\s*(\+|-)?\d+\s*$/);
+	};
+
 	RH.identity = function(a) {
 		return a;
 	};
@@ -151,7 +156,7 @@ if (typeof localStorage === 'undefined') {
 	};
 
 	RH.copyProperties = function(from, to) {
-		for (var property in from){
+		for (var property in from) {
 			to[property] = from[property];
 		}
 		return to;
@@ -165,7 +170,6 @@ if (typeof localStorage === 'undefined') {
 		}
 		return array;
 	};
-
 
 
 	RH.intermediatePosition = function(a, b, progress) {
@@ -195,7 +199,7 @@ if (typeof localStorage === 'undefined') {
 			C.prototype = new F();
 			C.superclass = P.prototype;
 			C.prototype.constructor = C;
-			C.prototype.super = function(){
+			C.prototype.super = function() {
 				P.apply(this, arguments);
 			};
 			RH.copyProperties(O, C.prototype);
@@ -203,10 +207,10 @@ if (typeof localStorage === 'undefined') {
 		};
 	}());
 
-	RH.getVersion = function(){
-		if(RH.VERSION !== undefined){
+	RH.getVersion = function() {
+		if (RH.VERSION !== undefined) {
 			return RH.VERSION.version;
-		}else{
+		} else {
 			return "DEV";
 		}
 	};

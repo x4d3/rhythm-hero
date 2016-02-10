@@ -79,7 +79,7 @@ $(document)
 				var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, notes);
 
 				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
-				displayCanvases(assert.test.testName, canvasesData);
+				displayCanvases(assert.test.testName, canvasesData);				
 				ok(true);
 			});
 
@@ -143,7 +143,7 @@ $(document)
 				"Score Computation - drawOnExternalCanvas",
 				function(assert) {
 
-					var NOTES_INPUT = "1/1,q,1/1r,1/1,q,1/1,1/1r,1/1,2/1,1/1r,1/1,1/1r,1/1r,1/1r,1/1r,q,1/1,1/1,1/1,1/1,q,1/1r,1/1,1/1r,2/1,1/1,1/1,1/1r,1/1r,1/1,1/1r,1/1,1/1r,q,q,1/1,q,1/1r,q,1/1r,1/1,q,1/1r,1/1r,1/1,1/1r,q,1/1,1/1,1/1";
+					var NOTES_INPUT = "1/1 q 1/1r 1/1 q 1/1 1/1r 1/1 2/1 1/1r 1/1 1/1r 1/1r 1/1r 1/1r q 1/1 1/1 1/1 1/1 q 1/1r 1/1 1/1r 2/1 1/1 1/1 1/1r 1/1r 1/1 1/1r 1/1 1/1r q q 1/1 q 1/1r q 1/1r 1/1 q 1/1r 1/1r 1/1 1/1r q 1/1 1/1 1/1";
 					var notes = Note.parseNotes(NOTES_INPUT);
 
 					var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, notes);

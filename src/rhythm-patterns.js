@@ -17,6 +17,9 @@ RH.Note = (function() {
 			}
 			var splitDuration = this.duration.subtract(duration);
 			return [new Note(duration, this.isRest), new Note(splitDuration, this.isRest)];
+		},
+		equals: function(other) {
+			return this.duration.equals(other.duration) && this.isRest === other.isRest;
 		}
 	};
 
@@ -45,26 +48,26 @@ RH.Note = (function() {
 	};
 
 	Note.parseNote = function(value) {
-		try {
-			var note = NOTES_ALIASES[value];
-			if (note) {
-				return note;
-			}
 
-			var isRest;
-			var replaced;
-			if (value.charAt(value.length - 1) === 'r') {
-				replaced = value.substring(0, value.length - 1);
-				isRest = true;
-			} else {
-				replaced = value;
-				isRest = false;
-			}
-			var duration = Fraction.parse(value);
-			return new Note(duration, isRest);
-		} catch (e) {
-			throw("could not parse: " + value + ", error: " + e.message);
+		var note = NOTES_ALIASES[value];
+		if (note) {
+			return note;
 		}
+		if(!value.match(/^\d+(\/\d+)?r?$/)){
+			throw value + " is not a valid note.";
+		}
+		var isRest;
+		var replaced;
+		if (value.charAt(value.length - 1) === 'r') {
+			replaced = value.substring(0, value.length - 1);
+			isRest = true;
+		} else {
+			replaced = value;
+			isRest = false;
+		}
+		var duration = Fraction.parse(value);
+		return new Note(duration, isRest);
+
 
 
 	};
