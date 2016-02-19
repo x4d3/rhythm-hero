@@ -121,8 +121,10 @@ RH.VexUtils = (function() {
 	var isPowerTwo = function(n) {
 		return (n & (n - 1)) === 0;
 	};
+
 	//Awful, awful code...Refactor please.
-	var generateNotesTupletTiesAndBeams = function(notes) {
+	//generate notes Tuplet TiesAnd Beams
+	var generateStaveElements = function(notes) {
 
 		var allNotes = [];
 		notes.forEach(function(note) {
@@ -169,32 +171,15 @@ RH.VexUtils = (function() {
 			}
 			allNotes.push(notesData);
 		});
-		var vxNotes = [];
-		var ties = [];
-		var tuplets = [];
-		var beams = [];
+		var result = {
+			notes: [],
+			tuplets: []
+		};
 		var currentTuplet = [];
 		allNotes.forEach(function(notesData) {
 			notesData.forEach(function(noteData, j) {
-				var vxNote = new VF.StaveNote({
-					keys: noteData.keys,
-					duration: fractionToString(noteData.duration),
-					dots: noteData.dots,
-					type: noteData.isRest ? "r" : ""
-				});
-				for (var i = 0; i < noteData.dots; i++) {
-					vxNote.addDotToAll();
-				}
-				if (j > 0 && !noteData.isRest) {
-					var tie = new Vex.Flow.StaveTie({
-						first_note: last(vxNotes),
-						last_note: vxNote,
-						first_indices: [0],
-						last_indices: [0]
-					});
-					ties.push(tie);
-				}
-				vxNotes.push(vxNote);
+				result.notes.push(noteData);
+				noteData.isTied = j > 0 && !noteData.isRest;
 
 				if (noteData.tupletFactor !== undefined) {
 					currentTuplet.push(noteData);
@@ -205,29 +190,20 @@ RH.VexUtils = (function() {
 					var n = wholeDuration.numerator;
 					var d = wholeDuration.denominator;
 					if ((n == 1 && isPowerTwo(d)) || (d == 1 && isPowerTwo(1))) {
-						var tupletOption = {
-							num_notes: noteData.tupletFactor,
-							beats_occupied: wholeDuration.value()
+						var tuplet = {
+							tupletFactor: noteData.tupletFactor,
+							duration: wholeDuration.value(),
+							index: result.notes.length - currentTuplet.length,
+							size: currentTuplet.length
 						};
-						var tupletNotes = vxNotes.slice(-currentTuplet.length);
-						var tuplet = new VF.Tuplet(tupletNotes, tupletOption);
-						tuplets.push(tuplet);
+						result.tuplets.push(tuplet);
 						currentTuplet = [];
 					}
 				}
 
 			});
 		});
-		var beamsOption = {
-			beam_rests: true,
-			beam_middle_only: true
-		};
-		return {
-			notes: vxNotes,
-			tuplets: tuplets,
-			ties: ties,
-			beams: VF.Beam.generateBeams(vxNotes, beamsOption)
-		};
+		return result;
 
 	};
 	var fractionToString = function(duration) {
@@ -275,36 +251,78 @@ RH.VexUtils = (function() {
 
 			stave.draw(context);
 			var formatter = new VF.Formatter();
-			var result = generateNotesTupletTiesAndBeams(measure.notes);
+			var staveElements = generateStaveElements(measure.notes);
 			var voice = new VF.Voice({
 				num_beats: timeSignature.numerator,
 				beat_value: timeSignature.denominator,
 				resolution: VF.RESOLUTION
 			});
 			voice.setStrict(false);
-			voice.addTickables(result.notes);
+
+			var ties = [];
+			var staveNotes = [];
+			staveElements.notes.forEach(function(noteData, index) {
+				var staveNote = new VF.StaveNote({
+					keys: noteData.keys,
+					duration: fractionToString(noteData.duration),
+					dots: noteData.dots,
+					type: noteData.isRest ? "r" : ""
+				});
+				for (var i = 0; i < noteData.dots; i++) {
+					staveNote.addDotToAll();
+				}
+				if (noteData.isTied) {
+					var tie = new Vex.Flow.StaveTie({
+						first_note: staveNotes[index - 1],
+						last_note: staveNote,
+						first_indices: [0],
+						last_indices: [0]
+					});
+					ties.push(tie);
+				}
+				staveNotes.push(staveNote);
+			});
+
+
+			var tuplets = staveElements.tuplets.map(function(tupleInfo) {
+
+				var tupletOption = {
+					num_notes: tupleInfo.tupletFactor,
+					beats_occupied: tupleInfo.duration
+				};
+				var tupletNotes = staveNotes.slice(tupleInfo.index, tupleInfo.index + tupleInfo.size);
+				return new VF.Tuplet(tupletNotes, tupletOption);
+			});
+			var beamsOption = {
+				beam_rests: true,
+				beam_middle_only: true
+			};
+			var beams = VF.Beam.generateBeams(staveNotes, beamsOption);
+
+
+			voice.addTickables(staveNotes);
 			formatter.joinVoices([voice]).formatToStave([voice], stave);
 			voice.draw(context, stave);
 			if (measure.firstNotePressed) {
 				var tie = new Vex.Flow.StaveTie({
 					first_note: previousMeasureLastNote,
-					last_note: result.notes[0],
+					last_note: staveNotes[0],
 					first_indices: [0],
 					last_indices: [0]
 				});
-				result.ties.push(tie);
+				ties.push(tie);
 			}
-			result.beams.forEach(function(beam) {
+			beams.forEach(function(beam) {
 				beam.setContext(context).draw();
 			});
-			result.tuplets.forEach(function(tuplet) {
+			tuplets.forEach(function(tuplet) {
 				tuplet.setContext(context).draw();
 			});
-			result.ties.forEach(function(tie) {
+			ties.forEach(function(tie) {
 				tie.setContext(context).draw();
 			});
 
-			previousMeasureLastNote = last(result.notes);
+			previousMeasureLastNote = last(staveNotes);
 		});
 		var result = [];
 		for (var i = 0; i < measures.length; i++) {
@@ -312,6 +330,6 @@ RH.VexUtils = (function() {
 		}
 		return result;
 	};
-
+	VexUtils.generateStaveElements = generateStaveElements;
 	return VexUtils;
 }());
