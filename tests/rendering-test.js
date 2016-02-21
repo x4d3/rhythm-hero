@@ -22,7 +22,7 @@ $(document)
 				var canvasJ = $('<canvas>');
 				canvasJ.prop({
 					width: width,
-					height: 200
+					height: 150
 				});
 				var div = $('<div>').append($('<h2>').text(title)).append(canvasJ);
 				if (comment !== undefined) {
@@ -46,6 +46,46 @@ $(document)
 					canvas.getContext('2d').putImageData(canvasesData[i], WIDTH * (i - 1), 0);
 				}
 			};
+
+			var testGenerateStaveElements = function(measure, expectedStaveElements) {
+				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, [new RH.Measure(60, RH.TS.TWO_FOUR, [], false, false), measure]);
+				displayCanvases(measure.toString(), canvasesData);
+				var staveElements = VexUtils.generateStaveElements(measure.notes);
+				deepEqual(staveElements, expectedStaveElements);
+			};
+
+			test('Generate Stave Elements', function(assert) {
+				testGenerateStaveElements(RH.LevelManager.levels[0].measures[1], {
+					"notes": [{
+						"dots": 0,
+						"duration": "1",
+						"isTied": false,
+						"keys": [
+							"c/5"
+						],
+						"type": ""
+					}],
+					"tuplets": []
+				});
+
+				// testGenerateStaveElements(RH.LevelManager.levels[4].measures[6], {
+				// 	"notes": [{
+				// 		"dots": 0,
+				// 		"duration": "1",
+				// 		"isTied": false,
+				// 		"keys": [
+				// 			"c/5"
+				// 		],
+				// 		"type": ""
+				// 	}],
+				// 	"tuplets": []
+				// });
+
+
+				ok(true);
+			});
+
+
 			test('All Patterns', function(assert) {
 				var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, getPatternsNotes(RhythmPatterns.PATTERNS));
 
@@ -79,7 +119,7 @@ $(document)
 				var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, notes);
 
 				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
-				displayCanvases(assert.test.testName, canvasesData);				
+				displayCanvases(assert.test.testName, canvasesData);
 				ok(true);
 			});
 
@@ -171,7 +211,6 @@ $(document)
 
 					ok(true);
 				});
-
 
 
 		});

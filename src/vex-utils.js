@@ -178,21 +178,27 @@ RH.VexUtils = (function() {
 		var currentTuplet = [];
 		allNotes.forEach(function(notesData) {
 			notesData.forEach(function(noteData, j) {
-				result.notes.push(noteData);
-				noteData.isTied = j > 0 && !noteData.isRest;
+				result.notes.push({
+					keys: noteData.keys,
+					duration: fractionToString(noteData.duration),
+					dots: noteData.dots,
+					type: noteData.isRest ? "r" : "",
+					isTied : j > 0 && !noteData.isRest
+				});
+
 
 				if (noteData.tupletFactor !== undefined) {
 					currentTuplet.push(noteData);
 					var wholeDuration = currentTuplet.reduce(function(sum, note) {
 						return sum.add(note.duration.inverse());
 					}, Fraction.ZERO);
-					wholeDuration = wholeDuration.divide(new Fraction(noteData.tupletFactor, 1));
+					wholeDuration = wholeDuration.divide(new Fraction(noteData.tupletFactor, 2));
 					var n = wholeDuration.numerator;
 					var d = wholeDuration.denominator;
-					if ((n == 1 && isPowerTwo(d)) || (d == 1 && isPowerTwo(1))) {
+					if ((n == 1 && isPowerTwo(d)) || (d == 1 && isPowerTwo(n))) {
 						var tuplet = {
 							tupletFactor: noteData.tupletFactor,
-							duration: wholeDuration.value(),
+							beats_occupied: 2,
 							index: result.notes.length - currentTuplet.length,
 							size: currentTuplet.length
 						};
@@ -213,6 +219,8 @@ RH.VexUtils = (function() {
 			return duration.toString();
 		}
 	};
+
+
 
 	VexUtils.generateMeasuresCanvases = function(measureWidth, measureHeight, measures) {
 		var tempCanvaJ = $('<canvas>');
@@ -262,12 +270,7 @@ RH.VexUtils = (function() {
 			var ties = [];
 			var staveNotes = [];
 			staveElements.notes.forEach(function(noteData, index) {
-				var staveNote = new VF.StaveNote({
-					keys: noteData.keys,
-					duration: fractionToString(noteData.duration),
-					dots: noteData.dots,
-					type: noteData.isRest ? "r" : ""
-				});
+				var staveNote = new VF.StaveNote(noteData);
 				for (var i = 0; i < noteData.dots; i++) {
 					staveNote.addDotToAll();
 				}
@@ -288,7 +291,7 @@ RH.VexUtils = (function() {
 
 				var tupletOption = {
 					num_notes: tupleInfo.tupletFactor,
-					beats_occupied: tupleInfo.duration
+					beats_occupied: tupleInfo.beats_occupied
 				};
 				var tupletNotes = staveNotes.slice(tupleInfo.index, tupleInfo.index + tupleInfo.size);
 				return new VF.Tuplet(tupletNotes, tupletOption);
@@ -312,11 +315,11 @@ RH.VexUtils = (function() {
 				});
 				ties.push(tie);
 			}
-			beams.forEach(function(beam) {
-				beam.setContext(context).draw();
-			});
 			tuplets.forEach(function(tuplet) {
 				tuplet.setContext(context).draw();
+			});
+			beams.forEach(function(beam) {
+				beam.setContext(context).draw();
 			});
 			ties.forEach(function(tie) {
 				tie.setContext(context).draw();
