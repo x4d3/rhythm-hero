@@ -206,6 +206,18 @@ if (typeof localStorage === 'undefined') {
 			return C;
 		};
 	}());
+	/**
+	* input {"a":"valueA", "b", "valueB"}
+	* output {"a" :0, "b":1}
+	*/
+	RH.getObjectKeysIndexes = function(input) {
+		var result = {};
+		Object.keys(input).forEach(function(key, index) {
+			result[key] = index;
+		});
+		return result;
+	};
+
 
 	RH.getVersion = function() {
 		if (RH.VERSION !== undefined) {

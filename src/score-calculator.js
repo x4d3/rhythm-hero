@@ -2,6 +2,15 @@ RH.ScoreCalculator = (function() {
 	'use strict';
 	var logger = RH.logManager.getLogger('ScoreCalculator');
 	var MAX_START_DIFF = 200;
+	var FAILED_REASONS = {
+		TOO_EARLY: 'Too Early',
+		TOO_LATE: 'Too Late',
+		TOO_SHORT: 'Too Short',
+		TOO_LONG: 'Too Long',
+		TOO_MANY_PRESSES: 'Pressed Too Much',
+		NOT_PLAYED: 'Not Played'
+	};
+
 
 	function ScoreType(value, label, icon, color) {
 		this.value = value;
@@ -10,40 +19,34 @@ RH.ScoreCalculator = (function() {
 		this.color = color;
 	}
 
-	var SCORE_TYPES = [new ScoreType(0, "Fail", "✗", "red"), new ScoreType(0.1, "Boo", "E", "orange"), new ScoreType(0.5, "Average", "D", "maroon"), new ScoreType(0.6, "Good", "C", "grey"),
+	var SCORE_TYPES = [new ScoreType(0.1, "Boo", "E", "orange"), new ScoreType(0.5, "Average", "D", "maroon"), new ScoreType(0.6, "Good", "C", "grey"),
 		new ScoreType(0.7, "Great", "B", "olive"), new ScoreType(0.8, "Awesome", "A", "green"), new ScoreType(0.9, "Perfect", "✔", "green")
 	];
 	var SCORE_TYPES_VALUES = SCORE_TYPES.map(function(s) {
 		return s.value;
 	});
 
-	function NoteScore(startDiff, durationDiff, notesPlayedBetween) {
-		this.startDiff = startDiff;
-		this.durationDiff = durationDiff;
-		this.notesPlayedBetween = notesPlayedBetween;
-		this.isFailed = !isFinite(startDiff) || !isFinite(durationDiff) || this.notesPlayedBetween || Math.abs(this.startDiff) > MAX_START_DIFF;
+	function SuccessNoteScore(value) {
+		this.value = value;
+		this.isFailed = false;
+		this.failureReasons = [];
 	}
-
-	NoteScore.prototype = {
-		toString: function() {
-			if (this.isFailed) {
-				return "F";
-			} else {
-				return this.startDiff.toFixed(0) + " " + numeral(100 * this.durationDiff).format('0') + " " + numeral(100 * this.value()).format('0');
-			}
-		},
-		value: function() {
-			if (this.isFailed) {
-				return 0;
-			} else {
-				var x = Math.max(1 - Math.abs(this.startDiff / MAX_START_DIFF), 0);
-				var y = Math.max(1 - Math.abs(this.durationDiff), 0);
-				return 0.1 + 0.6 * x * x + 0.3 * y;
-			}
+	SuccessNoteScore.prototype = {
+		toString : function(){
+			return this.value;
 		}
 	};
-	var PERFECT = new NoteScore(0, 0, false);
-	var FAILED = new NoteScore(Infinity, Infinity, true);
+	function FailedNoteScore(failureReasons) {
+		this.value = 0;
+		this.isFailed = true;
+		this.failureReasons = failureReasons;
+	}
+	FailedNoteScore.prototype = {
+		toString : function(){
+			return this.failureReasons.join(',');
+		}
+	};
+	var PERFECT = new SuccessNoteScore(1);
 
 	function MeasureScore(notes) {
 		this.notes = notes;
@@ -56,7 +59,7 @@ RH.ScoreCalculator = (function() {
 				if (score.isFailed) {
 					return 0;
 				}
-				sum += score.value();
+				sum += score.value;
 			}
 			return sum / this.notes.length;
 		},
@@ -68,11 +71,31 @@ RH.ScoreCalculator = (function() {
 		toString: function() {
 			return this.notes.join(" | ");
 		},
+		getMainFailureReason: function() {
+			var result = {};
+			this.notes.forEach(function(note) {
+				note.failureReasons.forEach(function(key) {
+					result[key] = 1 + (result[key]?result[key]:0);
+				});
+			});
+			var max = 0;
+			var maxKey = null;
+			Object.keys(result).forEach(function(key) {
+				if (result[key] > max) {
+					maxKey = key;
+					max = result[key];
+				}
+			});
+			return FAILED_REASONS[maxKey];
+		},
 		getType: function() {
-			return SCORE_TYPES[RH.binarySearch(SCORE_TYPES_VALUES, this.value())];
+			if (this.isFailed()) {
+				return new ScoreType(0, this.getMainFailureReason(), "✗", "red");
+			} else {
+				return SCORE_TYPES[RH.binarySearch(SCORE_TYPES_VALUES, this.value())];
+			}
 		}
 	};
-
 
 
 	function ScoreCalculator(eventManager, measures, withLife) {
@@ -95,6 +118,26 @@ RH.ScoreCalculator = (function() {
 		}
 	};
 
+	var calculateNoteScore = function(startDiff, durationDiff, notesPlayedBetween) {
+		var failureReasons = [];
+		var addFailureReason = function(failureType, isFailed) {
+			if (isFailed) {
+				failureReasons.push(failureType);
+			}
+		};
+		addFailureReason('TOO_EARLY', startDiff < -MAX_START_DIFF);
+		addFailureReason('TOO_LATE', startDiff > MAX_START_DIFF);
+		addFailureReason('TOO_SHORT', durationDiff < -0.5);
+		addFailureReason('TOO_LONG', durationDiff > 0.5);
+		addFailureReason('TOO_MANY_PRESSES', notesPlayedBetween);
+		if (failureReasons.length > 0) {
+			return new FailedNoteScore(failureReasons);
+		} else {
+			var x = Math.max(1 - Math.abs(startDiff / MAX_START_DIFF), 0);
+			var y = Math.max(1 - Math.abs(durationDiff), 0);
+			return new SuccessNoteScore(0.1 + 0.6 * x * x + 0.3 * y);
+		}
+	};
 	/**this.life = Math.max(this.life - 0.25, 0);
 	 * in milliseconds
 	 */
@@ -145,7 +188,7 @@ RH.ScoreCalculator = (function() {
 					if (note.isRest) {
 						return PERFECT;
 					} else {
-						return FAILED;
+						return new FailedNoteScore(['NOT_PLAYED']);
 					}
 				}
 				var index = 0;
@@ -155,7 +198,7 @@ RH.ScoreCalculator = (function() {
 						if (events[0].t > end && note.isRest) {
 							return PERFECT;
 						} else {
-							return FAILED;
+							return new FailedNoteScore(['NOT_PLAYED']);
 						}
 					}
 					index = 1;
@@ -172,7 +215,7 @@ RH.ScoreCalculator = (function() {
 				}
 
 				if (events[index].t > end) {
-					return FAILED;
+					return new FailedNoteScore(['TOO_LATE']);
 				}
 
 				var startDiff = eventStart - start;
@@ -201,7 +244,7 @@ RH.ScoreCalculator = (function() {
 				var durationDiff = (eventEnd - eventStart - expectedDuration) / expectedDuration;
 				var maxNotes = nextNoteIsRest ? 3 : 4;
 				var notesPlayedBetween = events.length - index > maxNotes;
-				return new NoteScore(startDiff, durationDiff, notesPlayedBetween);
+				return calculateNoteScore(startDiff, durationDiff, notesPlayedBetween);
 			}));
 			logger.debug("addMeasureScore(" + measureIndex + ") " + notesScores);
 			this.measuresScore[measureIndex] = notesScores;
@@ -225,5 +268,9 @@ RH.ScoreCalculator = (function() {
 	};
 
 	ScoreCalculator.SCORE_TYPES = SCORE_TYPES;
+	ScoreCalculator.calculateNoteScore = calculateNoteScore;
+	ScoreCalculator.FailedNoteScore = FailedNoteScore;
+	ScoreCalculator.SuccessNoteScore = SuccessNoteScore;
+	ScoreCalculator.MeasureScore = MeasureScore;
 	return ScoreCalculator;
 }());
