@@ -244,7 +244,7 @@ RH.Screen = (function() {
 				var context = canvas.getContext("2d");
 				context.save();
 				context.translate(METRONOME_POSITION.x, METRONOME_POSITION.y);
-				this.metronome.draw(context, measureInfo.measure.timeSignature, measureInfo.ellapsedBeats);
+				this.metronome.draw(context, measureInfo.measure, measureInfo.ellapsedBeats);
 				context.restore();
 			}
 		}

@@ -32,7 +32,8 @@ RH.SoundsManager = (function() {
 			$.mbAudio.play('effectSprite', id);
 		}
 	};
-
+	// in milliseconds
+	SoundsManager.NOTE_DURATION = 160;
 
 	return SoundsManager;
 }());

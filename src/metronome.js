@@ -5,7 +5,7 @@ RH.Metronome = (function() {
 	function Metronome(width, height) {
 		this.width = width;
 		this.height = height;
-		this.currentBeat = -1;
+		this.currentBeat = null;
 	}
 
 	var POINTS = {};
@@ -35,7 +35,6 @@ RH.Metronome = (function() {
 	}];
 
 
-
 	POINTS[RH.TS.THREE_FOUR.toString()] = [{
 		x: 1 / 2,
 		y: 1
@@ -62,15 +61,19 @@ RH.Metronome = (function() {
 	}];
 
 	Metronome.prototype = {
-		draw: function(context, timeSignature, ellapsedBeats) {
+		draw: function(context, measure, ellapsedBeats) {
+			var timeSignature = measure.timeSignature;
 			var width = this.width;
 			var height = this.height;
 			context.save();
 			var division = RH.divide(ellapsedBeats, 1);
 			var beatNumber = division.quotient;
-			if (this.currentBeat != beatNumber) {
-				this.currentBeat = beatNumber;
-				SoundsManager.play(beatNumber === 0 ? 'TIC' : 'TOC');
+			// the sound needs to start to be played a little bit before the exact change of the beat so it comes directly in the bottom of the beat
+			var adjustedEllapsedBeats = RH.divide(ellapsedBeats + (SoundsManager.NOTE_DURATION / 2) * measure.getBeatPerMillisecond(), 1);
+			var adjustedBeat = adjustedEllapsedBeats.quotient % measure.getBeatPerBar();
+			if (this.currentBeat != adjustedBeat) {
+				this.currentBeat = adjustedBeat;
+				SoundsManager.play(adjustedBeat === 0 ? 'TIC' : 'TOC');
 			}
 			var points = POINTS[timeSignature.toString()];
 			context.beginPath();
