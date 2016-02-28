@@ -121,15 +121,13 @@ RH.VexUtils = (function() {
 	var isPowerTwo = function(n) {
 		return (n & (n - 1)) === 0;
 	};
-
 	//Awful, awful code...Refactor please.
 	//generate notes Tuplet TiesAnd Beams
 	var generateStaveElements = function(notes) {
-
 		var allNotes = [];
+		var durationBuffer = Fraction.ZERO;
 		notes.forEach(function(note) {
 			var notesData = [];
-			var duration = note.duration;
 			var isRest = note.isRest;
 			var key;
 			if (isRest) {
@@ -137,39 +135,59 @@ RH.VexUtils = (function() {
 			} else {
 				key = VexUtils.randomKey();
 			}
+			var processNote = function(note) {
+				var duration = note.duration;
+				var tupletFactor;
+				if (duration.denominator != 1) {
+					var dFactors = PrimeLibrary.factor(duration.denominator);
+					tupletFactor = find(dFactors, function(factor) {
+						return factor != 2;
+					});
+				}
 
-			var tupletFactor;
-			if (duration.denominator != 1) {
-				var dFactors = PrimeLibrary.factor(duration.denominator);
-				tupletFactor = find(dFactors, function(factor) {
-					return factor != 2;
-				});
-			}
+				if (tupletFactor !== undefined) {
+					duration = duration.multiply(new Fraction(tupletFactor, 1)).divide(new Fraction(2, 1));
+				}
+				var binary = toBinary(duration.numerator);
 
-			if (tupletFactor !== undefined) {
-				duration = duration.multiply(new Fraction(tupletFactor, 1)).divide(new Fraction(2, 1));
-			}
-			var binary = toBinary(duration.numerator);
-
-			for (var i = 0; i < binary.length; i++) {
-				if (binary[i]) {
-					if (!isRest && i > 0 && binary[i - 1]) {
-						last(notesData).dots++;
-					} else {
-						var x = 1 << (binary.length - i - 1);
-						var noteDuration = new Fraction(4 * duration.denominator, x);
-						Vex.Flow.sanitizeDuration(fractionToString(noteDuration));
-						notesData.push({
-							keys: [key],
-							duration: noteDuration,
-							dots: 0,
-							tupletFactor: tupletFactor,
-							isRest: isRest ? "r" : ""
-						});
+				for (var i = 0; i < binary.length; i++) {
+					if (binary[i]) {
+						if (!isRest && i > 0 && binary[i - 1]) {
+							last(notesData).dots++;
+						} else {
+							var x = 1 << (binary.length - i - 1);
+							var noteDuration = new Fraction(4 * duration.denominator, x);
+							Vex.Flow.sanitizeDuration(fractionToString(noteDuration));
+							notesData.push({
+								keys: [key],
+								duration: noteDuration,
+								dots: 0,
+								tupletFactor: tupletFactor,
+								isRest: isRest ? "r" : ""
+							});
+						}
 					}
 				}
+				allNotes.push(notesData);
+			};
+
+			var sum = durationBuffer.add(note.duration);
+			var compare = Fraction.ONE.compareTo(sum);
+			//Separate note if they overflow a beat and don't come right on another beat
+			while (compare < 0 && !sum.mod(1).equals(Fraction.ZERO)) {
+				var durationLeft = Fraction.ONE.subtract(durationBuffer);
+				var split = note.split(durationLeft);
+				processNote(split[0]);
+				note = split[1];
+				durationBuffer = Fraction.ZERO;
+				sum = note.duration;
+				compare = Fraction.ONE.compareTo(sum);
 			}
-			allNotes.push(notesData);
+			durationBuffer = sum.mod(1);
+			if (!note.duration.equals(Fraction.ZERO)) {
+				processNote(note);
+			}
+
 		});
 		var result = {
 			notes: [],
@@ -183,7 +201,7 @@ RH.VexUtils = (function() {
 					duration: fractionToString(noteData.duration),
 					dots: noteData.dots,
 					type: noteData.isRest ? "r" : "",
-					isTied : j > 0 && !noteData.isRest
+					isTied: j > 0 && !noteData.isRest
 				});
 
 
@@ -219,7 +237,6 @@ RH.VexUtils = (function() {
 			return duration.toString();
 		}
 	};
-
 
 
 	VexUtils.generateMeasuresCanvases = function(measureWidth, measureHeight, measures) {

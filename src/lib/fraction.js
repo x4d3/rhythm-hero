@@ -167,6 +167,13 @@ Fraction = (function() {
 		return a.normalize();
 	};
 
+	Fraction.prototype.mod = function(b) {
+		checkIsInt(b);
+		var a = this.clone();
+		a.numerator %= b * a.denominator;
+		return a.normalize();
+	};
+
 	Fraction.prototype.equals = function(b) {
 		if (!(b instanceof Fraction)) {
 			return false;
