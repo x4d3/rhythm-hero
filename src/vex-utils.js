@@ -168,7 +168,6 @@ RH.VexUtils = (function() {
 						}
 					}
 				}
-				allNotes.push(notesData);
 			};
 
 			var sum = durationBuffer.add(note.duration);
@@ -187,6 +186,7 @@ RH.VexUtils = (function() {
 			if (!note.duration.equals(Fraction.ZERO)) {
 				processNote(note);
 			}
+			allNotes.push(notesData);
 
 		});
 		var result = {

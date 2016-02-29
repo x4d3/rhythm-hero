@@ -79,9 +79,8 @@ $(document)
 			test('Defined Patterns 3', function(assert) {
 				var notes = Note.parseNotes(
 					"1/2 1 1 1 1/2 " + 
-					"1/3 1/3 2/3 1/3 1/3 2" +
-					"");
-				var measures = RhythmPatterns.generateMeasures(options.tempi, [RH.TS.THREE_FOUR], notes);
+					"1/3 1/3 2/3 1/3 1/3 2");
+				var measures = RhythmPatterns.generateMeasures(options.tempi, [RH.TS.FOUR_FOUR], notes);
 
 				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
 				displayCanvases(assert.test.testName, canvasesData);
