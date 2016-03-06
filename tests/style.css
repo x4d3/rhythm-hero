@@ -1,0 +1,129 @@
+body {
+	margin: 0px;
+}
+
+.application-container {
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	height: 80%;
+	margin: auto;
+	position: absolute;
+	width: 100%;
+	position: absolute;
+	background: #eed;
+	border: 10px solid #ddc;
+	moz-border-radius: 5px;
+	webkit-border-radius: 5px;
+}
+
+canvas {
+	background: #eed;
+}
+
+.application {
+	height: 80%;
+	width: 100%;
+}
+
+.rh-icon {
+	background-position: 2px 2px;
+	background-repeat: no-repeat;
+	background-size: 28px;
+	height: 32px;
+	width: 32px;
+	top: -42px;
+	position: absolute;
+	cursor: pointer;
+}
+
+.rh-icon:hover {
+	background-position: 0 0px;
+	background-size: 32px;
+}
+
+.rh-icon.switch-sound{
+	background-image: url("images/sound-off.png");
+	right: 42px;
+
+}
+
+.rh-icon.switch-sound.on {
+	background-image: url("images/sound-on.png");
+}
+
+.rh-icon.beginner-mode{
+	background-image: url("images/beginner-off.png");
+	right: 84px;
+}
+.rh-icon.beginner-mode.on {
+	background-image: url("images/beginner-on.png");
+}
+
+.rh-icon.close-app {
+	background-image: url("images/close.png");
+	right: 0px;
+}
+
+/* Start by setting display:none to make this hidden.
+   Then we position it in relation to the viewport window
+   with position:fixed. Width, height, top and left speak
+   for themselves. Background we set to 80% white with
+   our animation centered, and no-repeating */
+.loading-modal {
+	display: none;
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	background: rgba(255, 255, 255, .8);
+}
+
+.loading-modal .message {
+	position: absolute;
+	top: 50%;
+	bottom: 50%;
+	left: 50%;
+	right: 50%;
+}
+
+.loading-modal img {
+	float: left;
+}
+
+.loading-modal i {
+	padding-left: 5px;
+}
+
+/* When the body has the loading class, we turn
+   the scrollbar off with overflow:hidden */
+body.loading {
+	overflow: hidden;
+}
+
+/* Anytime the body has the loading class, our
+   modal element will be visible */
+body.loading .loading-modal {
+	display: block;
+}
+
+.table.scores tbody>tr>td{
+    vertical-align: middle; 
+}
+
+td.score{
+	font-family: "scoreboard";
+	font-size: 2em;
+}
+
+@font-face {
+    font-family: 'scoreboard';
+    src: url('scoreboard.ttf');
+}
+@font-face {
+    font-family: 'arcadeclassic';
+    src: url('dpcomic.ttf');
+}
