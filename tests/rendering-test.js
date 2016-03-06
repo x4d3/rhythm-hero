@@ -56,7 +56,7 @@ $(document)
 				ok(true);
 			});
 			test('Defined Patterns', function(assert) {
-				var patternsS = ['minim', 'crotchet', 'quaver', 'triplet quaver', 'dotted crotchet quaver', 'quaver dotted crotchet', 'whole', 'minim', 'crotchet rest', 'crotchet rest',
+				var patternsS = ['minim', 'crotchet', 'triplet quaver', 'dotted crotchet quaver', 'quaver dotted crotchet', 'whole', 'minim', 'crotchet rest', 'crotchet rest',
 					'crotchet rest', 'crotchet rest', 'crotchet rest'
 				];
 				var patterns = patternsS.map(RhythmPatterns.getPattern);

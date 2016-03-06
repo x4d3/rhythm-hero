@@ -131,8 +131,11 @@ RH.RhythmPatterns = (function() {
 	addPattern("quaver rest", 2, 100, "qr");
 	addPattern("dotted crotchet quaver", 3, 100, "3/2 q");
 	addPattern("quaver dotted crotchet", 3, 100, "q 3/2");
-	addPattern("quaver", 3, 50, "q");
+	addPattern("rest quaver quaver", 3, 50, "qr q");
 	addPattern("quaver rest quaver", 3, 100, "qr q");
+	addPattern(null, 3, 100, "qr q");
+	addPattern(null, 3, 100, "q c c c q");
+	addPattern(null, 3, 100, "q c q q c q");
 
 	addPattern(null, 4, 25, "s s s s");
 	addPattern(null, 5, 25, "s s q");
@@ -150,20 +153,23 @@ RH.RhythmPatterns = (function() {
 	addPattern("triplet quaver", 7, 20, "tq tq tq");
 	addPattern("triplet crotchet", 8, 20, "2/3 2/3 2/3");
 
-	addPattern(null, 8, 5, "tqr tq tq");
-	addPattern(null, 8, 5, "tqr tqr tq");
-	addPattern(null, 8, 5, "tqr tqr tqr");
+	addPattern(null, 8, 20, "tqr tq tq");
+	addPattern(null, 8, 20, "tqr tqr tq");
+	addPattern(null, 8, 20, "tqr tqr tqr");
 
-	addPattern(null, 8, 5, "2/3 tq");
-	addPattern(null, 8, 5, "tq 2/3");
+	addPattern(null, 8, 20, "2/3 tq");
+	addPattern(null, 8, 20, "tq 2/3");
 
 
-	addPattern(null, 8, 5, "1/6 1/6 1/6");
+	addPattern(null, 8, 20, "1/6 1/6 1/6 q");
+	addPattern(null, 8, 20, "1/6 1/6 1/6 1/6 1/6 1/6");
+	addPattern(null, 8, 20, "q 1/6 1/6 1/6");
+
 
 	addPattern("quintuplet quaver", 9, 20, "1/5 1/5 1/5 1/5 1/5");
-	addPattern("quintuplet crotchet", 10, 1, "2/5 2/5 2/5 2/5 2/5");
+	addPattern("quintuplet crotchet", 10, 20, "2/5 2/5 2/5 2/5 2/5");
 
-	addPattern(null, 10, 1, "2/5 2/5r 2/5 2/5r 2/5");
+	addPattern(null, 10, 20, "2/5 2/5r 2/5 2/5r 2/5");
 
 
 	var difficulties = PATTERNS.map(function(x) {

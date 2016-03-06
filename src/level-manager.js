@@ -69,9 +69,9 @@ RH.LevelManager = (function() {
 
 
 		],
-		["Wiganor", ["4/4"],
+		["Siegfried-Idyll", ["4/4"],
 			[60],
-			["13/3  tq tq  tq  tq  tq  5/6 1 9/2",
+			["13/3  tq tq  tq  tq  5/6 1 9/2",
 				repeat("tq", 12), "q q qr q qr q qr q", "r q 3/2r q qr"
 			].join(" ")
 		],
