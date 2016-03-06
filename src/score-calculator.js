@@ -2,6 +2,8 @@ RH.ScoreCalculator = (function() {
 	'use strict';
 	var logger = RH.logManager.getLogger('ScoreCalculator');
 	var MAX_START_DIFF = 200;
+	var MAX_DURATION_DIFF = 0.8;
+	var MAX_FAILED_RATIO = 0.20;
 	var FAILED_REASONS = {
 		TOO_EARLY: 'Too Early',
 		TOO_LATE: 'Too Late',
@@ -32,17 +34,18 @@ RH.ScoreCalculator = (function() {
 		this.failureReasons = [];
 	}
 	SuccessNoteScore.prototype = {
-		toString : function(){
+		toString: function() {
 			return this.value;
 		}
 	};
+
 	function FailedNoteScore(failureReasons) {
 		this.value = 0;
 		this.isFailed = true;
 		this.failureReasons = failureReasons;
 	}
 	FailedNoteScore.prototype = {
-		toString : function(){
+		toString: function() {
 			return this.failureReasons.join(',');
 		}
 	};
@@ -53,20 +56,24 @@ RH.ScoreCalculator = (function() {
 	}
 	MeasureScore.prototype = {
 		value: function() {
-			var sum = 0;
-			for (var i = 0; i < this.notes.length; i++) {
-				var score = this.notes[i];
-				if (score.isFailed) {
-					return 0;
+			if (this.isFailed()) {
+				return 0;
+			} else {
+				var sum = 0;
+				for (var i = 0; i < this.notes.length; i++) {
+					sum += this.notes[i].value;
 				}
-				sum += score.value;
+				return sum / this.notes.length;
 			}
-			return sum / this.notes.length;
 		},
 		isFailed: function() {
-			return this.notes.some(function(x) {
-				return x.isFailed;
-			});
+			var failedNumber = 0;
+			for (var i = 0; i < this.notes.length; i++) {
+				if (this.notes[i].isFailed) {
+					failedNumber++;
+				}
+			}
+			return failedNumber / this.notes.length >= 0.2;
 		},
 		toString: function() {
 			return this.notes.join(" | ");
@@ -75,7 +82,7 @@ RH.ScoreCalculator = (function() {
 			var result = {};
 			this.notes.forEach(function(note) {
 				note.failureReasons.forEach(function(key) {
-					result[key] = 1 + (result[key]?result[key]:0);
+					result[key] = 1 + (result[key] ? result[key] : 0);
 				});
 			});
 			var max = 0;
@@ -127,15 +134,15 @@ RH.ScoreCalculator = (function() {
 		};
 		addFailureReason('TOO_EARLY', startDiff < -MAX_START_DIFF);
 		addFailureReason('TOO_LATE', startDiff > MAX_START_DIFF);
-		addFailureReason('TOO_SHORT', durationDiff < -0.5);
-		addFailureReason('TOO_LONG', durationDiff > 0.5);
+		addFailureReason('TOO_SHORT', durationDiff < -MAX_DURATION_DIFF);
+		addFailureReason('TOO_LONG', durationDiff > MAX_DURATION_DIFF);
 		addFailureReason('TOO_MANY_PRESSES', notesPlayedBetween);
 		if (failureReasons.length > 0) {
 			return new FailedNoteScore(failureReasons);
 		} else {
 			var x = Math.max(1 - Math.abs(startDiff / MAX_START_DIFF), 0);
-			var y = Math.max(1 - Math.abs(durationDiff), 0);
-			return new SuccessNoteScore(0.1 + 0.6 * x * x + 0.3 * y);
+			var y = Math.max(MAX_DURATION_DIFF - Math.abs(durationDiff), 0);
+			return new SuccessNoteScore(0.1 + 0.6 * x + 0.3 * y);
 		}
 	};
 	/**this.life = Math.max(this.life - 0.25, 0);
