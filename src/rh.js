@@ -207,15 +207,25 @@ if (typeof localStorage === 'undefined') {
 		};
 	}());
 	/**
-	* input {"a":"valueA", "b", "valueB"}
-	* output {"a" :0, "b":1}
-	*/
+	 * input {"a":"valueA", "b", "valueB"}
+	 * output {"a" :0, "b":1}
+	 */
 	RH.getObjectKeysIndexes = function(input) {
 		var result = {};
 		Object.keys(input).forEach(function(key, index) {
 			result[key] = index;
 		});
 		return result;
+	};
+	RH.map = function(input, callback) {
+		return Object.keys(input).map(function(key, index) {
+			return callback(input[key], key, index);
+		});
+	};
+	RH.forEach = function(input, callback) {
+		Object.keys(input).forEach(function(key, index) {
+			callback(input[key], key, index);
+		});
 	};
 
 

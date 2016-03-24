@@ -3,10 +3,10 @@ $(document)
 		function() {
 			'use strict';
 			module("Rendering Tests");
+			var Application = RH.Application;
 			var Game = RH.Game;
 			var Measure = RH.Measure;
 			var Note = RH.Note;
-			var GameOptions = RH.GameOptions;
 			var RhythmPatterns = RH.RhythmPatterns;
 			var VexUtils = RH.VexUtils;
 			var EventManager = RH.EventManager;
@@ -17,7 +17,8 @@ $(document)
 			// To make the test reproduceable
 			Math.seedrandom('Test');
 			RH.debug();
-			var options = new GameOptions();
+			var tempi = [Application.DEFAULT_TEMPO];
+			var timeSignatures = [Application.DEFAULT_TS];
 			var generateCanvas = function(title, width, comment) {
 				var canvasJ = $('<canvas>');
 				canvasJ.prop({
@@ -49,7 +50,7 @@ $(document)
 
 
 			test('All Patterns', function(assert) {
-				var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, getPatternsNotes(RhythmPatterns.PATTERNS));
+				var measures = RhythmPatterns.generateMeasures(tempi, timeSignatures, getPatternsNotes(RhythmPatterns.PATTERNS));
 
 				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
 				displayCanvases(assert.test.testName, canvasesData);
@@ -60,7 +61,7 @@ $(document)
 					'crotchet rest', 'crotchet rest', 'crotchet rest'
 				];
 				var patterns = patternsS.map(RhythmPatterns.getPattern);
-				var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, getPatternsNotes(patterns));
+				var measures = RhythmPatterns.generateMeasures(tempi, timeSignatures, getPatternsNotes(patterns));
 
 				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
 				displayCanvases(assert.test.testName, canvasesData);
@@ -70,7 +71,7 @@ $(document)
 				var notes = Note.parseNotes(
 					"1/3 1/3 1/3 2/3 2/3 2/3 " +
 					"q 1/6 1/6 1/6  q 1/6 1/6 1/6  q q  q 1/6 1/6 1/6  q 1/6 1/6 1/6  1/6 1/6 1/6 1/6 1/6 1/6");
-				var measures = RhythmPatterns.generateMeasures(options.tempi, [RH.TS.THREE_FOUR], notes);
+				var measures = RhythmPatterns.generateMeasures(tempi, [RH.TS.THREE_FOUR], notes);
 
 				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
 				displayCanvases(assert.test.testName, canvasesData);
@@ -80,7 +81,7 @@ $(document)
 				var notes = Note.parseNotes(
 					"1/2 1 1 1 1/2 " + 
 					"1/3 1/3 2/3 1/3 1/3 2");
-				var measures = RhythmPatterns.generateMeasures(options.tempi, [RH.TS.FOUR_FOUR], notes);
+				var measures = RhythmPatterns.generateMeasures(tempi, [RH.TS.FOUR_FOUR], notes);
 
 				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
 				displayCanvases(assert.test.testName, canvasesData);
@@ -89,7 +90,7 @@ $(document)
 
 			test('Random Patterns', function(assert) {
 				var notes = RH.RhythmPatterns.generateNotes(0, RH.RhythmPatterns.MAX_DIFFICULTY, 100);
-				var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, notes);
+				var measures = RhythmPatterns.generateMeasures(tempi, timeSignatures, notes);
 
 				var canvasesData = VexUtils.generateMeasuresCanvases(400, 150, measures);
 				displayCanvases(assert.test.testName, canvasesData);
@@ -112,7 +113,7 @@ $(document)
 					var NOTES_INPUT = "1/1 q 1/1r 1/1 q 1/1 1/1r 1/1 2/1 1/1r 1/1 1/1r 1/1r 1/1r 1/1r q 1/1 1/1 1/1 1/1 q 1/1r 1/1 1/1r 2/1 1/1 1/1 1/1r 1/1r 1/1 1/1r 1/1 1/1r q q 1/1 q 1/1r q 1/1r 1/1 q 1/1r 1/1r 1/1 1/1r q 1/1 1/1 1/1";
 					var notes = Note.parseNotes(NOTES_INPUT);
 
-					var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, notes);
+					var measures = RhythmPatterns.generateMeasures(tempi, timeSignatures, notes);
 					var eventManager = EventManager
 						.fromJson('{"keyPressed":[null,false],"keyChanged":[4031,4949,5100,5765,6474,7350,7509,8059,8175,10189,11869,12702,13975,15137,19082,19407,19579,20316,20473,21327,21490,22326,22481,23182,23343,23898,24758,26058,27051,28590,28815,29700,29832,31095,33061,34014,35001,35983,37174,37331,37500,37790,38031,38564,39078,39545,40401,40780,40915,41249,41932,42944,43107,43672],"isPressed":false}');
 					eventManager.getTime = function() {
@@ -121,7 +122,7 @@ $(document)
 					var scoreCalculator = new ScoreCalculator(eventManager, measures);
 
 					var t0 = 117;
-					var screen = new Screen(null, eventManager, scoreCalculator, measures, options);
+					var screen = new Screen(null, eventManager, scoreCalculator, measures);
 
 					for (var measureIndex = 2; measureIndex < measures.length; measureIndex++) {
 						var t = t0 + 4000 * measureIndex;

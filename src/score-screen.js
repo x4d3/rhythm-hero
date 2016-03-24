@@ -67,7 +67,8 @@ RH.ScoreScreen = (function() {
 			context.restore();
 		}
 	});
-	function TargetableScore(updateDuration){
+
+	function TargetableScore(updateDuration) {
 		this.updateDuration = updateDuration;
 		this.target = null;
 		this.value = null;
@@ -81,33 +82,32 @@ RH.ScoreScreen = (function() {
 				this.previousValue = this.value;
 				this.updateTime = t;
 			}
-			if(this.value === null){
+			if (this.value === null) {
 				this.value = this.target;
-			}else{
+			} else {
 				var progress = Math.min(1, (t - this.updateTime) / this.updateDuration);
 				this.value = intermediatePosition(this.previousValue, this.target, progress);
-			}			
+			}
 		}
 	};
+
 	function ScoreScreen(options) {
 		RH.copyProperties(options, this);
 		this.currentIndex = 0;
-		this.GoodScoreProjectiles = [];
+		this.projectiles = [];
 		this.totalScore = new TargetableScore(UPDATE_SCORE_DURATION);
 		this.life = new TargetableScore(UPDATE_LIFE_DURATION);
 	}
-	ScoreScreen.formatTotal = function(totalScore){
+	ScoreScreen.formatTotal = function(totalScore) {
 		return pad(Math.round(100 * totalScore), 5);
 	};
 
 	ScoreScreen.prototype = {
-		draw: function(context, measurePosition, measureIndex, t) {
-			// if (measureIndex < 1) {
-			// return; = 
-			// }
+		draw: function(context, measurePosition, measureIndex, measureInfo) {
+			var t = measureInfo.t;
 			var multiplier = this.scoreCalculator.multiplier;
 			var totalScore = this.scoreCalculator.totalScore;
-			if (measureIndex != this.currentIndex) {
+			if (measureIndex != this.currentIndex && (measureInfo.status == RH.Game.STATUS.STARTED)) {
 				this.currentIndex = measureIndex;
 				var score = this.scoreCalculator.measuresScore[measureIndex];
 				if (measureIndex > 0) {
@@ -124,19 +124,10 @@ RH.ScoreScreen = (function() {
 					} else {
 						newProjectile = new GoodScoreProjectile(options);
 					}
-					this.GoodScoreProjectiles.push(newProjectile);
+					this.projectiles.push(newProjectile);
 				}
 
 			}
-			var projectiles = [];
-			for (var i = 0; i < this.GoodScoreProjectiles.length; i++) {
-				var projectile = this.GoodScoreProjectiles[i];
-				if (!projectile.isFinished(t)) {
-					projectile.draw(context, t);
-					projectiles.push(projectile);
-				}
-			}
-			this.GoodScoreProjectiles = projectiles;
 
 			context.save();
 			context.font = '32px scoreboard';
@@ -152,20 +143,43 @@ RH.ScoreScreen = (function() {
 			context.fillText("X" + multiplier, this.multiplierPosition.x, this.multiplierPosition.y);
 			context.restore();
 
-			if(this.scoreCalculator.withLife){
-				this.life.update(this.scoreCalculator.life, t); 
+			if (this.scoreCalculator.withLife) {
+				this.life.update(this.scoreCalculator.life, t);
 				context.save();
 				context.strokeStyle = "black";
 				context.rect(this.lifePosition.x, this.lifePosition.y - LIFE_HEIGHT, LIFE_WIDTH, LIFE_HEIGHT);
 				context.stroke();
 				context.fillStyle = '#696969';
-				context.fillRect(this.lifePosition.x, this.lifePosition.y- LIFE_HEIGHT, LIFE_WIDTH* this.life.value, LIFE_HEIGHT);
+				context.fillRect(this.lifePosition.x, this.lifePosition.y - LIFE_HEIGHT, LIFE_WIDTH * this.life.value, LIFE_HEIGHT);
 				context.restore();
 			}
+
+			if (measureInfo.status == RH.Game.STATUS.SCORE_SCREEN) {
+				var best = this.scoreCalculator.scoreManager.best;
+				if (best) {
+					context.save();
+					context.font = '32px scoreboard';
+					context.fillStyle = '#696969';
+					context.fillText(ScoreScreen.formatTotal(best), this.scorePosition.x, this.scorePosition.y + 40);
+					context.restore();
+				}
+			}
+			this.drawProjectiles(context, t);
 		},
+		drawProjectiles: function(context, t) {
+			var projectiles = [];
+			for (var i = 0; i < this.projectiles.length; i++) {
+				var projectile = this.projectiles[i];
+				if (!projectile.isFinished(t)) {
+					projectile.draw(context, t);
+					projectiles.push(projectile);
+				}
+			}
+			this.projectiles = projectiles;
+		}
 
 	};
 
-	
+
 	return ScoreScreen;
 }());

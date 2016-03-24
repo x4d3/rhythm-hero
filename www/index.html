@@ -74,9 +74,10 @@
 						<h4 class="modal-title">Scores</h4>
 					</div>
 					<div class="modal-body">
-						<p data-bind="visible: scores().length == 0">You haven't any score yet.</p>
+
+						<!-- <p data-bind="visible: campaignScoresDisplay()">You haven't any score yet.</p> -->
 						<table class="table scores">
-							<tbody data-bind="foreach: scoresDisplay">
+							<tbody data-bind="foreach: campaignScoresDisplay">
 								<tr >
 									<td data-bind="text: description"> </td>
 									<td class="text-right score" data-bind="text: score"> </td>
@@ -84,6 +85,17 @@
 								</tr>
 							</table>
 						</tbody>
+
+						<!-- <p data-bind="visible: this.practiceScoresDisplay().length == 0">You haven't any score yet.</p> -->
+						<table class="table scores">
+							<tbody data-bind="foreach: practiceScoresDisplay">
+								<tr >
+									<td data-bind="text: description"> </td>
+									<td class="text-right score" data-bind="text: score"> </td>
+								</tr>
+							</table>
+						</tbody>
+
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-bind="event: { click: resetScores, touchstart: resetScores }">Reset Scores</button>
@@ -133,12 +145,12 @@
 							<select class="form-control" id="difficulty-select" data-bind="options: difficultyValues, value: difficulty"></select>
 						</fieldset>
 						<fieldset class="form-group">
-							<label for="timesignatures-select">Time Signatures</label>
-						<select multiple="multiple" class="form-control" id="timesignatures-select" data-bind="options: timeSignaturesValues, selectedOptions: timeSignatures"></select>
+							<label for="timesignature-select">Time Signature</label>
+						<select class="form-control" id="timesignature-select" data-bind="options: timeSignaturesValues, value: timeSignature"></select>
 					</fieldset>
 					<fieldset class="form-group">
-						<label for="tempi-select">Tempi</label>
-					<select multiple="multiple" class="form-control" id="tempi-select" data-bind="options: tempiValues, selectedOptions: tempi"></select>
+						<label for="tempo-select">Tempo</label>
+					<select class="form-control" id="tempo-select" data-bind="options: tempiValues, value: tempo"></select>
 				</fieldset>
 				<label for="scrolling-direction">Scrolling Direction</label>
 				<div class="radio">

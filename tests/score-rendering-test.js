@@ -2,10 +2,10 @@ $(document).ready(
 	function() {
 		'use strict';
 		module("Rendering Tests - Score");
+		var Application = RH.Application;
 		var Game = RH.Game;
 		var Measure = RH.Measure;
 		var Note = RH.Note;
-		var GameOptions = RH.GameOptions;
 		var RhythmPatterns = RH.RhythmPatterns;
 		var VexUtils = RH.VexUtils;
 		var EventManager = RH.EventManager;
@@ -16,7 +16,6 @@ $(document).ready(
 		// To make the test reproduceable
 		Math.seedrandom('Test Score');
 		RH.debug();
-		var options = new GameOptions();
 		var generateCanvas = function(title, width, comment) {
 			var canvasJ = $('<canvas>');
 			canvasJ.prop({

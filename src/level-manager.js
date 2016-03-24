@@ -3,7 +3,6 @@ RH.LevelManager = (function() {
 	var RhythmPatterns = RH.RhythmPatterns;
 	var TimeSignature = RH.TimeSignature;
 	var Note = RH.Note;
-	var GameOptions = RH.GameOptions;
 	var Level = function(description, measures) {
 		this.description = description;
 		this.measures = measures;

@@ -67,63 +67,65 @@ RH.Screen = (function() {
 			var context = canvas.getContext("2d");
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			var measure = measureInfo.measure;
+			var isOn = measureInfo.status === RH.Game.STATUS.STARTED;
 			var isHorizontal = RH.Parameters.model.scrollingDirection() == 'horizontal';
 			var isContinuous = RH.Parameters.model.scrollingMode() == 'continuous';
 			var shift = measureInfo.ellapsedBeats / measure.getBeatPerBar();
+			if (shift < 1.5) {
+				var staveShift = isContinuous ? shift : 0.5;
 
-			var staveShift = isContinuous ? shift : 0.5;
-
-			var suiteArray;
-			if (isHorizontal) {
-				suiteArray = RH.createSuiteArray(-1, 3);
-			} else {
-				suiteArray = RH.createSuiteArray(-2, 4);
-			}
-
-			suiteArray.forEach(function(i) {
-				var index = measureInfo.index + i;
-				if (index < 0 || index >= screen.measures.length) {
-					return;
-				}
-				var staveX;
-				var staveY;
+				var suiteArray;
 				if (isHorizontal) {
-					staveX = (i + 0.5 - staveShift) * MEASURE_WIDTH;
-					staveY = 50;
+					suiteArray = RH.createSuiteArray(-1, 3);
 				} else {
-					var parity = RH.mod(index, 2);
-					var alpha = Math.floor(i - parity) / 2;
-					staveX = parity * MEASURE_WIDTH;
-					staveY = (1 + alpha - staveShift / 2) * MEASURE_HEIGHT;
+					suiteArray = RH.createSuiteArray(-2, 4);
 				}
-				screen.displayStave(canvas, staveX, staveY, index, i === 0);
-				// display the count down
-				if (index === 0 && i === 0) {
 
-					context.fillStyle = 'grey';
-					var division = RH.divide(measureInfo.ellapsedBeats, 1).quotient;
-					var beatPerBar = screen.measures[index].getBeatPerBar();
-					for (var beat = 0; beat < beatPerBar; beat++) {
-						context.font = beat === division ? 'bolder 36px Open Sans' : '16px Open Sans';
-						context.fillText(beat + 1, staveX + beat * MEASURE_WIDTH / beatPerBar, staveY + 70);
-
-					}
-
-				}
-			});
-
-			if (RH.Parameters.isBeginnerMode()) {
-				this.displayEvents(canvas, EVENT_Y, measureInfo, 0.5);
-				[-1, 0, 1, 2].forEach(function(i) {
+				suiteArray.forEach(function(i) {
 					var index = measureInfo.index + i;
 					if (index < 0 || index >= screen.measures.length) {
 						return;
 					}
-					var startStave = i * MEASURE_WIDTH - shift;
-					screen.displayDebug(canvas, DEBUG_Y, (i + 0.5 - shift) * MEASURE_WIDTH, index);
+					var staveX;
+					var staveY;
+					if (isHorizontal) {
+						staveX = (i + 0.5 - staveShift) * MEASURE_WIDTH;
+						staveY = 50;
+					} else {
+						var parity = RH.mod(index, 2);
+						var alpha = Math.floor(i - parity) / 2;
+						staveX = parity * MEASURE_WIDTH;
+						staveY = (1 + alpha - staveShift / 2) * MEASURE_HEIGHT;
+					}
+					var isActive = i === 0 && isOn;
+					screen.displayStave(canvas, staveX, staveY, index, isActive);
+					// display the count down
+					if (index === 0 && i === 0) {
+						context.fillStyle = 'grey';
+						var division = RH.divide(measureInfo.ellapsedBeats, 1).quotient;
+						var beatPerBar = screen.measures[index].getBeatPerBar();
+						for (var beat = 0; beat < beatPerBar; beat++) {
+							context.font = beat === division ? 'bolder 36px Open Sans' : '16px Open Sans';
+							context.fillText(beat + 1, staveX + beat * MEASURE_WIDTH / beatPerBar, staveY + 70);
+						}
+					}
 				});
+				if (isOn) {
+					if (RH.Parameters.isBeginnerMode()) {
+						this.displayEvents(canvas, EVENT_Y, measure, measureInfo.t, 0.5);
+						[-1, 0, 1, 2].forEach(function(i) {
+							var index = measureInfo.index + i;
+							if (index < 0 || index >= screen.measures.length) {
+								return;
+							}
+							var startStave = i * MEASURE_WIDTH - shift;
+							screen.displayDebug(canvas, DEBUG_Y, (i + 0.5 - shift) * MEASURE_WIDTH, index);
+						});
+					}
+					this.displayMetronome(canvas, measure, measureInfo.ellapsedBeats);
+				}
+
 			}
-			this.displayMetronome(canvas, measureInfo);
 			var previousMeasureIndex = measureInfo.index - 1;
 			var measurePosition;
 			if (isHorizontal) {
@@ -147,7 +149,7 @@ RH.Screen = (function() {
 				//context.textBaseline = "middle";
 				context.fillText(this.title, TITLE_POSITION.x, TITLE_POSITION.y);
 			} else {
-				this.scoreScreen.draw(context, measurePosition, previousMeasureIndex, measureInfo.t);
+				this.scoreScreen.draw(context, measurePosition, previousMeasureIndex, measureInfo);
 			}
 
 			if (this.eventManager.isPressed) {
@@ -162,8 +164,9 @@ RH.Screen = (function() {
 
 		},
 		drawOnExternalCanvas: function(canvas, measureInfo) {
+			var measure = measureInfo.measure;
 			this.displayStave(canvas, 0, 0, measureInfo.index, true);
-			this.displayEvents(canvas, 150, measureInfo, 1);
+			this.displayEvents(canvas, 150, measure, measureInfo.t, 1);
 			this.displayDebug(canvas, 120, 0, measureInfo.index);
 			var score = this.scoreCalculator.measuresScore[measureInfo.index];
 			if (score !== undefined) {
@@ -174,12 +177,10 @@ RH.Screen = (function() {
 			}
 
 		},
-		displayEvents: function(canvas, eventY, measureInfo, percentage) {
+		displayEvents: function(canvas, eventY, measure, t, percentage) {
 			var context = canvas.getContext("2d");
-
-			var measure = measureInfo.measure;
 			var measureDuration = measure.getDuration();
-			var ups = this.eventManager.getEvents(measureInfo.t - measureDuration * percentage);
+			var ups = this.eventManager.getEvents(t - measureDuration * percentage);
 			var x = 0;
 			var screen = this;
 			context.save();
@@ -239,14 +240,13 @@ RH.Screen = (function() {
 			canvas.getContext('2d').putImageData(data, x, y);
 
 		},
-		displayMetronome: function(canvas, measureInfo) {
-			if (measureInfo.index !== this.measures.length - 1) {
-				var context = canvas.getContext("2d");
-				context.save();
-				context.translate(METRONOME_POSITION.x, METRONOME_POSITION.y);
-				this.metronome.draw(context, measureInfo.measure, measureInfo.ellapsedBeats);
-				context.restore();
-			}
+		displayMetronome: function(canvas, measure, ellapsedBeats) {
+			var context = canvas.getContext("2d");
+			context.save();
+			context.translate(METRONOME_POSITION.x, METRONOME_POSITION.y);
+			this.metronome.draw(context, measure, ellapsedBeats);
+			context.restore();
+
 		}
 
 	};

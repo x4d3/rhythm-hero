@@ -5,12 +5,11 @@ test("Game.generateBars", function() {
 	var Game = RH.Game;
 	var Measure = RH.Measure;
 	var Note = RH.Note;
-	var GameOptions = RH.GameOptions;
+	var Application = RH.Application;
 	var RhythmPatterns = RH.RhythmPatterns;
 	
-	var options = new GameOptions();
-	var tempo = options.tempi[0];
-	var timeSignature = options.timeSignatures[0];
+	var tempo = Application.DEFAULT_TEMPO;
+	var timeSignature = Application.DEFAULT_TS;
 	
 	var getPatternsNotes = function(patterns){
 		var result = [];
@@ -26,7 +25,7 @@ test("Game.generateBars", function() {
 
 	var testMeasures = function(patternsS, awaitedMeasures) {
 		var patterns = patternsS.map(RhythmPatterns.getPattern);
-		var measures = RhythmPatterns.generateMeasures(options.tempi, options.timeSignatures, getPatternsNotes(patterns)).slice(1, -1);
+		var measures = RhythmPatterns.generateMeasures([tempo], [timeSignature], getPatternsNotes(patterns)).slice(1);
 		deepEqual(measures, awaitedMeasures, "Got    : " + measures + "\nAwaited: " + awaitedMeasures);
 	};
 	testMeasures([ 'crotchet', 'whole', 'minim', 'crotchet' ],

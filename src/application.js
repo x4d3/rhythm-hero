@@ -3,15 +3,34 @@ RH.Application = (function() {
 	var Game = RH.Game;
 	var LevelManager = RH.LevelManager;
 	var RhythmPatterns = RH.RhythmPatterns;
-	var GameOptions = RH.GameOptions;
 	var TimeSignature = RH.TimeSignature;
 	var EndGameScreen = RH.EndGameScreen;
 	var logger = RH.logManager.getLogger('Application');
 
+	var DEFAULT_TEMPO = 60;
+	var DEFAULT_TS = RH.TS.FOUR_FOUR;
+
+	var ScoreManager = function(type, index) {
+		this.type = type;
+		this.index = index;
+	};
+
+	ScoreManager.prototype = {
+		save: function(score) {
+			var best = RH.Parameters.getScore(this.type, this.index);
+			if (best === undefined || best < score) {
+				RH.Parameters.saveScore(this.type, this.index, score);
+				this.bestScoreBeaten = true;
+				best = score;
+			}
+			this.best = best;
+		}
+	};
+
 	function Application(canvas) {
 		this.canvas = canvas;
 		this.screen = null;
-		this.N = false;
+		this.isAnimating = false;
 	}
 
 	Application.prototype = {
@@ -35,18 +54,25 @@ RH.Application = (function() {
 			var app = this;
 			Parameters.model.displayCanvas(true);
 			Parameters.model.beginnerModeEnabled(true);
-			var timeSignatures = Parameters.model.timeSignatures().map(TimeSignature.parse);
-			var tempi = Parameters.model.tempi();
+			var timeSignature = TimeSignature.parse(Parameters.model.timeSignature());
+			var tempo = Parameters.model.tempo();
 			var maxDifficulty = Parameters.model.difficulty();
 			var notes = RhythmPatterns.generateNotes(0, maxDifficulty, 50);
-			var measures = RhythmPatterns.generateMeasures(tempi, timeSignatures, notes);
-			var endGameCallback = function(game) {
-				Parameters.model.displayCanvas(false);
-				$('.result').append(game.renderScore());
-				app.screen = null;
-			};
+			var measures = RhythmPatterns.generateMeasures([tempo], [timeSignature], notes);
 			var withLife = Parameters.model.withLife();
-			this.screen = new Game(measures, "Practice Mode - Difficulty: " + maxDifficulty, this.canvas, withLife, endGameCallback);
+			var title = "Practice Mode - Difficulty: " + maxDifficulty;
+			var canvas = this.canvas;
+			var callback = function() {
+				var status = this.status;
+				if (status === Game.STATUS.SCORE_SCREEN) {
+					$('.result').append(this.renderScore());
+				} else if (status === Game.STATUS.FINISHED) {
+					Parameters.model.displayCanvas(false);
+					app.screen = null;
+				}
+			};
+			var scoreManager = new ScoreManager('practice', maxDifficulty + "#" + tempo);
+			this.screen = new Game(measures, title, canvas, withLife, scoreManager, callback);
 			this.startAnimation();
 		},
 		campaign: function(currentLevel) {
@@ -55,21 +81,22 @@ RH.Application = (function() {
 			var app = this;
 			Parameters.model.displayCanvas(true);
 			Parameters.model.beginnerModeEnabled(false);
-			var endLevelCallback = null;
-			var nextLevelCallback = function() {
+			var setGame = function() {
 				var level = LevelManager.getLevel(currentLevel);
-				app.screen = new Game(level.measures, level.description, app.canvas, true, endLevelCallback);
+				var scoreManager = new ScoreManager('campaign', currentLevel);
+				app.screen = new Game(level.measures, level.description, app.canvas, true, scoreManager, callback);
 			};
-			endLevelCallback = function(game) {
-				var bestScore = null;
-				if (!game.scoreCalculator.hasLost()) {
-					bestScore = RH.Parameters.saveScore(currentLevel, game.scoreCalculator.totalScore);
-					currentLevel++;
+			var callback = function() {
+				var status = this.status;
+				if (status === Game.STATUS.SCORE_SCREEN) {
+					if (!this.scoreCalculator.hasLost()) {
+						currentLevel++;
+					}
+				} else if (status === Game.STATUS.FINISHED) {
+					setGame();
 				}
-				app.screen = new EndGameScreen(app.canvas, game, bestScore, nextLevelCallback);
-
 			};
-			nextLevelCallback();
+			setGame();
 			this.startAnimation();
 		},
 		resetKeyPressed: function() {
@@ -95,11 +122,17 @@ RH.Application = (function() {
 			RH.Parameters.model.displayCanvas(false);
 		}
 	};
+
+	Application.DEFAULT_TEMPO = DEFAULT_TEMPO;
+	Application.DEFAULT_TS = DEFAULT_TS;
+
 	return Application;
 }());
 
 $(document).ready(function() {
 	'use strict';
+	var DEFAULT_TEMPO = RH.Application.DEFAULT_TEMPO;
+	var DEFAULT_TS = RH.Application.DEFAULT_TS;
 
 	var getParameterByName = function(name) {
 		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -146,12 +179,12 @@ $(document).ready(function() {
 			persist: 'RH.difficulty'
 		}),
 		timeSignaturesValues: timeSignaturesValues,
-		timeSignatures: ko.observable([RH.TS.FOUR_FOUR.toString()], {
-			persist: 'RH.timeSignatures'
+		timeSignature: ko.observable(DEFAULT_TS.toString(), {
+			persist: 'RH.timeSignature'
 		}),
 		tempiValues: [60, 90, 120, 150, 180],
-		tempi: ko.observable([60], {
-			persist: 'RH.tempi'
+		tempo: ko.observable(DEFAULT_TEMPO, {
+			persist: 'RH.tempo'
 		}),
 		scrollingDirection: ko.observable("horizontal", {
 			persist: 'RH.scrollingDirection'
@@ -161,13 +194,19 @@ $(document).ready(function() {
 		}),
 		displayCanvas: ko.observable(false),
 		beginnerModeEnabled: ko.observable(true),
-		scores: ko.observable([], {
+		scores: ko.observable({
+			campaign: [],
+			practice: {}
+		}, {
 			persist: 'RH.scores'
 		}),
 		resetScores: function() {
 			bootbox.confirm("Are you sure you want to reset all your scores ?", function(result) {
 				if (result) {
-					model.scores([]);
+					model.scores({
+						campaign: [],
+						practice: {}
+					});
 				}
 			});
 		},
@@ -179,9 +218,8 @@ $(document).ready(function() {
 		},
 		startCampaign: function() {
 			initAudio(function() {
-				application.campaign(model.scores().length);
+				application.campaign(model.scores().campaign.length);
 			});
-
 		},
 		startLevel: function(score) {
 			initAudio(function() {
@@ -192,10 +230,20 @@ $(document).ready(function() {
 			application.stop();
 		}
 	};
-	model.scoresDisplay = ko.computed(function() {
-		return model.scores().map(function(score, index) {
+	model.campaignScoresDisplay = ko.computed(function() {
+		return model.scores().campaign.map(function(score, index) {
 			return {
 				description: RH.LevelManager.getLevel(index).description,
+				score: RH.ScoreScreen.formatTotal(score),
+				index: index
+			};
+		});
+	});
+	model.practiceScoresDisplay = ko.computed(function() {
+		RH.map(model.scores().practice, function(score, key, index) {
+			var split = key.split('#');
+			return {
+				description: 'Difficulty: ' + split[0] + ' ,Tempo:' + split[1],
 				score: RH.ScoreScreen.formatTotal(score),
 				index: index
 			};
@@ -207,21 +255,19 @@ $(document).ready(function() {
 		isBeginnerMode: function() {
 			return model.beginnerModeEnabled() && model.beginnerMode();
 		},
+		getScore : function(type, index){
+			return model.scores()[type][index];
+		},
 		/**
 		 * save the score if it is the best
 		 * @return the current Best Score
 		 */
-		saveScore: function(index, score) {
+		saveScore: function(type, index, score) {
 			var scores = model.scores();
-			var previousScore = scores[index];
-			if (previousScore !== undefined && previousScore > score) {
-				return previousScore;
-			} else {
-				scores[index] = score;
-				model.scores(scores);
-				return score;
-			}
+			scores[type][index] = score;
+			model.scores(scores);
 		}
+
 	};
 
 	var onDown = function(event) {

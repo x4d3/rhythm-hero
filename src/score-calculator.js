@@ -105,16 +105,18 @@ RH.ScoreCalculator = (function() {
 	};
 
 
-	function ScoreCalculator(eventManager, measures, withLife) {
+	function ScoreCalculator(eventManager, measures, withLife, scoreManager) {
 		this.eventManager = eventManager;
 		this.measures = measures;
 		this.withLife = withLife;
+		this.scoreManager = scoreManager;
 		this.life = 0.8;
 		this.measuresScore = [];
 		this.multiplier = 1;
 		this.totalScore = 0;
 		this.goodMeasureCount = 0;
 	}
+
 	var keepBetween = function(min, max, value) {
 		if (value > max) {
 			return max;
@@ -263,14 +265,24 @@ RH.ScoreCalculator = (function() {
 			} else {
 				this.goodMeasureCount++;
 				if (this.goodMeasureCount == 2) {
-					this.multiplier = Math.min(this.multiplier + 1, 8);
+					this.multiplier = Math.min(this.multiplier + 1, 4);
 					this.goodMeasureCount = 0;
 				}
 				this.totalScore += notesScores.value() * this.multiplier;
 				lifeChange = (notesScores.value() - 0.5) * 0.3;
 			}
 			this.life = keepBetween(0, 1, this.life + lifeChange);
+			if(measureIndex == this.measures.length -1){
+				this.scoreManager.save(this.totalScore);
+			}
 			return notesScores;
+		},
+		win: function(){
+			this.totalScore = 666;
+			this.scoreManager.save(this.totalScore);
+		},
+		loose : function(){
+			this.life = 0;
 		}
 	};
 
