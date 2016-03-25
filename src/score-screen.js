@@ -127,16 +127,14 @@ RH.ScoreScreen = (function() {
 					}
 					this.projectiles.push(newProjectile);
 				}
-
 			}
-
 
 			context.font = '32px scoreboard';
 			context.fillStyle = '#696969';
+			context.textAlign = "right";
 			this.totalScore.update(totalScore, t);
 
 			context.fillText(ScoreScreen.formatTotal(this.totalScore.value), this.scorePosition.x, this.scorePosition.y);
-
 
 			context.font = '32px arcadeclassic';
 			context.fillStyle = '#696969';
@@ -145,22 +143,23 @@ RH.ScoreScreen = (function() {
 
 			if (this.scoreCalculator.withLife) {
 				this.life.update(this.scoreCalculator.life, t);
-				context.lineWidth = 5;
+				context.lineWidth = 1;
 				context.strokeStyle = '#696969';
 				context.rect(this.lifePosition.x, this.lifePosition.y - LIFE_HEIGHT, LIFE_WIDTH, LIFE_HEIGHT);
 				context.stroke();
 				context.fillStyle = '#696969';
 				context.fillRect(this.lifePosition.x, this.lifePosition.y - LIFE_HEIGHT, LIFE_WIDTH * this.life.value, LIFE_HEIGHT);
-
 			}
-
 			if (measureInfo.status == RH.Game.STATUS.SCORE_SCREEN) {
 				var best = this.scoreCalculator.scoreManager.best;
-				if (best) {
-					context.font = '32px scoreboard';
-					context.fillStyle = '#696969';
-					context.fillText(ScoreScreen.formatTotal(best), this.scorePosition.x, this.scorePosition.y + 40);
+				var bestScoreBeaten = this.scoreCalculator.scoreManager.bestScoreBeaten;
 
+				if (best) {
+					if (!bestScoreBeaten || ((t % 1000) > 300)) {
+						context.font = '32px scoreboard';
+						context.fillStyle = '#696969';
+						context.fillText('HS: ' + ScoreScreen.formatTotal(best), this.scorePosition.x, this.scorePosition.y + 40);
+					}
 				}
 				if (this.scoreCalculator.hasLost()) {
 					context.font = '32px arcadeclassic';
@@ -168,6 +167,18 @@ RH.ScoreScreen = (function() {
 					context.textAlign = "center";
 					context.textBaseline = "middle";
 					context.fillText('Game Over', this.center.x, this.center.y);
+				} else {
+					context.font = '20px arcadeclassic';
+					context.fillStyle = '#696969';
+					context.textAlign = "left";
+					context.textBaseline = "middle";
+					var x = this.center.x;
+					var y = this.center.y - 25;
+					this.scoreCalculator.scoresTypeCount().reverse().forEach(function(scoreType) {
+						context.fillText(scoreType.label, x - 100, y);
+						context.fillText(scoreType.count, x + 50, y);
+						y += 25;
+					});
 				}
 			}
 			this.drawProjectiles(context, t);

@@ -51,19 +51,19 @@ module("ScoreCalculator");
 	};
 	var measures = generateMeasures(['crotchet', 'whole', 'minim', 'crotchet']);
 
-	test("addMeasureScore - errors", function() {
+	test("calculateMeasureScore - errors", function() {
 
 		var scoreCalculator = new ScoreCalculator(mockEventManager([3900, 4800, 5010, 9010, 9015, 11010, 11020, 12030]), measures, false, scoreManager);
-		var score1 = scoreCalculator.addMeasureScore(8000, 1);
-		var score2 = scoreCalculator.addMeasureScore(12000, 2);
+		var score1 = scoreCalculator.calculateMeasureScore(8000, 1);
+		var score2 = scoreCalculator.calculateMeasureScore(12000, 2);
 		ok(true);
 	});
 
-	test("addMeasureScore - perfect", function() {
+	test("calculateMeasureScore - perfect", function() {
 
 		var scoreCalculator = new ScoreCalculator(mockEventManager([4000, 4999, 5000, 8999, 9000, 10999, 11000, 11999]), measures, false, scoreManager);
-		var score1 = scoreCalculator.addMeasureScore(8000, 1);
-		var score2 = scoreCalculator.addMeasureScore(12000, 2);
+		var score1 = scoreCalculator.calculateMeasureScore(8000, 1);
+		var score2 = scoreCalculator.calculateMeasureScore(12000, 2);
 
 		ok(true);
 	});

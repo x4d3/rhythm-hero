@@ -69,7 +69,7 @@ RH.Game = (function() {
 				//new measure, let's calculate the measure score
 				this.currentMeasureIndex = measureInfo.index;
 				if (this.status == STATUS.STARTED) {
-					this.scoreCalculator.addMeasureScore(ellapsed, measureInfo.index - 1);
+					this.scoreCalculator.calculateMeasureScore(ellapsed, measureInfo.index - 1);
 					logger.debug(measureInfo.index + "," + measureInfo.measure);
 				}
 			}

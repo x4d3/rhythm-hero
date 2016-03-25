@@ -20,7 +20,7 @@ RH.Screen = (function() {
 
 	var SCORE_POSITION = {
 		x: MEASURE_WIDTH - 25,
-		y: 35
+		y: 40
 	};
 	var MULTIPLIER_POSITION = {
 		x: MEASURE_WIDTH + 100,
@@ -28,7 +28,7 @@ RH.Screen = (function() {
 	};
 	var LIFE_POSITION = {
 		x: MEASURE_WIDTH + 200,
-		y: 40
+		y: 35
 	};
 
 
@@ -36,6 +36,8 @@ RH.Screen = (function() {
 	Screen.MEASURE_WIDTH = MEASURE_WIDTH;
 	Screen.SCORE_POSITION = SCORE_POSITION;
 	Screen.MULTIPLIER_POSITION = MULTIPLIER_POSITION;
+	Screen.LIFE_POSITION = LIFE_POSITION;
+
 
 	var EVENT_Y = 200;
 	var DEBUG_Y = 178;
@@ -153,6 +155,7 @@ RH.Screen = (function() {
 				//context.textAlign = "center";
 				//context.textBaseline = "middle";
 				context.fillText(this.title, TITLE_POSITION.x, TITLE_POSITION.y);
+				context.restore();
 			} else {
 				this.scoreScreen.draw(context, measurePosition, previousMeasureIndex, measureInfo);
 			}
@@ -164,7 +167,7 @@ RH.Screen = (function() {
 				context.arc(canvas.width - 20, 20, 10, 0, 2 * Math.PI, false);
 				context.fillStyle = '#696969';
 				context.fill();
-				
+
 				context.strokeStyle = '#696969';
 				context.stroke();
 				context.restore();
