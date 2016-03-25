@@ -50,16 +50,6 @@ RH.Game = (function() {
 			var measureInfo = {
 				t: ellapsed
 			};
-			if (this.status == STATUS.STARTED) {
-				if (this.scoreCalculator.hasLost()) {
-					this.endGameTime = ellapsed;
-				}
-				if (ellapsed >= this.endGameTime) {
-					this.status = STATUS.SCORE_SCREEN;
-					this.callback();
-				}
-
-			}
 			measureInfo.index = RH.binarySearch(this.measuresStartTime, ellapsed);
 			var startTime = this.measuresStartTime[measureInfo.index];
 			measureInfo.measure = this.measures[Math.min(measureInfo.index, this.measures.length - 1)];
@@ -73,13 +63,23 @@ RH.Game = (function() {
 					logger.debug(measureInfo.index + "," + measureInfo.measure);
 				}
 			}
+			if (this.status == STATUS.STARTED) {
+				if (this.scoreCalculator.hasLost()) {
+					this.endGameTime = ellapsed;
+				}
+				if (ellapsed >= this.endGameTime) {
+					this.status = STATUS.SCORE_SCREEN;
+					this.callback();
+				}
 
+			}
 			measureInfo.status = this.status;
 			this.screen.display(measureInfo);
 		},
 		renderScore: function() {
 			var game = this;
 			var resultDiv = $('<div>');
+			resultDiv.empty();
 			resultDiv.append('<h2>Result</h2>');
 			this.measuresStartTime.forEach(function(startTime, measureIndex) {
 				if (measureIndex < 2 || measureIndex == game.measures.length) {
@@ -100,7 +100,6 @@ RH.Game = (function() {
 				game.screen.drawOnExternalCanvas(tempCanvaJ[0], measureInfo);
 				resultDiv.append(tempCanvaJ);
 			});
-			return resultDiv;
 		},
 		resetKeyPressed: function() {
 			this.eventManager.resetKeyPressed();
@@ -108,7 +107,6 @@ RH.Game = (function() {
 		onEvent: function(isUp, event) {
 			this.eventManager.onEvent(isUp, event);
 			if (!isUp) {
-				console.log(this.ellapsed() + this.status + this.endGameTime);
 				if (this.status == STATUS.SCORE_SCREEN && (this.ellapsed() - this.endGameTime > 500)) {
 					this.status = STATUS.FINISHED;
 					this.callback();

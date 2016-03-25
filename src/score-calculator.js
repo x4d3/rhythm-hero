@@ -256,7 +256,7 @@ RH.ScoreCalculator = (function() {
 			}
 			var measure = this.measures[measureIndex];
 			var score = calculateMeasureScore(this.eventManager, t, measure);
-			return this.addMeasureScore(measure, score);
+			return this.addMeasureScore(measureIndex, score);
 		},
 		addMeasureScore: function(measureIndex, score) {
 			this.measuresScore[measureIndex] = score;

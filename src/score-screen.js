@@ -108,10 +108,10 @@ RH.ScoreScreen = (function() {
 			var t = measureInfo.t;
 			var multiplier = this.scoreCalculator.multiplier;
 			var totalScore = this.scoreCalculator.totalScore;
-			if (measureIndex != this.currentIndex && (measureInfo.status == RH.Game.STATUS.STARTED)) {
+			if (measureIndex != this.currentIndex) {
 				this.currentIndex = measureIndex;
 				var score = this.scoreCalculator.measuresScore[measureIndex];
-				if (measureIndex > 0) {
+				if (score !== undefined && measureIndex > 0) {
 					var scoreType = score.getType();
 					var options = {
 						t0: t,
