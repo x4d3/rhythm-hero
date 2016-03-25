@@ -65,6 +65,7 @@ RH.Application = (function() {
 			var callback = function() {
 				var status = this.status;
 				if (status === Game.STATUS.SCORE_SCREEN) {
+					$('.result').empty();
 					$('.result').append(this.renderScore());
 				} else if (status === Game.STATUS.FINISHED) {
 					Parameters.model.displayCanvas(false);

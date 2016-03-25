@@ -152,8 +152,6 @@ RH.Screen = (function() {
 				context.save();
 				context.font = '24px arcadeclassic';
 				context.fillStyle = "#696969";
-				//context.textAlign = "center";
-				//context.textBaseline = "middle";
 				context.fillText(this.title, TITLE_POSITION.x, TITLE_POSITION.y);
 				context.restore();
 			} else {
@@ -244,7 +242,6 @@ RH.Screen = (function() {
 			});
 			context.stroke();
 			context.restore();
-
 		},
 		displayStave: function(canvas, x, y, index, isActive) {
 			var data = this.measuresCanvases[isActive][index];
@@ -257,12 +254,7 @@ RH.Screen = (function() {
 			context.translate(METRONOME_POSITION.x, METRONOME_POSITION.y);
 			this.metronome.draw(context, measure, ellapsedBeats);
 			context.restore();
-
 		}
-
 	};
-
-
 	return Screen;
-
 }());

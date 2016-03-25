@@ -9,7 +9,7 @@ RH.ScoreCalculator = (function() {
 		TOO_LATE: 'Too Late',
 		TOO_SHORT: 'Too Short',
 		TOO_LONG: 'Too Long',
-		TOO_MANY_PRESSES: 'Pressed Too Much',
+		TOO_MANY_PRESSES: 'Too Much',
 		NOT_PLAYED: 'Not Played'
 	};
 
@@ -25,7 +25,7 @@ RH.ScoreCalculator = (function() {
 		new ScoreType(0, "Failed", "F", "black"),
 		new ScoreType(0.1, "Boo", "E", "orange"),
 		new ScoreType(0.4, "Good", "C", "grey"),
-		new ScoreType(0.8, "Awesome", "A", "green"),
+		new ScoreType(0.7, "Awesome", "A", "green"),
 		new ScoreType(0.9, "Perfect", "✔", "green")
 	];
 	var SCORE_TYPES_VALUES = SCORE_TYPES.map(function(s) {

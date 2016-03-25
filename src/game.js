@@ -79,7 +79,6 @@ RH.Game = (function() {
 		renderScore: function() {
 			var game = this;
 			var resultDiv = $('<div>');
-			resultDiv.empty();
 			resultDiv.append('<h2>Result</h2>');
 			this.measuresStartTime.forEach(function(startTime, measureIndex) {
 				if (measureIndex < 2 || measureIndex == game.measures.length) {
@@ -100,6 +99,7 @@ RH.Game = (function() {
 				game.screen.drawOnExternalCanvas(tempCanvaJ[0], measureInfo);
 				resultDiv.append(tempCanvaJ);
 			});
+			return resultDiv;
 		},
 		resetKeyPressed: function() {
 			this.eventManager.resetKeyPressed();

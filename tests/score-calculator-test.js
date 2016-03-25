@@ -78,7 +78,7 @@ module("ScoreCalculator");
 		score = new MeasureScore([calculateNoteScore(0, 0.9, false)]);
 		equal(score.getMainFailureReason(), 'Too Long');
 		score = new MeasureScore([calculateNoteScore(0, 0, true)]);
-		equal(score.getMainFailureReason(), 'Pressed Too Much');
+		equal(score.getMainFailureReason(), 'Too Much');
 
 		score = new MeasureScore([calculateNoteScore(-350, 2, true), calculateNoteScore(-350, 0, false)]);
 		equal(score.getMainFailureReason(), 'Too Early');
