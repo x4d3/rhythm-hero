@@ -31,6 +31,7 @@ RH.Screen = (function() {
 		y: 40
 	};
 
+
 	Screen.METRONOME_POSITION = METRONOME_POSITION;
 	Screen.MEASURE_WIDTH = MEASURE_WIDTH;
 	Screen.SCORE_POSITION = SCORE_POSITION;
@@ -56,7 +57,11 @@ RH.Screen = (function() {
 			scoreCalculator: scoreCalculator,
 			scorePosition: SCORE_POSITION,
 			multiplierPosition: MULTIPLIER_POSITION,
-			lifePosition: LIFE_POSITION
+			lifePosition: LIFE_POSITION,
+			center: {
+				x: canvas.width / 2,
+				y: canvas.height / 2
+			}
 		});
 	}
 
@@ -153,13 +158,16 @@ RH.Screen = (function() {
 			}
 
 			if (this.eventManager.isPressed) {
+				context.save();
 				context.beginPath();
-				context.arc(canvas.width - 20, 20, 10, 0, 2 * Math.PI, false);
-				context.fillStyle = 'grey';
-				context.fill();
 				context.lineWidth = 0.5;
-				context.strokeStyle = 'black';
+				context.arc(canvas.width - 20, 20, 10, 0, 2 * Math.PI, false);
+				context.fillStyle = '#696969';
+				context.fill();
+				
+				context.strokeStyle = '#696969';
 				context.stroke();
+				context.restore();
 			}
 
 		},

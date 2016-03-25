@@ -104,6 +104,7 @@ RH.ScoreScreen = (function() {
 
 	ScoreScreen.prototype = {
 		draw: function(context, measurePosition, measureIndex, measureInfo) {
+			context.save();
 			var t = measureInfo.t;
 			var multiplier = this.scoreCalculator.multiplier;
 			var totalScore = this.scoreCalculator.totalScore;
@@ -129,42 +130,48 @@ RH.ScoreScreen = (function() {
 
 			}
 
-			context.save();
+
 			context.font = '32px scoreboard';
 			context.fillStyle = '#696969';
 			this.totalScore.update(totalScore, t);
 
 			context.fillText(ScoreScreen.formatTotal(this.totalScore.value), this.scorePosition.x, this.scorePosition.y);
-			context.restore();
 
-			context.save();
+
 			context.font = '32px arcadeclassic';
 			context.fillStyle = '#696969';
 			context.fillText("X" + multiplier, this.multiplierPosition.x, this.multiplierPosition.y);
-			context.restore();
+
 
 			if (this.scoreCalculator.withLife) {
 				this.life.update(this.scoreCalculator.life, t);
-				context.save();
-				context.strokeStyle = "black";
+				context.lineWidth = 5;
+				context.strokeStyle = '#696969';
 				context.rect(this.lifePosition.x, this.lifePosition.y - LIFE_HEIGHT, LIFE_WIDTH, LIFE_HEIGHT);
 				context.stroke();
 				context.fillStyle = '#696969';
 				context.fillRect(this.lifePosition.x, this.lifePosition.y - LIFE_HEIGHT, LIFE_WIDTH * this.life.value, LIFE_HEIGHT);
-				context.restore();
+
 			}
 
 			if (measureInfo.status == RH.Game.STATUS.SCORE_SCREEN) {
 				var best = this.scoreCalculator.scoreManager.best;
 				if (best) {
-					context.save();
 					context.font = '32px scoreboard';
 					context.fillStyle = '#696969';
 					context.fillText(ScoreScreen.formatTotal(best), this.scorePosition.x, this.scorePosition.y + 40);
-					context.restore();
+
+				}
+				if (this.scoreCalculator.hasLost()) {
+					context.font = '32px arcadeclassic';
+					context.fillStyle = '#696969';
+					context.textAlign = "center";
+					context.textBaseline = "middle";
+					context.fillText('Game Over', this.center.x, this.center.y);
 				}
 			}
 			this.drawProjectiles(context, t);
+			context.restore();
 		},
 		drawProjectiles: function(context, t) {
 			var projectiles = [];

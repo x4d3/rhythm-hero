@@ -77,24 +77,4 @@ $(document).ready(
 				ok(true);
 			});
 
-		test("End Game Screen",
-			function(assert) {
-				var canvas = generateCanvas(assert.test.testName, Screen.MEASURE_WIDTH * 2);
-				var bestScore = 50;
-				var game = {
-					scoreCalculator: {
-						hasLost: function() {
-							return false;
-						},
-						totalScore: 25
-					}
-				};
-				var callback = function() {
-					console.log('callback called');
-				};
-				var endGameScreen = new RH.EndGameScreen(canvas, game, bestScore, callback);
-
-				ok(true);
-			});
-
 	});

@@ -51,14 +51,18 @@ RH.Game = (function() {
 				t: ellapsed
 			};
 			if (this.status == STATUS.STARTED) {
+				if (this.scoreCalculator.hasLost()) {
+					this.endGameTime = ellapsed;
+				}
 				if (ellapsed >= this.endGameTime) {
 					this.status = STATUS.SCORE_SCREEN;
 					this.callback();
 				}
+
 			}
 			measureInfo.index = RH.binarySearch(this.measuresStartTime, ellapsed);
 			var startTime = this.measuresStartTime[measureInfo.index];
-			measureInfo.measure = this.measures[Math.min(measureInfo.index, this.measures.length-1)];
+			measureInfo.measure = this.measures[Math.min(measureInfo.index, this.measures.length - 1)];
 
 			measureInfo.ellapsedBeats = measureInfo.measure.getBeatPerMillisecond() * (ellapsed - startTime);
 			if (measureInfo.index !== this.currentMeasureIndex) {
@@ -69,9 +73,7 @@ RH.Game = (function() {
 					logger.debug(measureInfo.index + "," + measureInfo.measure);
 				}
 			}
-			if (this.scoreCalculator.hasLost()) {
-				this.endGameTime = ellapsed;
-			}
+
 			measureInfo.status = this.status;
 			this.screen.display(measureInfo);
 		},
@@ -105,10 +107,14 @@ RH.Game = (function() {
 		},
 		onEvent: function(isUp, event) {
 			this.eventManager.onEvent(isUp, event);
-			if (this.status == STATUS.SCORE_SCREEN && !isUp && this.ellapsed() - this.endGameTime > 500) {
-				this.status = STATUS.FINISHED;
-				this.callback();
+			if (!isUp) {
+				console.log(this.ellapsed() + this.status + this.endGameTime);
+				if (this.status == STATUS.SCORE_SCREEN && (this.ellapsed() - this.endGameTime > 500)) {
+					this.status = STATUS.FINISHED;
+					this.callback();
+				}
 			}
+
 			if (RH.isDebug) {
 				var letterPressed = String.fromCharCode(event.which);
 				if (letterPressed !== "") {

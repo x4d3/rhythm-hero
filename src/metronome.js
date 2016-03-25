@@ -65,7 +65,6 @@ RH.Metronome = (function() {
 			var timeSignature = measure.timeSignature;
 			var width = this.width;
 			var height = this.height;
-			context.save();
 			var division = RH.divide(ellapsedBeats, 1);
 			var beatNumber = division.quotient;
 			// the sound needs to start to be played a little bit before the exact change of the beat so it comes directly in the bottom of the beat
@@ -92,7 +91,6 @@ RH.Metronome = (function() {
 
 			context.font = "14px Arial, sans-serif";
 			context.fillText(beatNumber + 1, 5, 10);
-			context.restore();
 		}
 	};
 	return Metronome;
