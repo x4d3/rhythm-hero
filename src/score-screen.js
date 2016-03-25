@@ -179,6 +179,10 @@ RH.ScoreScreen = (function() {
 						context.fillText(scoreType.count, x + 50, y);
 						y += 25;
 					});
+					y += 10;
+					context.fillText('Longest Combo', x - 100, y);
+					context.fillText(this.scoreCalculator.maxGoodMeasuresCount, x + 50, y);
+
 				}
 			}
 			this.drawProjectiles(context, t);
