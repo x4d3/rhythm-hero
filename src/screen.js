@@ -162,7 +162,7 @@ RH.Screen = (function() {
 				context.save();
 				context.beginPath();
 				context.lineWidth = 0.5;
-				context.arc(canvas.width - 20, 20, 10, 0, 2 * Math.PI, false);
+				context.arc(200, 30, 10, 0, 2 * Math.PI, false);
 				context.fillStyle = '#696969';
 				context.fill();
 
