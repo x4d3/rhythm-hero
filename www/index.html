@@ -74,8 +74,8 @@
 						<h4 class="modal-title">Scores</h4>
 					</div>
 					<div class="modal-body">
-
-						<!-- <p data-bind="visible: campaignScoresDisplay()">You haven't any score yet.</p> -->
+						<h3>Campaign</h3>
+						<p data-bind="visible: campaignScoresDisplay().length == 0">You haven't any score yet.</p>
 						<table class="table scores">
 							<tbody data-bind="foreach: campaignScoresDisplay">
 								<tr >
@@ -85,8 +85,8 @@
 								</tr>
 							</table>
 						</tbody>
-
-						<!-- <p data-bind="visible: this.practiceScoresDisplay().length == 0">You haven't any score yet.</p> -->
+						<h3>Practice</h3>
+						<p data-bind="visible: practiceScoresDisplay().length == 0">You haven't any score yet.</p>
 						<table class="table scores">
 							<tbody data-bind="foreach: practiceScoresDisplay">
 								<tr >

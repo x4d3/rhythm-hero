@@ -240,11 +240,12 @@ $(document).ready(function() {
 			};
 		});
 	});
+
 	model.practiceScoresDisplay = ko.computed(function() {
-		RH.map(model.scores().practice, function(score, key, index) {
+		return RH.map(model.scores().practice, function(score, key, index) {
 			var split = key.split('#');
 			return {
-				description: 'Difficulty: ' + split[0] + ' ,Tempo:' + split[1],
+				description: 'Difficulty: ' + split[0] + ' Tempo:' + split[1],
 				score: RH.ScoreScreen.formatTotal(score),
 				index: index
 			};
