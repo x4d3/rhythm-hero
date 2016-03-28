@@ -10,7 +10,7 @@ RH.ScoreScreen = (function() {
 	var LIFE_HEIGHT = 10;
 	var intermediatePoint = RH.intermediatePoint;
 	var intermediatePosition = RH.intermediatePosition;
-
+	var MULTIPLIERS_FONT = [24, 30, 36, 42];
 
 	var pad = function(n, width, joiner) {
 		joiner = joiner || '0';
@@ -25,6 +25,15 @@ RH.ScoreScreen = (function() {
 	AbstractProjectile.prototype = {
 		isFinished: function(t) {
 			return (t - this.t0) > TRAJECTORY_DURATION;
+		},
+		draw: function(context, t) {
+			var alpha = (t - this.t0) / TRAJECTORY_DURATION;
+			var point = intermediatePoint(this.start, this.end, Math.pow(alpha, 0.5));
+			context.save();
+			context.font = '18px Open Sans';
+			context.fillStyle = this.color;
+			context.fillText(this.value, point.x, point.y);
+			context.restore();
 		}
 	};
 
@@ -36,44 +45,25 @@ RH.ScoreScreen = (function() {
 		};
 	}
 
-	RH.inherit(GoodScoreProjectile, AbstractProjectile, {
-		draw: function(context, t) {
-			var alpha = (t - this.t0) / TRAJECTORY_DURATION;
-			var point = intermediatePoint(this.start, this.end, Math.pow(alpha, 4));
-			context.save();
-			context.font = '18px Open Sans';
-			context.fillStyle = this.color;
-			context.fillText(this.value, point.x, point.y);
-			context.restore();
-		}
-	});
+	RH.inherit(GoodScoreProjectile, AbstractProjectile);
 
 	function FailedScoreProjectile(options) {
 		this.super(options);
 		this.end = {
 			x: this.start.x - 3,
-			y: this.start.y
+			y: this.start.y + 25
 		};
 	}
 
-	RH.inherit(FailedScoreProjectile, AbstractProjectile, {
-		draw: function(context, t) {
-			var alpha = (t - this.t0) / TRAJECTORY_DURATION;
-			var point = intermediatePoint(this.start, this.end, Math.sin(15 * alpha * Math.PI));
-			context.save();
-			context.font = '18px Open Sans';
-			context.fillStyle = this.color;
-			context.fillText(this.value, point.x, point.y);
-			context.restore();
-		}
-	});
+	RH.inherit(FailedScoreProjectile, AbstractProjectile);
 
-	function TargetableScore(updateDuration) {
+	function TargetableScore(updateDuration, getValueFromProgress) {
 		this.updateDuration = updateDuration;
 		this.target = null;
 		this.value = null;
 		this.previousValue = null;
 		this.updateTime = null;
+		this.getValueFromProgress = getValueFromProgress ? getValueFromProgress : intermediatePosition;
 	}
 	TargetableScore.prototype = {
 		update: function(newValue, t) {
@@ -86,7 +76,7 @@ RH.ScoreScreen = (function() {
 				this.value = this.target;
 			} else {
 				var progress = Math.min(1, (t - this.updateTime) / this.updateDuration);
-				this.value = intermediatePosition(this.previousValue, this.target, progress);
+				this.value = this.getValueFromProgress(this.previousValue, this.target, progress);
 			}
 		}
 	};
@@ -97,6 +87,18 @@ RH.ScoreScreen = (function() {
 		this.projectiles = [];
 		this.totalScore = new TargetableScore(UPDATE_SCORE_DURATION);
 		this.life = new TargetableScore(UPDATE_LIFE_DURATION);
+		this.multiplierSize = new TargetableScore(250, function(a, b, progress) {
+			var c = a + 4 * (b - a);
+			var alpha = 0.7;
+			var result;
+			if (progress < alpha) {
+				result = intermediatePosition(a, c, progress / alpha);
+			} else {
+				result = intermediatePosition(c, b, (progress - alpha) / (1 - alpha));
+			}
+			return RH.keepBetween(5, 55, result);
+		});
+		this.multiplierSize.value = 28;
 	}
 	ScoreScreen.formatTotal = function(totalScore) {
 		return pad(Math.round(100 * totalScore), 5);
@@ -132,12 +134,16 @@ RH.ScoreScreen = (function() {
 			context.font = '32px scoreboard';
 			context.fillStyle = '#696969';
 			context.textAlign = "right";
+			context.textBaseline = "middle";
 			this.totalScore.update(totalScore, t);
 
 			context.fillText(ScoreScreen.formatTotal(this.totalScore.value), this.scorePosition.x, this.scorePosition.y);
 
-			context.font = '32px arcadeclassic';
+			this.multiplierSize.update(MULTIPLIERS_FONT[multiplier - 1], t);
+			context.font = this.multiplierSize.value + 'px arcadeclassic';
+			context.textAlign = "center";
 			context.fillStyle = '#696969';
+			context.textBaseline = "middle";
 			context.fillText("X" + multiplier, this.multiplierPosition.x, this.multiplierPosition.y);
 
 
@@ -158,6 +164,8 @@ RH.ScoreScreen = (function() {
 					if (!bestScoreBeaten || ((t % 1000) > 300)) {
 						context.font = '32px scoreboard';
 						context.fillStyle = '#696969';
+						context.textAlign = "right";
+						context.textBaseline = "middle";
 						context.fillText('HS: ' + ScoreScreen.formatTotal(best), this.scorePosition.x, this.scorePosition.y + 40);
 					}
 				}

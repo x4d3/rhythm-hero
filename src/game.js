@@ -107,7 +107,7 @@ RH.Game = (function() {
 		onEvent: function(isUp, event) {
 			this.eventManager.onEvent(isUp, event);
 			if (!isUp) {
-				if (this.status == STATUS.SCORE_SCREEN && (this.ellapsed() - this.endGameTime > 500)) {
+				if (this.status == STATUS.SCORE_SCREEN && (this.ellapsed() - this.endGameTime > 2000)) {
 					this.status = STATUS.FINISHED;
 					this.callback();
 				}

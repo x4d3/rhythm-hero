@@ -202,7 +202,9 @@ if (typeof localStorage === 'undefined') {
 			C.prototype.super = function() {
 				P.apply(this, arguments);
 			};
-			RH.copyProperties(O, C.prototype);
+			if (O) {
+				RH.copyProperties(O, C.prototype);
+			}
 			return C;
 		};
 	}());
@@ -228,6 +230,15 @@ if (typeof localStorage === 'undefined') {
 		});
 	};
 
+	RH.keepBetween = function(min, max, value) {
+		if (value > max) {
+			return max;
+		} else if (value < min) {
+			return min;
+		} else {
+			return value;
+		}
+	};
 
 	RH.getVersion = function() {
 		if (RH.VERSION !== undefined) {

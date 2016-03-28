@@ -21,7 +21,11 @@ $(document).ready(
 			x: Screen.MEASURE_WIDTH / 2 - 80,
 			y: 70
 		};
-
+		var scoreManager = {
+			save: function() {},
+			best: 666,
+			bestScoreBeaten: true
+		};
 		var WIDTH = 400;
 		// To make the test reproduceable
 		Math.seedrandom('Test Score');
@@ -45,39 +49,63 @@ $(document).ready(
 			function(assert) {
 				var canvas = generateCanvas(assert.test.testName, Screen.MEASURE_WIDTH * 2);
 				var context = canvas.getContext("2d");
-				var NOTES_INPUT = "1/1 q 1/1r 1/1 q 1/1 1/1r 1/1 2/1 1/1r 1/1 1/1r 1/1r 1/1r 1/1r q 1/1 1/1 1/1 1/1 q 1/1r 1/1 1/1r 2/1 1/1 1/1 1/1r 1/1r 1/1 1/1r 1/1 1/1r q q 1/1 q 1/1r q 1/1r 1/1 q 1/1r 1/1r 1/1 1/1r q 1/1 1/1 1/1";
-				var notes = Note.parseNotes(NOTES_INPUT);
-				var measures = RhythmPatterns.generateMeasures([120], [RH.TS.FOUR_FOUR], notes);
-				var eventManager = EventManager
-					.fromJson('{"keyPressed":[null,false],"keyChanged":[4031,4949,5100,5765,6474,7350,7509,8059,8175,10189,11869,12702,13975,15137,19082,19407,19579,20316,20473,21327,21490,22326,22481,23182,23343,23898,24758,26058,27051,28590,28815,29700,29832,31095,33061,34014,35001,35983,37174,37331,37500,37790,38031,38564,39078,39545,40401,40780,40915,41249,41932,42944,43107,43672],"isPressed":false}');
+				var measuresScores = [
+					new MeasureScore([
+						new SuccessNoteScore(0.8),
+						new SuccessNoteScore(0.8),
+						new SuccessNoteScore(0.8),
+					]),
+					new MeasureScore([
+						new SuccessNoteScore(0.1),
+						new SuccessNoteScore(0.2),
+						new SuccessNoteScore(0.3),
+					]),
+					new MeasureScore([
+						new FailedNoteScore(['TOO_EARLY']),
+					]),
+					new MeasureScore([
+						new SuccessNoteScore(0.95),
+					]),
+					new MeasureScore([
+						new SuccessNoteScore(0.7),
+					]),
+					new MeasureScore([
+						new SuccessNoteScore(0.8),
+					]),
+					new MeasureScore([
+						new SuccessNoteScore(0.6),
+					]),
 
-
-				var scoreCalculator = new ScoreCalculator(eventManager, measures, true);
+				];
+				var eventManager = new EventManager(function() {
+					return t;
+				});
+				var scoreCalculator = new ScoreCalculator(eventManager, [], true, scoreManager);
 				var scoreScreen = new ScoreScreen({
 					scoreCalculator: scoreCalculator,
 					scorePosition: Screen.SCORE_POSITION,
 					multiplierPosition: Screen.MULTIPLIER_POSITION,
 					lifePosition: Screen.LIFE_POSITION,
+					center: {
+						x: canvas.width / 2,
+						y: canvas.height / 2
+					}
 				});
-
+				var measureDuration = 2000;
 				var t0 = RH.getTime();
 				var previousIndex = -1;
 				(function animloop() {
 					var t = RH.getTime() - t0;
 					context.clearRect(0, 0, canvas.width, canvas.height);
-					var index = Math.round(t / measures[0].getDuration());
-					if (measures[index] === undefined) {
-						return;
-					}
-					eventManager.getTime = function() {
-						return t;
-					};
-
-					if (previousIndex != index) {
-						scoreCalculator.calculateMeasureScore(t, index);
+					var index = Math.round(t / measureDuration) + 1;
+					if (index != previousIndex) {
+						scoreCalculator.addMeasureScore(previousIndex, RH.getArrayElement(measuresScores, previousIndex));
 						previousIndex = index;
 					}
-					scoreScreen.draw(context, measurePosition, index, t);
+					var measureInfo = {
+						t: t
+					};
+					scoreScreen.draw(context, measurePosition, index - 1, measureInfo);
 					requestAnimFrame(animloop);
 				})();
 
@@ -86,11 +114,7 @@ $(document).ready(
 		test(
 			"End Score Rendering",
 			function(assert) {
-				var scoreManager = {
-					save: function() {},
-					best: 666,
-					bestScoreBeaten: true
-				};
+
 				var canvas = generateCanvas(assert.test.testName, Screen.MEASURE_WIDTH * 2);
 				var context = canvas.getContext("2d");
 				var eventManager = new EventManager(function() {

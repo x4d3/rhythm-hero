@@ -1,6 +1,7 @@
 RH.ScoreCalculator = (function() {
 	'use strict';
 	var logger = RH.logManager.getLogger('ScoreCalculator');
+	var keepBetween = RH.keepBetween;
 	var MAX_START_DIFF = 200;
 	var MAX_DURATION_DIFF = 0.8;
 	var MAX_FAILED_RATIO = 0.20;
@@ -110,17 +111,6 @@ RH.ScoreCalculator = (function() {
 			return RH.binarySearch(SCORE_TYPES_VALUES, this.value());
 		}
 	};
-
-	var keepBetween = function(min, max, value) {
-		if (value > max) {
-			return max;
-		} else if (value < min) {
-			return min;
-		} else {
-			return value;
-		}
-	};
-
 
 	var EPSILON = 10;
 	var NO_SCORE = new MeasureScore([]);
@@ -272,7 +262,7 @@ RH.ScoreCalculator = (function() {
 				}
 				this.maxGoodMeasuresCount = Math.max(this.goodMeasuresCount, this.maxGoodMeasuresCount);
 				this.totalScore += score.value() * this.multiplier;
-				lifeChange = (score.value() - 0.5) * 0.3;
+				lifeChange = (score.value() - 0.2) * 0.4;
 			}
 			this.life = keepBetween(0, 1, this.life + lifeChange);
 			if (measureIndex == this.measures.length - 1) {

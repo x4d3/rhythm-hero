@@ -19,18 +19,21 @@ RH.Screen = (function() {
 	};
 
 	var SCORE_POSITION = {
-		x: MEASURE_WIDTH - 25,
-		y: 40
-	};
-	var MULTIPLIER_POSITION = {
-		x: MEASURE_WIDTH + 100,
-		y: 40
-	};
-	var LIFE_POSITION = {
-		x: MEASURE_WIDTH + 200,
+		x: MEASURE_WIDTH + 25,
 		y: 35
 	};
-
+	var MULTIPLIER_POSITION = {
+		x: MEASURE_WIDTH + 75,
+		y: 37
+	};
+	var LIFE_POSITION = {
+		x: 25,
+		y: 35
+	};
+	var PRESS_POSITION = {
+		x: 150,
+		y: 30
+	};
 
 	Screen.METRONOME_POSITION = METRONOME_POSITION;
 	Screen.MEASURE_WIDTH = MEASURE_WIDTH;
@@ -162,7 +165,7 @@ RH.Screen = (function() {
 				context.save();
 				context.beginPath();
 				context.lineWidth = 0.5;
-				context.arc(200, 30, 10, 0, 2 * Math.PI, false);
+				context.arc(PRESS_POSITION.x, PRESS_POSITION.y, 10, 0, 2 * Math.PI, false);
 				context.fillStyle = '#696969';
 				context.fill();
 
