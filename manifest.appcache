@@ -1,0 +1,29 @@
+CACHE MANIFEST
+# rev 1 - 2016-03-29T08:57:32.960Z
+
+CACHE:
+arcadeclassic.ttf
+bootbox.min.js
+bootstrap.css
+bootstrap.min.js
+dpcomic.ttf
+favicon.ico
+images/beginner-off.png
+images/beginner-on.png
+images/close.png
+images/loading.gif
+images/off.png
+images/on.png
+images/reload.png
+images/sound-off.png
+images/sound-on.png
+index.html
+lunchds.ttf
+scoreboard.ttf
+script.js
+sounds/sprites.mp3
+sounds/sprites.ogg
+sounds/tic.mp3
+sounds/toc.mp3
+style.css
+version.js
