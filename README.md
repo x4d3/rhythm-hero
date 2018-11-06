@@ -1,6 +1,8 @@
 Rhythm Hero
 ==========
 
+This is awesome
+
 Little game to learn read rythm on music sheet, using [VexFlow](http://www.vexflow.com) music notation rendering API.
 
 [![Build Status](https://travis-ci.org/x4d3/rhythm-hero.svg?branch=master)](https://travis-ci.org/x4d3/rhythm-hero)
