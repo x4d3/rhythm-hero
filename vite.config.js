@@ -9,6 +9,7 @@ export default defineConfig({
   plugins: [tailwindcss()],
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
+    __APP_PR_URL__: JSON.stringify(process.env.APP_PR_URL || ''),
   },
   build: {
     outDir: 'dist',

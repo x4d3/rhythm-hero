@@ -291,7 +291,7 @@ if (getParameterByName('debug') === 'true') {
 const versionEl = document.getElementById('app-version');
 if (versionEl) {
   versionEl.textContent = `v${__APP_VERSION__}`;
-  versionEl.href = `https://github.com/x4d3/rhythm-hero/tree/v${__APP_VERSION__}`;
+  versionEl.href = __APP_PR_URL__ || `https://github.com/x4d3/rhythm-hero/tree/v${__APP_VERSION__}`;
 }
 
 // Remove loading screen
