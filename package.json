@@ -1,6 +1,6 @@
 {
   "name": "rhythm-hero",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A browser-based rhythm learning game",
   "private": true,
   "type": "module",
