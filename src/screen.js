@@ -1,263 +1,248 @@
-RH.Screen = (function() {
-	'use strict';
-	var Preconditions = RH.Preconditions;
-	var VF = Vex.Flow;
-	var VexUtils = RH.VexUtils;
-	var ScoreScreen = RH.ScoreScreen;
-	var CanvasUtils = RH.CanvasUtils;
+'use strict';
 
-	var MEASURE_WIDTH = 400;
-	var MEASURE_HEIGHT = 150;
-	var METRONOME_POSITION = {
-		x: MEASURE_WIDTH / 2 - 25,
-		y: 5
-	};
+import * as VexUtils from './vex-utils.js';
+import ScoreScreen from './score-screen.js';
+import { brighten } from './canvas-utils.js';
+import Metronome from './metronome.js';
+import { createSuiteArray, divide, mod } from './utils.js';
+import { MEASURE_WIDTH, REST_PERCENTAGE, STATUS } from './constants.js';
 
-	var TITLE_POSITION = {
-		x: MEASURE_WIDTH - 60,
-		y: 40
-	};
+const MEASURE_HEIGHT = 150;
+const METRONOME_POSITION = {
+  x: MEASURE_WIDTH / 2 - 25,
+  y: 5,
+};
+const TITLE_POSITION = {
+  x: MEASURE_WIDTH - 60,
+  y: 40,
+};
+const SCORE_POSITION = {
+  x: MEASURE_WIDTH + 25,
+  y: 35,
+};
+const MULTIPLIER_POSITION = {
+  x: MEASURE_WIDTH + 75,
+  y: 37,
+};
+const LIFE_POSITION = {
+  x: 25,
+  y: 35,
+};
+const PRESS_POSITION = {
+  x: 150,
+  y: 30,
+};
+const EVENT_Y = 200;
+const DEBUG_Y = 178;
+const SIGNAL_HEIGHT = 20;
 
-	var SCORE_POSITION = {
-		x: MEASURE_WIDTH + 25,
-		y: 35
-	};
-	var MULTIPLIER_POSITION = {
-		x: MEASURE_WIDTH + 75,
-		y: 37
-	};
-	var LIFE_POSITION = {
-		x: 25,
-		y: 35
-	};
-	var PRESS_POSITION = {
-		x: 150,
-		y: 30
-	};
+export { METRONOME_POSITION, MEASURE_WIDTH, SCORE_POSITION, MULTIPLIER_POSITION, LIFE_POSITION };
 
-	Screen.METRONOME_POSITION = METRONOME_POSITION;
-	Screen.MEASURE_WIDTH = MEASURE_WIDTH;
-	Screen.SCORE_POSITION = SCORE_POSITION;
-	Screen.MULTIPLIER_POSITION = MULTIPLIER_POSITION;
-	Screen.LIFE_POSITION = LIFE_POSITION;
+export default class Screen {
+  constructor(canvas, eventManager, scoreCalculator, measures, title, settings) {
+    this.canvas = canvas;
+    this.eventManager = eventManager;
+    this.scoreCalculator = scoreCalculator;
+    this.measures = measures;
+    this.title = title;
+    this.settings = settings;
+    this.metronome = new Metronome(50, 50);
+    const measuresCanvases = VexUtils.generateMeasuresCanvases(MEASURE_WIDTH, MEASURE_HEIGHT, measures);
+    this.measuresCanvases = {
+      'true': measuresCanvases,
+      'false': measuresCanvases.map(brighten),
+    };
+    this.scoreScreen = new ScoreScreen({
+      scoreCalculator,
+      scorePosition: SCORE_POSITION,
+      multiplierPosition: MULTIPLIER_POSITION,
+      lifePosition: LIFE_POSITION,
+      center: {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+      },
+    });
+  }
 
+  display(measureInfo) {
+    const screen = this;
+    const canvas = this.canvas;
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    const measure = measureInfo.measure;
+    const isOn = measureInfo.status === STATUS.STARTED;
+    const isHorizontal = this.settings.get('scrollingDirection') === 'horizontal';
+    const isContinuous = this.settings.get('scrollingMode') === 'continuous';
+    const shift = measureInfo.ellapsedBeats / measure.getBeatPerBar();
+    if (shift < 1.5) {
+      const staveShift = isContinuous ? shift : 0.5;
 
-	var EVENT_Y = 200;
-	var DEBUG_Y = 178;
-	var SIGNAL_HEIGHT = 20;
+      let suiteArray;
+      if (isHorizontal) {
+        suiteArray = createSuiteArray(-1, 3);
+      } else {
+        suiteArray = createSuiteArray(-2, 4);
+      }
 
-	function Screen(canvas, eventManager, scoreCalculator, measures, title) {
-		this.canvas = canvas;
-		this.eventManager = eventManager;
-		this.scoreCalculator = scoreCalculator;
-		this.measures = measures;
-		this.title = title;
-		this.metronome = new RH.Metronome(50, 50);
-		var measuresCanvases = VexUtils.generateMeasuresCanvases(MEASURE_WIDTH, MEASURE_HEIGHT, measures);
-		this.measuresCanvases = {
-			"true": measuresCanvases,
-			"false": measuresCanvases.map(CanvasUtils.brighten)
-		};
-		this.scoreScreen = new ScoreScreen({
-			scoreCalculator: scoreCalculator,
-			scorePosition: SCORE_POSITION,
-			multiplierPosition: MULTIPLIER_POSITION,
-			lifePosition: LIFE_POSITION,
-			center: {
-				x: canvas.width / 2,
-				y: canvas.height / 2
-			}
-		});
-	}
+      suiteArray.forEach(i => {
+        const index = measureInfo.index + i;
+        if (index < 0 || index >= screen.measures.length) {
+          return;
+        }
+        let staveX;
+        let staveY;
+        if (isHorizontal) {
+          staveX = (i + 0.5 - staveShift) * MEASURE_WIDTH;
+          staveY = 50;
+        } else {
+          const parity = mod(index, 2);
+          const alpha = Math.floor(i - parity) / 2;
+          staveX = parity * MEASURE_WIDTH;
+          staveY = (1 + alpha - staveShift / 2) * MEASURE_HEIGHT;
+        }
+        const isActive = i === 0 && isOn;
+        screen.displayStave(canvas, staveX, staveY, index, isActive);
+        if (index === 0 && i === 0) {
+          context.fillStyle = 'grey';
+          const division = divide(measureInfo.ellapsedBeats, 1).quotient;
+          const beatPerBar = screen.measures[index].getBeatPerBar();
+          for (let beat = 0; beat < beatPerBar; beat++) {
+            context.font = beat === division ? 'bolder 36px Open Sans' : '16px Open Sans';
+            context.fillText(beat + 1, staveX + beat * MEASURE_WIDTH / beatPerBar, staveY + 70);
+          }
+        }
+      });
+      if (isOn) {
+        const isBeginnerMode = this.settings.get('beginnerModeEnabled') && this.settings.get('beginnerMode');
+        if (isBeginnerMode) {
+          this.displayEvents(canvas, EVENT_Y, measure, measureInfo.t, 0.5);
+          [-1, 0, 1, 2].forEach(i => {
+            const index = measureInfo.index + i;
+            if (index < 0 || index >= screen.measures.length) {
+              return;
+            }
+            screen.displayDebug(canvas, DEBUG_Y, (i + 0.5 - shift) * MEASURE_WIDTH, index);
+          });
+        }
+        this.displayMetronome(canvas, measure, measureInfo.ellapsedBeats);
+      }
+    }
+    const previousMeasureIndex = measureInfo.index - 1;
+    let measurePosition;
+    if (isHorizontal) {
+      measurePosition = {
+        x: MEASURE_WIDTH / 2 - 80,
+        y: 70,
+      };
+    } else {
+      measurePosition = {
+        x: (0.75 + mod(previousMeasureIndex, 2)) * MEASURE_WIDTH,
+        y: 70,
+      };
+    }
+    if (measureInfo.index < 1) {
+      context.save();
+      context.font = '24px arcadeclassic';
+      context.fillStyle = '#696969';
+      context.fillText(this.title, TITLE_POSITION.x, TITLE_POSITION.y);
+      context.restore();
+    } else {
+      this.scoreScreen.draw(context, measurePosition, previousMeasureIndex, measureInfo);
+    }
 
-	Screen.prototype = {
-		display: function(measureInfo) {
-			var screen = this;
-			var canvas = this.canvas;
-			var context = canvas.getContext("2d");
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			var measure = measureInfo.measure;
-			var isOn = measureInfo.status === RH.Game.STATUS.STARTED;
-			var isHorizontal = RH.Parameters.model.scrollingDirection() == 'horizontal';
-			var isContinuous = RH.Parameters.model.scrollingMode() == 'continuous';
-			var shift = measureInfo.ellapsedBeats / measure.getBeatPerBar();
-			if (shift < 1.5) {
-				var staveShift = isContinuous ? shift : 0.5;
+    if (this.eventManager.isPressed) {
+      context.save();
+      context.beginPath();
+      context.lineWidth = 0.5;
+      context.arc(PRESS_POSITION.x, PRESS_POSITION.y, 10, 0, 2 * Math.PI, false);
+      context.fillStyle = '#696969';
+      context.fill();
+      context.strokeStyle = '#696969';
+      context.stroke();
+      context.restore();
+    }
+  }
 
-				var suiteArray;
-				if (isHorizontal) {
-					suiteArray = RH.createSuiteArray(-1, 3);
-				} else {
-					suiteArray = RH.createSuiteArray(-2, 4);
-				}
+  drawOnExternalCanvas(canvas, measureInfo) {
+    const measure = measureInfo.measure;
+    this.displayStave(canvas, 0, 0, measureInfo.index, true);
+    this.displayEvents(canvas, 150, measure, measureInfo.t, 1);
+    this.displayDebug(canvas, 120, 0, measureInfo.index);
+    const score = this.scoreCalculator.measuresScore[measureInfo.index];
+    if (score !== undefined) {
+      const context = canvas.getContext('2d');
+      context.font = '18px Open Sans';
+      context.fillStyle = 'grey';
+      context.fillText(Math.round(100 * score.value()), SCORE_POSITION.x, SCORE_POSITION.y);
+    }
+  }
 
-				suiteArray.forEach(function(i) {
-					var index = measureInfo.index + i;
-					if (index < 0 || index >= screen.measures.length) {
-						return;
-					}
-					var staveX;
-					var staveY;
-					if (isHorizontal) {
-						staveX = (i + 0.5 - staveShift) * MEASURE_WIDTH;
-						staveY = 50;
-					} else {
-						var parity = RH.mod(index, 2);
-						var alpha = Math.floor(i - parity) / 2;
-						staveX = parity * MEASURE_WIDTH;
-						staveY = (1 + alpha - staveShift / 2) * MEASURE_HEIGHT;
-					}
-					var isActive = i === 0 && isOn;
-					screen.displayStave(canvas, staveX, staveY, index, isActive);
-					// display the count down
-					if (index === 0 && i === 0) {
-						context.fillStyle = 'grey';
-						var division = RH.divide(measureInfo.ellapsedBeats, 1).quotient;
-						var beatPerBar = screen.measures[index].getBeatPerBar();
-						for (var beat = 0; beat < beatPerBar; beat++) {
-							context.font = beat === division ? 'bolder 36px Open Sans' : '16px Open Sans';
-							context.fillText(beat + 1, staveX + beat * MEASURE_WIDTH / beatPerBar, staveY + 70);
-						}
-					}
-				});
-				if (isOn) {
-					if (RH.Parameters.isBeginnerMode()) {
-						this.displayEvents(canvas, EVENT_Y, measure, measureInfo.t, 0.5);
-						[-1, 0, 1, 2].forEach(function(i) {
-							var index = measureInfo.index + i;
-							if (index < 0 || index >= screen.measures.length) {
-								return;
-							}
-							var startStave = i * MEASURE_WIDTH - shift;
-							screen.displayDebug(canvas, DEBUG_Y, (i + 0.5 - shift) * MEASURE_WIDTH, index);
-						});
-					}
-					this.displayMetronome(canvas, measure, measureInfo.ellapsedBeats);
-				}
+  displayEvents(canvas, eventY, measure, t, percentage) {
+    const context = canvas.getContext('2d');
+    const measureDuration = measure.getDuration();
+    const ups = this.eventManager.getEvents(t - measureDuration * percentage);
+    let x = 0;
+    context.save();
+    context.beginPath();
+    context.strokeStyle = '#003300';
+    context.lineWidth = 1;
+    const Y_IS_ON = eventY - SIGNAL_HEIGHT;
+    const Y_IS_OFF = eventY;
+    let y;
+    ups.forEach(element => {
+      y = 0.5 + (element.isPressed ? Y_IS_ON : Y_IS_OFF);
+      context.lineTo(x, y);
+      const newX = x + element.duration * MEASURE_WIDTH / measureDuration;
+      context.lineTo(newX, y);
+      x = newX;
+    });
+    context.stroke();
+    context.restore();
+  }
 
-			}
-			var previousMeasureIndex = measureInfo.index - 1;
-			var measurePosition;
-			if (isHorizontal) {
-				measurePosition = {
-					x: MEASURE_WIDTH / 2 - 80,
-					y: 70
-				};
-			} else {
-				measurePosition = {
-					x: (0.75 + RH.mod(previousMeasureIndex, 2)) * MEASURE_WIDTH,
-					y: 70
-				};
+  displayDebug(canvas, debugY, startStave, index) {
+    const context = canvas.getContext('2d');
+    const currentMeasure = this.measures[index];
+    context.save();
+    context.beginPath();
+    context.strokeStyle = 'blue';
+    context.lineWidth = 1;
+    let x = startStave;
+    const beatLength = MEASURE_WIDTH / currentMeasure.getBeatPerBar();
+    const epsilon = REST_PERCENTAGE * beatLength;
+    const Y_IS_ON = debugY - SIGNAL_HEIGHT;
+    const Y_IS_OFF = debugY;
+    let y = currentMeasure.firstNotePressed ? Y_IS_ON : Y_IS_OFF;
+    currentMeasure.notes.forEach((note, j) => {
+      context.moveTo(x, y);
+      y = note.isRest ? Y_IS_OFF : Y_IS_ON;
+      context.lineTo(x, y);
+      const duration = note.duration.value() * beatLength;
+      const newX = x + duration;
+      if (j === (currentMeasure.notes.length - 1) && currentMeasure.lastNotePressed) {
+        context.lineTo(newX, y);
+      } else {
+        context.lineTo(newX - epsilon, y);
+        y = Y_IS_OFF;
+        context.lineTo(newX - epsilon, y);
+        context.lineTo(newX, y);
+      }
+      x = newX;
+    });
+    context.stroke();
+    context.restore();
+  }
 
-			}
-			//display title
-			if (measureInfo.index < 1) {
-				context.save();
-				context.font = '24px arcadeclassic';
-				context.fillStyle = "#696969";
-				context.fillText(this.title, TITLE_POSITION.x, TITLE_POSITION.y);
-				context.restore();
-			} else {
-				this.scoreScreen.draw(context, measurePosition, previousMeasureIndex, measureInfo);
-			}
+  displayStave(canvas, x, y, index, isActive) {
+    const data = this.measuresCanvases[isActive][index];
+    canvas.getContext('2d').putImageData(data, x, y);
+  }
 
-			if (this.eventManager.isPressed) {
-				context.save();
-				context.beginPath();
-				context.lineWidth = 0.5;
-				context.arc(PRESS_POSITION.x, PRESS_POSITION.y, 10, 0, 2 * Math.PI, false);
-				context.fillStyle = '#696969';
-				context.fill();
-
-				context.strokeStyle = '#696969';
-				context.stroke();
-				context.restore();
-			}
-
-		},
-		drawOnExternalCanvas: function(canvas, measureInfo) {
-			var measure = measureInfo.measure;
-			this.displayStave(canvas, 0, 0, measureInfo.index, true);
-			this.displayEvents(canvas, 150, measure, measureInfo.t, 1);
-			this.displayDebug(canvas, 120, 0, measureInfo.index);
-			var score = this.scoreCalculator.measuresScore[measureInfo.index];
-			if (score !== undefined) {
-				var context = canvas.getContext("2d");
-				context.font = '18px Open Sans';
-				context.fillStyle = 'grey';
-				context.fillText(Math.round(100 * score.value()), SCORE_POSITION.x, SCORE_POSITION.y);
-			}
-
-		},
-		displayEvents: function(canvas, eventY, measure, t, percentage) {
-			var context = canvas.getContext("2d");
-			var measureDuration = measure.getDuration();
-			var ups = this.eventManager.getEvents(t - measureDuration * percentage);
-			var x = 0;
-			var screen = this;
-			context.save();
-			context.beginPath();
-			context.strokeStyle = '#003300';
-			context.lineWidth = 1;
-			var Y_IS_ON = eventY - SIGNAL_HEIGHT;
-			var Y_IS_OFF = eventY;
-			var y = canvas.height / 8;
-			ups.forEach(function(element) {
-				y = 0.5 + (element.isPressed ? Y_IS_ON : Y_IS_OFF);
-				context.lineTo(x, y);
-				var newX = x + element.duration * MEASURE_WIDTH / measureDuration;
-				context.lineTo(newX, y);
-				x = newX;
-			});
-			context.stroke();
-			context.restore();
-		},
-		displayDebug: function(canvas, debugY, startStave, index) {
-			var screen = this;
-			var context = canvas.getContext("2d");
-			var currentMeasure = screen.measures[index];
-			// display awaited rhythm
-			context.save();
-			context.beginPath();
-			context.strokeStyle = 'blue';
-			context.lineWidth = 1;
-			var x = startStave;
-			var beatLength = MEASURE_WIDTH / currentMeasure.getBeatPerBar();
-			var epsilon = RH.REST_PERCENTAGE * beatLength;
-			var Y_IS_ON = debugY - SIGNAL_HEIGHT;
-			var Y_IS_OFF = debugY;
-			var y = currentMeasure.firstNotePressed ? Y_IS_ON : Y_IS_OFF;
-			currentMeasure.notes.forEach(function(note, j) {
-				context.moveTo(x, y);
-				y = (note.isRest ? Y_IS_OFF : Y_IS_ON);
-				context.lineTo(x, y);
-				var duration = note.duration.value() * beatLength;
-				var newX = x + duration;
-				if (j == (currentMeasure.notes.length - 1) && currentMeasure.lastNotePressed) {
-					context.lineTo(newX, y);
-				} else {
-					context.lineTo(newX - epsilon, y);
-					y = Y_IS_OFF;
-					context.lineTo(newX - epsilon, y);
-					context.lineTo(newX, y);
-				}
-				x = newX;
-			});
-			context.stroke();
-			context.restore();
-		},
-		displayStave: function(canvas, x, y, index, isActive) {
-			var data = this.measuresCanvases[isActive][index];
-			canvas.getContext('2d').putImageData(data, x, y);
-
-		},
-		displayMetronome: function(canvas, measure, ellapsedBeats) {
-			var context = canvas.getContext("2d");
-			context.save();
-			context.translate(METRONOME_POSITION.x, METRONOME_POSITION.y);
-			this.metronome.draw(context, measure, ellapsedBeats);
-			context.restore();
-		}
-	};
-	return Screen;
-}());
+  displayMetronome(canvas, measure, ellapsedBeats) {
+    const context = canvas.getContext('2d');
+    context.save();
+    context.translate(METRONOME_POSITION.x, METRONOME_POSITION.y);
+    this.metronome.draw(context, measure, ellapsedBeats, this.settings.get('soundsOn'));
+    context.restore();
+  }
+}

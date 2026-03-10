@@ -1,282 +1,184 @@
-Fraction = (function() {
-	var checkType = function(value, type) {
-		if (typeof value !== type) {
-			throw "It should be a " + type + ": " + value;
-		}
-		return value;
-	};
-	var checkIsNumber = function(value) {
-		return checkType(value, 'number');
-	};
-	var checkIsInt = function(value) {
-		checkIsNumber(value);
-		if (value % 1 !== 0) {
-			throw "It should be an int: " + value;
-		}
-		return value;
-	};
+'use strict';
 
-	/**
-	 * Initialize the Fraction, numerator and denominator
-	 * @class Fraction
-	 * @constructor
-	 * @param {Integer} numerator of the fraction
-	 * @param {Integer} denominator the fraction must not be equal to 0
-	 */
-	var Fraction = function(numerator, denominator, noCheck) {
-		if (!noCheck) {
-			checkIsInt(numerator);
-			checkIsInt(denominator);
-			if (denominator === 0) {
-				throw "The denominator must not be zero";
-			}
-			if (denominator < 0) {
-				numerator = -numerator;
-				denominator = -denominator;
-			}
-		}
-		this.numerator = numerator;
-		this.denominator = denominator;
-		this.normalize();
-	};
+function checkIsInt(value) {
+  if (typeof value !== 'number') {
+    throw 'It should be a number: ' + value;
+  }
+  if (value % 1 !== 0) {
+    throw 'It should be an int: ' + value;
+  }
+  return value;
+}
 
-	/**
-	 *
-	 * @method value
-	 * @return {Number} the float number represented by the fraction
-	 */
-	Fraction.prototype.value = function() {
-		return this.numerator / this.denominator;
-	};
+export default class Fraction {
+  constructor(numerator, denominator, noCheck) {
+    if (!noCheck) {
+      checkIsInt(numerator);
+      checkIsInt(denominator);
+      if (denominator === 0) {
+        throw 'The denominator must not be zero';
+      }
+      if (denominator < 0) {
+        numerator = -numerator;
+        denominator = -denominator;
+      }
+    }
+    this.numerator = numerator;
+    this.denominator = denominator;
+    this.normalize();
+  }
 
-	/**
-	 * clone the Fraction
-	 *
-	 * @method clone
-	 * @return {Fraction} Returns a clone of the fraction
-	 */
-	Fraction.prototype.clone = function() {
-		return new Fraction(this.numerator, this.denominator, true);
-	};
+  value() {
+    return this.numerator / this.denominator;
+  }
 
-	/**
-	 * inverse the Fraction
-	 *
-	 * @method inverse
-	 * @return {Fraction} Returns the inverse of the fraction
-	 */
-	Fraction.prototype.inverse = function() {
-		return new Fraction(this.denominator, this.numerator);
-	};
-	/**
-	 * pretty-printer, converts fractions into whole numbers and fractions
-	 *
-	 * @method toString
-	 * @returns {String}
-	 */
-	Fraction.prototype.toString = function() {
-		return this.numerator + "/" + this.denominator;
+  clone() {
+    return new Fraction(this.numerator, this.denominator, true);
+  }
 
-	};
+  inverse() {
+    return new Fraction(this.denominator, this.numerator);
+  }
 
-	/**
-	 * pretty-printer to support TeX notation (using with MathJax, KaTeX, etc)
-	 *
-	 * @method toTeX
-	 * @returns {String}
-	 */
-	Fraction.prototype.toTeX = function(mixed) {
-		var result = '';
-		if ((this.numerator < 0) != (this.denominator < 0))
-			result = '-';
-		var numerator = Math.abs(this.numerator);
-		var denominator = Math.abs(this.denominator);
+  toString() {
+    return this.numerator + '/' + this.denominator;
+  }
 
-		if (!mixed) {
-			// We want a simple fraction, without wholepart extracted
-			if (denominator === 1)
-				return result + numerator;
-			else
-				return result + '\\frac{' + numerator + '}{' + denominator + '}';
-		}
-		var wholepart = Math.floor(numerator / denominator);
-		numerator = numerator % denominator;
-		if (wholepart !== 0)
-			result += wholepart;
-		if (numerator !== 0)
-			result += '\\frac{' + numerator + '}{' + denominator + '}';
-		return result.length > 0 ? result : '0';
-	};
+  toTeX(mixed) {
+    let result = '';
+    if ((this.numerator < 0) !== (this.denominator < 0)) result = '-';
+    let numerator = Math.abs(this.numerator);
+    const denominator = Math.abs(this.denominator);
 
-	/* destructively rescale the fraction by some integral factor */
-	Fraction.prototype.rescale = function(factor) {
-		this.numerator *= factor;
-		this.denominator *= factor;
-		return this;
-	};
+    if (!mixed) {
+      if (denominator === 1) return result + numerator;
+      return result + '\\frac{' + numerator + '}{' + denominator + '}';
+    }
+    const wholepart = Math.floor(numerator / denominator);
+    numerator = numerator % denominator;
+    if (wholepart !== 0) result += wholepart;
+    if (numerator !== 0) result += '\\frac{' + numerator + '}{' + denominator + '}';
+    return result.length > 0 ? result : '0';
+  }
 
-	/**
-	 * Adds the value of this fraction to another, returning the result in reduced form.
-	 *
-	 * @method add
-	 * @returns {Fraction}
-	 */
-	Fraction.prototype.add = function(b) {
-		var a = this.clone();
-		if (!(b instanceof Fraction)) {
-			throw "must be a Fraction: " + b;
-		}
-		var td = a.denominator;
-		a.rescale(b.denominator);
-		a.numerator += b.numerator * td;
-		return a.normalize();
-	};
+  rescale(factor) {
+    this.numerator *= factor;
+    this.denominator *= factor;
+    return this;
+  }
 
-	/**
-	 * Subtracts the value of another fraction from the value of this one, returning the result in reduced form
-	 *
-	 * @method subtract
-	 * @returns {Fraction}
-	 */
-	Fraction.prototype.subtract = function(b) {
-		var a = this.clone();
-		if (!(b instanceof Fraction)) {
-			throw "must be a Fraction: " + b;
-		}
-		var td = a.denominator;
-		a.rescale(b.denominator);
-		a.numerator -= b.numerator * td;
+  add(b) {
+    const a = this.clone();
+    if (!(b instanceof Fraction)) {
+      throw 'must be a Fraction: ' + b;
+    }
+    const td = a.denominator;
+    a.rescale(b.denominator);
+    a.numerator += b.numerator * td;
+    return a.normalize();
+  }
 
-		return a.normalize();
-	};
+  subtract(b) {
+    const a = this.clone();
+    if (!(b instanceof Fraction)) {
+      throw 'must be a Fraction: ' + b;
+    }
+    const td = a.denominator;
+    a.rescale(b.denominator);
+    a.numerator -= b.numerator * td;
+    return a.normalize();
+  }
 
-	Fraction.prototype.multiply = function(b) {
-		var a = this.clone();
-		a.numerator *= b.numerator;
-		a.denominator *= b.denominator;
-		return a.normalize();
-	};
+  multiply(b) {
+    const a = this.clone();
+    a.numerator *= b.numerator;
+    a.denominator *= b.denominator;
+    return a.normalize();
+  }
 
-	Fraction.prototype.divide = function(b) {
-		if (!(b instanceof Fraction)) {
-			throw "must be a Fraction: " + b;
-		}
-		var a = this.clone();
-		a.numerator *= b.denominator;
-		a.denominator *= b.numerator;
-		return a.normalize();
-	};
+  divide(b) {
+    if (!(b instanceof Fraction)) {
+      throw 'must be a Fraction: ' + b;
+    }
+    const a = this.clone();
+    a.numerator *= b.denominator;
+    a.denominator *= b.numerator;
+    return a.normalize();
+  }
 
-	Fraction.prototype.mod = function(b) {
-		checkIsInt(b);
-		var a = this.clone();
-		a.numerator %= b * a.denominator;
-		return a.normalize();
-	};
+  mod(b) {
+    checkIsInt(b);
+    const a = this.clone();
+    a.numerator %= b * a.denominator;
+    return a.normalize();
+  }
 
-	Fraction.prototype.equals = function(b) {
-		if (!(b instanceof Fraction)) {
-			return false;
-		}
-		// fractions that are equal should have equal normalized forms
-		return (this.numerator === b.numerator && this.denominator === b.denominator);
-	};
-	/**
-	 * Compares this object to another based on size.
-	 * @method compareTo
-	 * @returns {Fraction}
-	 */
-	Fraction.prototype.compareTo = function(b) {
-		if (!(b instanceof Fraction)) {
-			throw "must be a Fraction: " + b;
-		}
-		if (this === b || this.equals(b)) {
-			return 0;
-		}
-		var first = this.numerator * b.denominator;
-		var second = b.numerator * this.denominator;
-		if (first == second) {
-			return 0;
-		} else if (first < second) {
-			return -1;
-		} else {
-			return 1;
-		}
-	};
+  equals(b) {
+    if (!(b instanceof Fraction)) {
+      return false;
+    }
+    return this.numerator === b.numerator && this.denominator === b.denominator;
+  }
 
-	Fraction.prototype.normalize = function() {
-		var gcf = Fraction.gcf(this.numerator, this.denominator);
-		this.numerator /= gcf;
-		this.denominator /= gcf;
-		if (this.denominator < 0) {
-			this.numerator *= -1;
-			this.denominator *= -1;
-		}
-		return this;
-	};
-	/* . */
-	// Adapted from Ratio.js
-	/**
-	 * Takes two numbers and returns their greatest common factor
-	 *
-	 * @static
-	 * @method gcf
-	 * @returns {Number}
-	 */
-	Fraction.gcf = function(a, b) {
-		if (arguments.length < 2) {
-			return a;
-		}
-		var c;
-		a = Math.abs(a);
-		b = Math.abs(b);
-		while (b) {
-			c = a % b;
-			a = b;
-			b = c;
-		}
-		return a;
-	};
-	/**
-	 * parse a string of the format a/b to a Fraction
-	 *
-	 * @static
-	 * @method parse
-	 * @returns {Fraction}
-	 */
-	Fraction.parse = function(s) {
-		var split = s.split('/');
-		var n = parseInt(split[0].trim(), 10);
-		if (isNaN(n)) {
-			throw "can't parse: " + s;
-		}
-		if (split.length === 1) {
-			return new Fraction(n, 1);
-		} else {
-			var d = parseInt(split[1].trim(), 10);
-			if (isNaN(n)) {
-				throw "can't parse: " + s;
-			}
-			return new Fraction(n, d);
-		}
-	};
+  compareTo(b) {
+    if (!(b instanceof Fraction)) {
+      throw 'must be a Fraction: ' + b;
+    }
+    if (this === b || this.equals(b)) {
+      return 0;
+    }
+    const first = this.numerator * b.denominator;
+    const second = b.numerator * this.denominator;
+    if (first === second) {
+      return 0;
+    } else if (first < second) {
+      return -1;
+    }
+    return 1;
+  }
 
-	/**
-	 *<code>Fraction</code> representation of 0.
-	 * @property ZERO
-	 * @type Fraction
-	 * @static
-	 * @final
-	 */
-	Fraction.ZERO = new Fraction(0, 1);
-	/**
-	 *<code>Fraction</code> representation of 1.
-	 * @property ONE
-	 * @type Fraction
-	 * @static
-	 * @final
-	 */
-	Fraction.ONE = new Fraction(1, 1);
+  normalize() {
+    const gcf = Fraction.gcf(this.numerator, this.denominator);
+    this.numerator /= gcf;
+    this.denominator /= gcf;
+    if (this.denominator < 0) {
+      this.numerator *= -1;
+      this.denominator *= -1;
+    }
+    return this;
+  }
 
-	return Fraction;
-})();
+  static gcf(a, b) {
+    if (arguments.length < 2) {
+      return a;
+    }
+    let c;
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b) {
+      c = a % b;
+      a = b;
+      b = c;
+    }
+    return a;
+  }
+
+  static parse(s) {
+    const split = s.split('/');
+    const n = parseInt(split[0].trim(), 10);
+    if (isNaN(n)) {
+      throw "can't parse: " + s;
+    }
+    if (split.length === 1) {
+      return new Fraction(n, 1);
+    }
+    const d = parseInt(split[1].trim(), 10);
+    if (isNaN(d)) {
+      throw "can't parse: " + s;
+    }
+    return new Fraction(n, d);
+  }
+}
+
+Fraction.ZERO = new Fraction(0, 1);
+Fraction.ONE = new Fraction(1, 1);
