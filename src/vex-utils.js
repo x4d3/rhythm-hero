@@ -175,7 +175,7 @@ export function generateMeasuresCanvases(measureWidth, measureHeight, measures) 
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = measureWidth * measures.length;
   tempCanvas.height = measureHeight;
-  const context = tempCanvas.getContext('2d');
+  const context = tempCanvas.getContext('2d', { willReadFrequently: true });
   const renderer = new VF.Renderer(tempCanvas, VF.Renderer.Backends.CANVAS);
   const ctx = renderer.getContext();
   let currentTimeSignature = null;

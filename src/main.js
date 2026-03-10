@@ -142,9 +142,9 @@ closeIcon.addEventListener('click', () => {
 settings.onChange('displayCanvas', (show) => {
   const navbar = document.querySelector('.navbar');
   const mainContainer = document.getElementById('main-container');
-  navbar.classList.toggle('hidden', show);
-  mainContainer.classList.toggle('hidden', show);
-  appContainer.classList.toggle('hidden', !show);
+  navbar.classList.toggle('js-hidden', show);
+  mainContainer.classList.toggle('js-hidden', show);
+  appContainer.classList.toggle('js-hidden', !show);
 
   if (show) {
     beginnerIcon.classList.toggle('on', settings.get('beginnerMode'));
@@ -157,7 +157,7 @@ settings.onChange('beginnerModeEnabled', (enabled) => {
 });
 
 // Initialize display state
-appContainer.classList.add('hidden');
+appContainer.classList.add('js-hidden');
 soundIcon.classList.toggle('on', settings.get('soundsOn'));
 beginnerIcon.classList.toggle('on', settings.get('beginnerMode'));
 
@@ -165,11 +165,11 @@ beginnerIcon.classList.toggle('on', settings.get('beginnerMode'));
 const onDown = (event) => application.onEvent(false, event);
 const onUp = (event) => application.onEvent(true, event);
 
-document.body.addEventListener('touchstart', onDown);
+document.body.addEventListener('touchstart', onDown, { passive: false });
 document.body.addEventListener('mousedown', onDown);
-document.body.addEventListener('touchend', onUp);
+document.body.addEventListener('touchend', onUp, { passive: false });
 document.body.addEventListener('mouseup', onUp);
-document.body.addEventListener('touchcancel', onUp);
+document.body.addEventListener('touchcancel', onUp, { passive: false });
 document.body.addEventListener('keydown', onDown);
 document.body.addEventListener('keyup', onUp);
 
@@ -181,10 +181,10 @@ window.addEventListener('blur', () => {
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.classList.add('show');
-  modal.style.display = 'block';
   // Create backdrop
   const backdrop = document.createElement('div');
-  backdrop.className = 'modal-backdrop';
+  backdrop.className = 'fixed inset-0 bg-black/50 z-40';
+  backdrop.dataset.modalBackdrop = modalId;
   backdrop.addEventListener('click', () => closeModal(modalId));
   document.body.appendChild(backdrop);
 }
@@ -192,8 +192,7 @@ function openModal(modalId) {
 function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.classList.remove('show');
-  modal.style.display = 'none';
-  const backdrop = document.querySelector('.modal-backdrop');
+  const backdrop = document.querySelector(`[data-modal-backdrop="${modalId}"]`);
   if (backdrop) backdrop.remove();
 }
 
@@ -222,13 +221,14 @@ function renderScores() {
   const campaignEmpty = document.getElementById('campaign-scores-empty');
   campaignBody.innerHTML = '';
   if (scores.campaign.length === 0) {
-    campaignEmpty.classList.remove('hidden');
+    campaignEmpty.classList.remove('js-hidden');
   } else {
-    campaignEmpty.classList.add('hidden');
+    campaignEmpty.classList.add('js-hidden');
     scores.campaign.forEach((score, index) => {
       const level = levelManager.getLevel(index);
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${level.description}</td><td class="text-right score">${ScoreScreen.formatTotal(score)}</td><td class="text-right"><button type="button" class="btn btn-default" data-modal-dismiss>Retry</button></td>`;
+      tr.className = 'border-b border-stone-700/50';
+      tr.innerHTML = `<td class="py-2 text-stone-300">${level.description}</td><td class="text-right score py-2">${ScoreScreen.formatTotal(score)}</td><td class="text-right py-2"><button type="button" class="px-3 py-1 rounded bg-amber-700 hover:bg-amber-600 text-amber-50 text-sm transition cursor-pointer">Retry</button></td>`;
       tr.querySelector('button').addEventListener('click', () => {
         closeModal('scores-modal');
         initAudio(() => application.campaign(index));
@@ -244,13 +244,14 @@ function renderScores() {
   const practiceScores = scores.practice;
   const practiceKeys = Object.keys(practiceScores);
   if (practiceKeys.length === 0) {
-    practiceEmpty.classList.remove('hidden');
+    practiceEmpty.classList.remove('js-hidden');
   } else {
-    practiceEmpty.classList.add('hidden');
+    practiceEmpty.classList.add('js-hidden');
     practiceKeys.forEach(key => {
       const split = key.split('#');
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>Difficulty: ${split[0]} Tempo:${split[1]}</td><td class="text-right score">${ScoreScreen.formatTotal(practiceScores[key])}</td>`;
+      tr.className = 'border-b border-stone-700/50';
+      tr.innerHTML = `<td class="py-2 text-stone-300">Difficulty: ${split[0]} Tempo:${split[1]}</td><td class="text-right score py-2">${ScoreScreen.formatTotal(practiceScores[key])}</td>`;
       practiceBody.appendChild(tr);
     });
   }
@@ -269,11 +270,10 @@ document.getElementById('btn-reset-scores').addEventListener('click', () => {
 
 // Navbar collapse toggle
 const navbarToggle = document.querySelector('.navbar-toggle');
-const navbarCollapse = document.getElementById('navbar-main');
+const navbarMobile = document.getElementById('navbar-mobile');
 if (navbarToggle) {
   navbarToggle.addEventListener('click', () => {
-    navbarCollapse.classList.toggle('in');
-    navbarCollapse.classList.toggle('collapse');
+    navbarMobile.classList.toggle('js-hidden');
   });
 }
 
