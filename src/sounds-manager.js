@@ -1,39 +1,39 @@
-RH.SoundsManager = (function() {
-	'use strict';
-	var SoundsManager = {};
+'use strict';
 
-	$.mbAudio.sounds = {
+const SPRITES = {
+  TIC: { start: 0, end: 0.16 },
+  TOC: { start: 0.27, end: 0.425 },
+};
 
-		backgroundSprite: {},
+class SoundsManager {
+  constructor() {
+    this.audioContext = null;
+    this.audioBuffer = null;
+    this.initialized = false;
+  }
 
-		effectSprite: {
-			id: "effectSprite",
-			ogg: "sounds/sprites.ogg",
-			mp3: "sounds/sprites.mp3",
-			sprite: {
-				TIC: {
-					id: "TIC",
-					start: 0,
-					end: 0.16,
-					loop: false
-				},
-				TOC: {
-					id: "TOC",
-					start: 0.27,
-					end: 0.425,
-					loop: false
-				}
-			}
-		}
-	};
+  async init() {
+    this.audioContext = new AudioContext();
+    const response = await fetch('/sounds/sprites.mp3');
+    const arrayBuffer = await response.arrayBuffer();
+    this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+    this.initialized = true;
+  }
 
-	SoundsManager.play = function(id) {
-		if (RH.Parameters.model.soundsOn()) {
-			$.mbAudio.play('effectSprite', id);
-		}
-	};
-	// in milliseconds
-	SoundsManager.NOTE_DURATION = 160;
+  play(id, soundsOn) {
+    if (!soundsOn || !this.initialized) return;
+    if (this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
+    }
+    const sprite = SPRITES[id];
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.audioBuffer;
+    source.connect(this.audioContext.destination);
+    source.start(0, sprite.start, sprite.end - sprite.start);
+  }
+}
 
-	return SoundsManager;
-}());
+export const soundsManager = new SoundsManager();
+
+// in milliseconds
+export const NOTE_DURATION = 160;
