@@ -143,4 +143,9 @@ td.score{
 
 .modal.show {
 	display: block;
+	opacity: 1;
+}
+
+.modal.show .modal-dialog {
+	margin-top: 60px;
 }
