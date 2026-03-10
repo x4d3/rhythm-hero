@@ -3,6 +3,7 @@ name: Deploy to GitHub Pages
 on:
   pull_request:
     branches: [master]
+    types: [opened, synchronize, reopened, closed]
 
 permissions:
   contents: write
