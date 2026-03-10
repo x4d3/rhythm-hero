@@ -3,13 +3,24 @@ name: Deploy to GitHub Pages
 on:
   pull_request:
     branches: [master]
-    types: [closed]
 
 permissions:
   contents: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
   deploy:
+    needs: test
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
@@ -21,7 +32,6 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm test
 
       - name: Bump version and tag with PR info
         env:
