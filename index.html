@@ -1,164 +1,197 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<title>Rhythm Hero</title>
 		<link href='/favicon.ico' rel="icon" type='image/x-icon' />
-		<link rel="stylesheet" media="screen" href="/bootstrap.css" type="text/css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 	</head>
-	<body class="loading">
-		<div class="navbar navbar-default navbar-fixed-top">
-			<div class="container">
-				<div class="navbar-header">
-					<a href="/" class="navbar-brand">Rhythm Hero</a>
-					<button class="navbar-toggle" type="button">
-					<span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-					</button>
+	<body class="loading bg-stone-950 text-stone-200 min-h-screen">
+		<!-- Navbar -->
+		<nav class="navbar fixed top-0 w-full bg-stone-900/95 backdrop-blur border-b border-stone-700/50 z-50">
+			<div class="max-w-5xl mx-auto px-4 flex items-center justify-between h-14">
+				<a href="/" class="font-display text-xl font-bold text-amber-100 tracking-wide">Rhythm Hero</a>
+				<button class="navbar-toggle md:hidden p-2 rounded text-stone-400 hover:text-amber-200 hover:bg-stone-800" type="button">
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+					</svg>
+				</button>
+				<div id="navbar-main" class="hidden md:flex items-center gap-6">
+					<a href="#" data-modal-target="help-modal" class="text-stone-400 hover:text-amber-200 transition">Help</a>
+					<a href="#" data-modal-target="options-modal" class="text-stone-400 hover:text-amber-200 transition">Options</a>
+					<a href="#" data-modal-target="scores-modal" class="text-stone-400 hover:text-amber-200 transition">Scores</a>
+					<span class="hidden md:block w-px h-5 bg-stone-700"></span>
+					<a href="https://github.com/x4d3/rhythm-hero" class="text-stone-500 hover:text-amber-200 transition">GitHub</a>
+					<a href="http://xade.eu" class="text-stone-500 hover:text-amber-200 transition">xade.eu</a>
 				</div>
-				<div class="navbar-collapse collapse" id="navbar-main">
-					<ul class="nav navbar-nav">
-						<li><a href="#" data-modal-target="help-modal">Help</a></li>
-						<li><a href="#" data-modal-target="options-modal">Options</a></li>
-						<li><a href="#" data-modal-target="scores-modal">Scores</a></li>
-					</ul>
-					<ul class="nav navbar-nav navbar-right">
-						<li><a href="https://github.com/x4d3/rhythm-hero">GitHub</a></li>
-						<li><a href="http://xade.eu">xade.eu</a></li>
-					</ul>
-				</div>
+			</div>
+			<!-- Mobile menu -->
+			<div id="navbar-mobile" class="js-hidden md:hidden border-t border-stone-700/50 bg-stone-900 px-4 py-3 space-y-2">
+				<a href="#" data-modal-target="help-modal" class="block text-stone-400 hover:text-amber-200 py-1">Help</a>
+				<a href="#" data-modal-target="options-modal" class="block text-stone-400 hover:text-amber-200 py-1">Options</a>
+				<a href="#" data-modal-target="scores-modal" class="block text-stone-400 hover:text-amber-200 py-1">Scores</a>
+				<hr class="border-stone-700/50">
+				<a href="https://github.com/x4d3/rhythm-hero" class="block text-stone-500 hover:text-amber-200 py-1">GitHub</a>
+				<a href="http://xade.eu" class="block text-stone-500 hover:text-amber-200 py-1">xade.eu</a>
+			</div>
+		</nav>
+
+		<!-- Main Content -->
+		<div id="main-container" class="pt-24 pb-16 flex flex-col items-center justify-center min-h-screen">
+			<div class="text-center mb-14">
+				<p class="text-6xl mb-6 opacity-40">&#119070;</p>
+				<h1 class="font-display text-5xl md:text-6xl font-bold tracking-tight text-amber-50 mb-3">Rhythm Hero</h1>
+				<p><a id="app-version" href="#" class="text-sm text-stone-600 hover:text-stone-500 transition"></a></p>
+				<p class="font-display italic text-lg text-stone-400 mt-3">Learn to read rhythm on sheet music</p>
+			</div>
+			<div class="flex flex-col gap-3 w-64">
+				<button id="btn-practice" class="w-full py-3 px-6 rounded-lg bg-amber-700 hover:bg-amber-600 text-amber-50 font-semibold transition cursor-pointer shadow-lg shadow-amber-900/30">Practice</button>
+				<button id="btn-campaign" class="w-full py-3 px-6 rounded-lg bg-amber-700 hover:bg-amber-600 text-amber-50 font-semibold transition cursor-pointer shadow-lg shadow-amber-900/30">Campaign</button>
+				<button data-modal-target="options-modal" class="w-full py-3 px-6 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 font-semibold transition cursor-pointer border border-stone-700">Options</button>
 			</div>
 		</div>
-		<div class="container" id="main-container">
-			<div class="page-header" id="banner">
-				<div class="row">
-					<div class="col-lg-8 col-md-7 col-sm-6">
-						<h1>Rhythm Hero</h1>
-						<p class="lead"><a id="app-version" href="#"></a></p>
-						<p class="lead">Learn your rhythm playing</p>
-					</div>
-				</div>
+
+		<!-- Game Canvas Container -->
+		<div class="application-container js-hidden">
+			<div class="rh-icons">
+				<button id="icon-beginner" class="rh-icon" title="Beginner Mode">
+					<svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+					<svg class="icon-on" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+				</button>
+				<button id="icon-sound" class="rh-icon" title="Sound">
+					<svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+					<svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+				</button>
+				<button id="icon-close" class="rh-icon" title="Close">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+				</button>
 			</div>
-			<div class="row">
-				<div class="col-lg-4"></div>
-				<div class="col-lg-4 text-center">
-					<button id="btn-practice" class="btn btn-default btn-block">Practice</button>
-					<button id="btn-campaign" class="btn btn-default btn-block">Campaign</button>
-					<button class="btn btn-default btn-block" data-modal-target="options-modal">Options</button>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-2"></div>
-				<div class="col-lg-10 result"></div>
-			</div>
-		</div>
-		<div class="application-container hidden">
-			<div id="icon-beginner" class="rh-icon beginner-mode"></div>
-			<div id="icon-sound" class="rh-icon switch-sound"></div>
-			<div id="icon-close" class="rh-icon close-app"></div>
 			<canvas class="application" width=800 height=300></canvas>
 		</div>
+
 		<!-- Loading overlay -->
 		<div class="loading-modal">
 			<div class="message">
-				<img src="/images/loading.gif" /><i>Loading...</i>
+				<img src="/images/loading.gif" /><i class="pl-2">Loading...</i>
 			</div>
 		</div>
+
 		<!-- Scores Modal -->
-		<div id="scores-modal" class="modal fade" role="dialog" tabindex="-1" style="display:none">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-modal-dismiss>&times;</button>
-						<h4 class="modal-title">Scores</h4>
-					</div>
-					<div class="modal-body">
-						<h3>Campaign</h3>
-						<p id="campaign-scores-empty">You haven't any score yet.</p>
-						<table class="table scores">
-							<tbody id="campaign-scores-body"></tbody>
-						</table>
-						<h3>Practice</h3>
-						<p id="practice-scores-empty">You haven't any score yet.</p>
-						<table class="table scores">
-							<tbody id="practice-scores-body"></tbody>
-						</table>
-					</div>
-					<div class="modal-footer">
-						<button type="button" id="btn-reset-scores" class="btn btn-default">Reset Scores</button>
-						<button type="button" class="btn btn-default" data-modal-dismiss>Close</button>
-					</div>
+		<div id="scores-modal" class="modal fixed inset-0 z-50 flex items-center justify-center" style="display:none">
+			<div class="bg-stone-900 rounded-xl shadow-2xl border border-stone-700/50 w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
+				<div class="flex items-center justify-between px-6 py-4 border-b border-stone-700/50">
+					<h4 class="font-display text-lg font-bold text-amber-100">Scores</h4>
+					<button type="button" class="text-stone-500 hover:text-amber-200 text-2xl leading-none cursor-pointer" data-modal-dismiss>&times;</button>
+				</div>
+				<div class="px-6 py-4 overflow-y-auto">
+					<h3 class="font-display text-md font-semibold text-amber-400 mb-2">Campaign</h3>
+					<p id="campaign-scores-empty" class="text-stone-500 text-sm italic mb-4">No scores yet.</p>
+					<table class="w-full mb-6">
+						<tbody id="campaign-scores-body"></tbody>
+					</table>
+					<h3 class="font-display text-md font-semibold text-amber-400 mb-2">Practice</h3>
+					<p id="practice-scores-empty" class="text-stone-500 text-sm italic mb-4">No scores yet.</p>
+					<table class="w-full">
+						<tbody id="practice-scores-body"></tbody>
+					</table>
+				</div>
+				<div class="flex justify-end gap-3 px-6 py-4 border-t border-stone-700/50">
+					<button type="button" id="btn-reset-scores" class="px-4 py-2 rounded-lg bg-red-900/30 text-red-400 hover:bg-red-900/50 transition cursor-pointer">Reset Scores</button>
+					<button type="button" class="px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 transition cursor-pointer border border-stone-700" data-modal-dismiss>Close</button>
 				</div>
 			</div>
 		</div>
+
 		<!-- Help Modal -->
-		<div id="help-modal" class="modal fade" role="dialog" tabindex="-1" style="display:none">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-modal-dismiss>&times;</button>
-						<h4 class="modal-title">How to play Rhythm-Hero</h4>
-					</div>
-					<div class="modal-body">
-						<p>Press the rhythm while the music is displayed.</p>
-						<p>Pay attention to the metronome, he is the one giving you the beat.</p>
-						<p>Don't hesitate to start the practice mode, to get the hang of it.</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-modal-dismiss>Close</button>
-					</div>
+		<div id="help-modal" class="modal fixed inset-0 z-50 flex items-center justify-center" style="display:none">
+			<div class="bg-stone-900 rounded-xl shadow-2xl border border-stone-700/50 w-full max-w-lg mx-4">
+				<div class="flex items-center justify-between px-6 py-4 border-b border-stone-700/50">
+					<h4 class="font-display text-lg font-bold text-amber-100">How to Play</h4>
+					<button type="button" class="text-stone-500 hover:text-amber-200 text-2xl leading-none cursor-pointer" data-modal-dismiss>&times;</button>
+				</div>
+				<div class="px-6 py-4 space-y-3 text-stone-300">
+					<p>Press the rhythm while the music is displayed.</p>
+					<p>Pay attention to the metronome, he is the one giving you the beat.</p>
+					<p>Don't hesitate to start the practice mode, to get the hang of it.</p>
+				</div>
+				<div class="flex justify-end px-6 py-4 border-t border-stone-700/50">
+					<button type="button" class="px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 transition cursor-pointer border border-stone-700" data-modal-dismiss>Close</button>
 				</div>
 			</div>
 		</div>
+
 		<!-- Options Modal -->
-		<div id="options-modal" class="modal fade" role="dialog" tabindex="-1" style="display:none">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-modal-dismiss>&times;</button>
-						<h4 class="modal-title">Options</h4>
-					</div>
-					<div class="modal-body">
-						<form id="options-form">
-							<div class="checkbox">
-								<label><input type="checkbox" id="beginner-mode-checkbox"> Beginner Mode</label>
+		<div id="options-modal" class="modal fixed inset-0 z-50 flex items-center justify-center" style="display:none">
+			<div class="bg-stone-900 rounded-xl shadow-2xl border border-stone-700/50 w-full max-w-lg mx-4">
+				<div class="flex items-center justify-between px-6 py-4 border-b border-stone-700/50">
+					<h4 class="font-display text-lg font-bold text-amber-100">Options</h4>
+					<button type="button" class="text-stone-500 hover:text-amber-200 text-2xl leading-none cursor-pointer" data-modal-dismiss>&times;</button>
+				</div>
+				<div class="px-6 py-4">
+					<form id="options-form" class="space-y-4">
+						<label class="flex items-center gap-2 cursor-pointer">
+							<input type="checkbox" id="beginner-mode-checkbox" class="w-4 h-4 rounded border-stone-600 bg-stone-800 text-amber-600 focus:ring-amber-500">
+							<span>Beginner Mode</span>
+						</label>
+						<label class="flex items-center gap-2 cursor-pointer">
+							<input type="checkbox" id="with-life-checkbox" class="w-4 h-4 rounded border-stone-600 bg-stone-800 text-amber-600 focus:ring-amber-500">
+							<span>With Life</span>
+						</label>
+						<div>
+							<label for="difficulty-select" class="block text-sm text-stone-400 mb-1">Difficulty</label>
+							<select class="w-full rounded-lg bg-stone-800 border border-stone-700 text-stone-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500" id="difficulty-select"></select>
+						</div>
+						<div>
+							<label for="timesignature-select" class="block text-sm text-stone-400 mb-1">Time Signature</label>
+							<select class="w-full rounded-lg bg-stone-800 border border-stone-700 text-stone-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500" id="timesignature-select"></select>
+						</div>
+						<div>
+							<label for="tempo-select" class="block text-sm text-stone-400 mb-1">Tempo</label>
+							<select class="w-full rounded-lg bg-stone-800 border border-stone-700 text-stone-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500" id="tempo-select"></select>
+						</div>
+						<div>
+							<p class="text-sm text-stone-400 mb-2">Scrolling Direction</p>
+							<div class="flex gap-4">
+								<label class="flex items-center gap-2 cursor-pointer">
+									<input type="radio" name="scrolling-direction" value="horizontal" class="text-amber-600 focus:ring-amber-500 bg-stone-800 border-stone-600">
+									<span>Horizontal</span>
+								</label>
+								<label class="flex items-center gap-2 cursor-pointer">
+									<input type="radio" name="scrolling-direction" value="vertical" class="text-amber-600 focus:ring-amber-500 bg-stone-800 border-stone-600">
+									<span>Vertical</span>
+								</label>
 							</div>
-							<div class="checkbox">
-								<label><input type="checkbox" id="with-life-checkbox"> With Life</label>
+						</div>
+						<div>
+							<p class="text-sm text-stone-400 mb-2">Scrolling Mode</p>
+							<div class="flex gap-4">
+								<label class="flex items-center gap-2 cursor-pointer">
+									<input type="radio" name="scrolling-mode" value="continuous" class="text-amber-600 focus:ring-amber-500 bg-stone-800 border-stone-600">
+									<span>Continuous</span>
+								</label>
+								<label class="flex items-center gap-2 cursor-pointer">
+									<input type="radio" name="scrolling-mode" value="perMeasure" class="text-amber-600 focus:ring-amber-500 bg-stone-800 border-stone-600">
+									<span>Per Measure</span>
+								</label>
 							</div>
-							<fieldset class="form-group">
-								<label for="difficulty-select">Difficulty</label>
-								<select class="form-control" id="difficulty-select"></select>
-							</fieldset>
-							<fieldset class="form-group">
-								<label for="timesignature-select">Time Signature</label>
-								<select class="form-control" id="timesignature-select"></select>
-							</fieldset>
-							<fieldset class="form-group">
-								<label for="tempo-select">Tempo</label>
-								<select class="form-control" id="tempo-select"></select>
-							</fieldset>
-							<label>Scrolling Direction</label>
-							<div class="radio">
-								<label><input type="radio" name="scrolling-direction" value="horizontal"> Horizontal</label>
-							</div>
-							<div class="radio">
-								<label><input type="radio" name="scrolling-direction" value="vertical"> Vertical</label>
-							</div>
-							<label>Scrolling Mode</label>
-							<div class="radio">
-								<label><input type="radio" name="scrolling-mode" value="continuous"> Continuous</label>
-							</div>
-							<div class="radio">
-								<label><input type="radio" name="scrolling-mode" value="perMeasure"> Per Measure</label>
-							</div>
-						</form>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-modal-dismiss>Close</button>
-					</div>
+						</div>
+					</form>
+				</div>
+				<div class="flex justify-end px-6 py-4 border-t border-stone-700/50">
+					<button type="button" class="px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 transition cursor-pointer border border-stone-700" data-modal-dismiss>Close</button>
 				</div>
 			</div>
 		</div>
+
+		<!-- Rotate phone prompt (portrait mobile only) -->
+		<div id="rotate-prompt" class="fixed inset-0 z-[100] bg-stone-950 flex flex-col items-center justify-center text-center px-8">
+			<p class="text-5xl mb-4 opacity-40">&#119070;</p>
+			<p class="font-display text-xl font-bold text-amber-100 mb-2">Rotate your device</p>
+			<p class="text-stone-400">This game is best played in landscape mode</p>
+		</div>
+
 		<script type="module" src="/src/main.js"></script>
 	</body>
 </html>

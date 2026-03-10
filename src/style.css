@@ -1,75 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+	--font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+}
+
 body {
 	margin: 0px;
 }
 
 .application-container {
-	top: 0;
-	bottom: 0;
-	right: 0;
-	left: 0;
-	height: 80%;
-	margin: auto;
-	position: absolute;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: calc(100% - 16px);
+	max-width: 1100px;
+	background: #1c1917;
+	border: 2px solid #44403c;
+	border-radius: 8px;
+}
+
+.application-container canvas {
 	width: 100%;
-	background: #eed;
-	border: 10px solid #ddc;
-	moz-border-radius: 5px;
-	webkit-border-radius: 5px;
+	height: auto;
+	display: block;
 }
 
 canvas {
 	background: #eed;
 }
 
-.application {
-	height: 80%;
-	width: 100%;
+.rh-icons {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	padding: 8px 8px 4px;
 }
 
 .rh-icon {
-	background-position: 2px 2px;
-	background-repeat: no-repeat;
-	background-size: 28px;
-	height: 32px;
-	width: 32px;
-	top: -42px;
-	position: absolute;
+	width: 28px;
+	height: 28px;
 	cursor: pointer;
+	color: #a8a29e;
+	background: none;
+	border: none;
+	padding: 0;
+	transition: color 0.15s;
 }
 
 .rh-icon:hover {
-	background-position: 0 0px;
-	background-size: 32px;
+	color: #fbbf24;
 }
 
-.rh-icon.switch-sound{
-	background-image: url("/images/sound-off.png");
-	right: 42px;
-
+.rh-icon svg {
+	width: 100%;
+	height: 100%;
 }
 
-.rh-icon.switch-sound.on {
-	background-image: url("/images/sound-on.png");
+.rh-icon .icon-on {
+	display: none;
 }
 
-.rh-icon.beginner-mode{
-	background-image: url("/images/beginner-off.png");
-	right: 84px;
-}
-.rh-icon.beginner-mode.on {
-	background-image: url("/images/beginner-on.png");
+.rh-icon .icon-off {
+	display: block;
 }
 
-.rh-icon.close-app {
-	background-image: url("/images/close.png");
-	right: 0px;
+.rh-icon.on .icon-on {
+	display: block;
+	color: #fbbf24;
 }
 
-/* Start by setting display:none to make this hidden.
-   Then we position it in relation to the viewport window
-   with position:fixed. Width, height, top and left speak
-   for themselves. Background we set to 80% white with
-   our animation centered, and no-repeating */
+.rh-icon.on .icon-off {
+	display: none;
+}
+
 .loading-modal {
 	display: none;
 	position: fixed;
@@ -78,69 +82,58 @@ canvas {
 	left: 0;
 	height: 100%;
 	width: 100%;
-	background: rgba(255, 255, 255, .8);
+	background: rgba(0, 0, 0, .7);
 }
 
 .loading-modal .message {
 	position: absolute;
 	top: 50%;
-	bottom: 50%;
 	left: 50%;
-	right: 50%;
+	transform: translate(-50%, -50%);
+	color: #e7e5e4;
 }
 
 .loading-modal img {
 	float: left;
 }
 
-.loading-modal i {
-	padding-left: 5px;
-}
-
-/* When the body has the loading class, we turn
-   the scrollbar off with overflow:hidden */
 body.loading {
 	overflow: hidden;
 }
 
-/* Anytime the body has the loading class, our
-   modal element will be visible */
 body.loading .loading-modal {
 	display: block;
 }
 
-.table.scores tbody>tr>td{
-    vertical-align: middle;
-}
-
-td.score{
+td.score {
 	font-family: "scoreboard";
 	font-size: 2em;
 }
 
 @font-face {
-    font-family: 'scoreboard';
-    src: url('/fonts/scoreboard.ttf');
+	font-family: 'scoreboard';
+	src: url('/fonts/scoreboard.ttf');
 }
 @font-face {
-    font-family: 'arcadeclassic';
-    src: url('/fonts/dpcomic.ttf');
+	font-family: 'arcadeclassic';
+	src: url('/fonts/dpcomic.ttf');
 }
 
-.hidden {
+.js-hidden {
 	display: none !important;
 }
 
-.modal-backdrop {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.5);
-	z-index: 1040;
+.modal.show {
+	display: flex !important;
 }
 
-.modal.show {
-	display: block;
+/* Rotate prompt: visible only on small portrait screens */
+#rotate-prompt {
+	display: none;
+}
+
+@media (max-width: 767px) and (orientation: portrait) {
+	#rotate-prompt {
+		display: flex;
+	}
 }

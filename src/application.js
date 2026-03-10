@@ -125,7 +125,8 @@ export default class Application {
     if (event.keyCode === 27) {
       this.stop();
     }
-    if (!event.ctrlKey && this.screen !== null) {
+    const isIcon = event.target && event.target.closest && event.target.closest('.rh-icon');
+    if (!event.ctrlKey && this.screen !== null && !isIcon) {
       event.preventDefault();
     }
   }

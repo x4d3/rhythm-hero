@@ -1,27 +1,52 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
+  pull_request:
     branches: [master]
 
 permissions:
   contents: write
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
-
-      - run: npm ci
+      - uses: actions/cache@v4
+        id: node-modules-cache
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+      - if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: npm ci
       - run: npm test
 
-      - name: Bump version
+  deploy:
+    needs: test
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/cache@v4
+        id: node-modules-cache
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+      - if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Bump version and tag with PR info
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -29,9 +54,21 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           git add package.json package-lock.json
           git commit -m "v${VERSION} [skip ci]"
-          git tag -a "v${VERSION}" -m "v${VERSION}"
 
-      - run: npm run build
+          TAG_MESSAGE=$(cat <<EOF
+          v${VERSION} — PR #${PR_NUMBER}: ${PR_TITLE}
+
+          ${PR_BODY}
+
+          ${PR_URL}
+          EOF
+          )
+          git tag -a "v${VERSION}" -m "${TAG_MESSAGE}"
+
+      - name: Build
+        env:
+          APP_PR_URL: ${{ github.event.pull_request.html_url }}
+        run: npm run build
 
       - uses: peaceiris/actions-gh-pages@v4
         with:
